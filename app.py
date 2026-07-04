@@ -705,6 +705,9 @@ elif menu == "🔍 EDA Explorer":
               # =========================
         # TAB 4 - CORRELATION
         # =========================
+               # =========================
+        # TAB 4 - CORRELATION
+        # =========================
         with tab4:
             corr = filtered_df[numeric_cols].corr()
 
@@ -712,9 +715,15 @@ elif menu == "🔍 EDA Explorer":
                 corr,
                 text_auto=".2f",
                 aspect="auto",
-                color_continuous_scale="RdBu_r",
                 zmin=-1,
                 zmax=1,
+                color_continuous_scale=[
+                    [0.0, "#7f1d1d"],   # merah gelap untuk korelasi negatif kuat
+                    [0.25, "#b91c1c"],
+                    [0.5, "#1f2937"],   # netral gelap di tengah
+                    [0.75, "#0f766e"],
+                    [1.0, "#14b8a6"]    # teal terang untuk korelasi positif kuat
+                ],
                 title="Heatmap Korelasi Antar Komoditas"
             )
 
@@ -734,7 +743,6 @@ elif menu == "🔍 EDA Explorer":
                 margin=dict(l=40, r=30, t=70, b=40)
             )
 
-            # update colorbar secara aman
             fig.update_coloraxes(
                 colorbar=dict(
                     title=dict(
@@ -746,6 +754,9 @@ elif menu == "🔍 EDA Explorer":
             )
 
             st.plotly_chart(fig, use_container_width=True)
+
+            st.plotly_chart(fig, use_container_width=True)
+            
         # =========================
         # TAB 5 - PROVINCE DEEP DIVE
         # =========================
