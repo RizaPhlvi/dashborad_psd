@@ -16,7 +16,7 @@ from sklearn.model_selection import train_test_split
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Premium Dashboard Komoditas Perkebunan Indonesia",
+    page_title="Dashboard Komoditas Perkebunan Indonesia",
     page_icon="🌾",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -681,16 +681,42 @@ elif menu == "🔍 EDA Explorer":
                         unsafe_allow_html=True
                     )
 
-        with tab4:
-            corr = filtered_df[numeric_cols].corr()
-            fig = px.imshow(
-                corr,
-                aspect="auto",
-                color_continuous_scale="RdBu_r",
-                title="Heatmap Korelasi Antar Komoditas"
-            )
-            fig = apply_dark_layout(fig, 650)
-            st.plotly_chart(fig, use_container_width=True)
+       with tab4:
+    corr = filtered_df[numeric_cols].corr()
+
+    fig = px.imshow(
+        corr,
+        text_auto=".2f",   # menampilkan angka korelasi
+        aspect="auto",
+        color_continuous_scale="RdBu_r",
+        zmin=-1,
+        zmax=1,
+        title="Heatmap Korelasi Antar Komoditas"
+    )
+
+    fig.update_traces(
+        textfont=dict(color="white", size=12)
+    )
+
+    fig.update_xaxes(side="bottom", tickangle=30)
+    fig.update_yaxes(autorange="reversed")
+
+    fig.update_layout(
+        paper_bgcolor="#111827",
+        plot_bgcolor="#111827",
+        font=dict(color="#f8fafc"),
+        margin=dict(l=40, r=30, t=70, b=40),
+        coloraxis_colorbar=dict(
+            title="Korelasi",
+            tickfont=dict(color="#f8fafc"),
+            titlefont=dict(color="#f8fafc")
+        )
+    )
+
+    # beri jarak antar kotak agar heatmap lebih jelas
+    fig.update_traces(xgap=2, ygap=2)
+
+    st.plotly_chart(fig, use_container_width=True)
 
         with tab5:
             province_pick = st.selectbox("Pilih provinsi", filtered_df["Provinsi"].tolist(), key="deep_prov")
