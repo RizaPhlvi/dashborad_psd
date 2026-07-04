@@ -408,7 +408,7 @@ def apply_dark_layout(fig, height=500):
 # =========================================================
 st.markdown("""
 <div class="hero-wrap">
-    <div class="hero-title">🌾 Premium Dashboard Komoditas Perkebunan Indonesia</div>
+    <div class="hero-title">🌾 Dashboard Komoditas Perkebunan Indonesia</div>
     <div class="hero-subtitle">
         Dashboard analitik interaktif untuk eksplorasi, visualisasi, dan pemodelan data produksi komoditas perkebunan Indonesia per provinsi (2024). 
         Dirancang dengan pendekatan executive dashboard, EDA interaktif, predictive analytics, dan insight generator yang lebih presentable untuk konteks akademik maupun demonstrasi proyek.
@@ -1253,7 +1253,7 @@ elif menu == "📥 Export Center":
 # =========================================================
 st.markdown("""
 <div class="footer-box">
-    <h3>🎓 Premium Dashboard — UAS Pengenalan Sains Data</h3>
+    <h3>🎓 Dashboard UAS Pengenalan Sains Data</h3>
     <p>Versi dark theme dengan executive dashboard, EDA interaktif, predictive analytics, dan export center.</p>
 </div>
 """, unsafe_allow_html=True)
