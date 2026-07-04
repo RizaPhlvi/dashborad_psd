@@ -702,6 +702,9 @@ elif menu == "🔍 EDA Explorer":
         # =========================
         # TAB 4 - CORRELATION
         # =========================
+              # =========================
+        # TAB 4 - CORRELATION
+        # =========================
         with tab4:
             corr = filtered_df[numeric_cols].corr()
 
@@ -728,16 +731,21 @@ elif menu == "🔍 EDA Explorer":
                 paper_bgcolor="#111827",
                 plot_bgcolor="#111827",
                 font=dict(color="#f8fafc"),
-                margin=dict(l=40, r=30, t=70, b=40),
-                coloraxis_colorbar=dict(
-                    title="Korelasi",
-                    tickfont=dict(color="#f8fafc"),
-                    titlefont=dict(color="#f8fafc")
+                margin=dict(l=40, r=30, t=70, b=40)
+            )
+
+            # update colorbar secara aman
+            fig.update_coloraxes(
+                colorbar=dict(
+                    title=dict(
+                        text="Korelasi",
+                        font=dict(color="#f8fafc")
+                    ),
+                    tickfont=dict(color="#f8fafc")
                 )
             )
 
             st.plotly_chart(fig, use_container_width=True)
-
         # =========================
         # TAB 5 - PROVINCE DEEP DIVE
         # =========================
