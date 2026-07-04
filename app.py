@@ -560,30 +560,40 @@ elif menu == "📈 Proyeksi & Model":
     else:
         tab_lr, tab_fc, tab_rf, tab_dt = st.tabs(["📐 Regresi Linear", "📅 Forecasting 2025", "🌲 Random Forest", "🌳 Decision Tree"])
         
-        # --- TAB 1: REGRESI ---
+               # --- TAB 1: REGRESI ---
         with tab_lr:
             c1, c2 = st.columns(2)
-            x_v = c1.selectbox("Prediktor (X)", numeric_cols, index=1, key="proj_x")
-            y_v = c2.selectbox("Target (Y)", numeric_cols, index=0, key="proj_y")
-            if x_v != y_v:
-                mdf = active_df[[x_v, y_v]].dropna()
+            x_var = c1.selectbox("Prediktor (X)", numeric_cols, index=1, key="proj_x")
+            y_var = c2.selectbox("Target (Y)", numeric_cols, index=0, key="proj_y")
+            
+            if x_var != y_var:
+                mdf = active_df[[x_var, y_var]].dropna()
                 if len(mdf) >= 5:
-                    X, y = mdf[[x_v]].values, mdf[y_v].values
+                    X, y = mdf[[x_var]].values, mdf[y_var].values
                     lr = LinearRegression().fit(X, y)
                     pred = lr.predict(X)
-                    k1,k2,k3 = st.columns(3)
-                    k1.metric("MAE", f"{mean_absolute_error(y,pred):.2f}")
-                    k2.metric("RMSE", f"{math.sqrt(mean_squared_error(y,pred)):.2f}")
-                    k3.metric("R²", f"{r2_score(y,pred):.4f}")
+                    
+                    k1, k2, k3 = st.columns(3)
+                    k1.metric("MAE", f"{mean_absolute_error(y, pred):.2f}")
+                    k2.metric("RMSE", f"{math.sqrt(mean_squared_error(y, pred)):.2f}")
+                    k3.metric("R²", f"{r2_score(y, pred):.4f}")
+                    
                     fig = go.Figure()
-                    fig.add_trace(go.Scatter(x=mdf[x_v], y=mdf[y_v], mode="markers", name="Aktual", marker=dict(color="#4ade80", size=9)))
-                    fig.add_trace(go.Scatter(x=mdf[x_v].values[np.argsort(mdf[x_v].values)], y=pred[np.argsort(mdf[x_v].values)], mode="lines", name="Regresi", line=dict(color="#d4a017", width=3)))
+                    fig.add_trace(go.Scatter(x=mdf[x_var], y=mdf[y_var], mode="markers", name="Aktual", marker=dict(color="#4ade80", size=9)))
+                    sort_idx = np.argsort(mdf[x_var].values)
+                    fig.add_trace(go.Scatter(x=mdf[x_var].values[sort_idx], y=pred[sort_idx], mode="lines", name="Regresi", line=dict(color="#d4a017", width=3)))
+                    fig.update_layout(title=f"Pola Hubungan: {x_var} → {y_var}", xaxis_title=x_var, yaxis_title=y_var)
                     st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="proj_reg")
-                    x_input = st.number_input(f"Input {x_v}:", min_value=0.0, value=float(np.median(mdf[x_v])))
+                    
+                    st.markdown("#### 🎮 Playground Prediksi")
+                    x_input = st.number_input(f"Masukkan volume {x_var} (Ribu Ton):", min_value=0.0, value=float(np.median(mdf[x_var])))
                     pred_val = lr.predict([[x_input]])[0]
-                    st.markdown(f'<div class="insight-card">🌾 Prediksi <b>{y_var}</b> untuk <b>{x_input:.2f}</b>: <b>{pred_val:.2f}</b> ribu ton.</div>', unsafe_allow_html=True)
-                else: st.warning("Data tidak cukup.")
-            else: st.warning("Pilih variabel berbeda.")
+                    
+                    st.markdown(f'<div class="insight-card">🌾 Prediksi <b>{y_var}</b> jika <b>{x_var} = {x_input:.2f}</b> ribu ton adalah <b>{pred_val:.2f}</b> ribu ton.</div>', unsafe_allow_html=True)
+                else: 
+                    st.warning("Data tidak cukup untuk membangun model regresi (minimal 5 observasi).")
+            else: 
+                st.warning("Pilih dua komoditas yang berbeda untuk analisis.")
         
         # --- TAB 2: FORECASTING (GROUPED BAR) ---
         with tab_fc:
