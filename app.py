@@ -1,4 +1,4 @@
-```python
+
 import io
 import math
 import numpy as np
@@ -1080,4 +1080,4 @@ st.markdown("""
     <p>Versi final dengan executive dashboard, EDA interaktif, geo insight, predictive analytics, dan export center.</p>
 </div>
 """, unsafe_allow_html=True)
-```
+
