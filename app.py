@@ -584,14 +584,24 @@ elif menu == "🔍 EDA Explorer":
         st.warning("Tidak ada data untuk filter aktif.")
     else:
         tab1, tab2, tab3, tab4, tab5 = st.tabs([
-            "📌 Overview", "📊 Distribution", "🔗 Relationship", "🔥 Correlation", "📍 Province Deep Dive"
+            "📌 Overview",
+            "📊 Distribution",
+            "🔗 Relationship",
+            "🔥 Correlation",
+            "📍 Province Deep Dive"
         ])
 
+        # =========================
+        # TAB 1 - OVERVIEW
+        # =========================
         with tab1:
             c1, c2 = st.columns([1.2, 1])
 
             with c1:
-                top_df = filtered_df[["Provinsi", selected_commodity]].sort_values(selected_commodity, ascending=False).head(min(top_n, len(filtered_df))).copy()
+                top_df = filtered_df[["Provinsi", selected_commodity]].sort_values(
+                    selected_commodity, ascending=False
+                ).head(min(top_n, len(filtered_df))).copy()
+
                 fig = px.bar(
                     top_df.sort_values(selected_commodity, ascending=True),
                     x=selected_commodity,
@@ -607,6 +617,7 @@ elif menu == "🔍 EDA Explorer":
             with c2:
                 temp = add_total_production(filtered_df)
                 top_total = temp.sort_values("Total Produksi", ascending=False).head(min(top_n, len(temp)))
+
                 fig2 = px.bar(
                     top_total,
                     x="Provinsi",
@@ -624,6 +635,9 @@ elif menu == "🔍 EDA Explorer":
                 unsafe_allow_html=True
             )
 
+        # =========================
+        # TAB 2 - DISTRIBUTION
+        # =========================
         with tab2:
             c1, c2 = st.columns(2)
 
@@ -644,6 +658,7 @@ elif menu == "🔍 EDA Explorer":
                     var_name="Komoditas",
                     value_name="Produksi"
                 )
+
                 fig2 = px.box(
                     melted,
                     x="Komoditas",
@@ -656,6 +671,9 @@ elif menu == "🔍 EDA Explorer":
                 fig2 = apply_dark_layout(fig2, 480)
                 st.plotly_chart(fig2, use_container_width=True)
 
+        # =========================
+        # TAB 3 - RELATIONSHIP
+        # =========================
         with tab3:
             x_var = st.selectbox("Variabel X", numeric_cols, index=0, key="eda_x")
             y_default = 1 if len(numeric_cols) > 1 else 0
@@ -681,44 +699,54 @@ elif menu == "🔍 EDA Explorer":
                         unsafe_allow_html=True
                     )
 
-with tab4:
-    corr = filtered_df[numeric_cols].corr()
+        # =========================
+        # TAB 4 - CORRELATION
+        # =========================
+        with tab4:
+            corr = filtered_df[numeric_cols].corr()
 
-    fig = px.imshow(
-        corr,
-        text_auto=".2f",
-        aspect="auto",
-        color_continuous_scale="RdBu_r",
-        zmin=-1,
-        zmax=1,
-        title="Heatmap Korelasi Antar Komoditas"
-    )
+            fig = px.imshow(
+                corr,
+                text_auto=".2f",
+                aspect="auto",
+                color_continuous_scale="RdBu_r",
+                zmin=-1,
+                zmax=1,
+                title="Heatmap Korelasi Antar Komoditas"
+            )
 
-    fig.update_traces(
-        textfont=dict(color="white", size=12),
-        xgap=2,
-        ygap=2
-    )
+            fig.update_traces(
+                textfont=dict(color="white", size=12),
+                xgap=2,
+                ygap=2
+            )
 
-    fig.update_xaxes(side="bottom", tickangle=30)
-    fig.update_yaxes(autorange="reversed")
+            fig.update_xaxes(side="bottom", tickangle=30)
+            fig.update_yaxes(autorange="reversed")
 
-    fig.update_layout(
-        paper_bgcolor="#111827",
-        plot_bgcolor="#111827",
-        font=dict(color="#f8fafc"),
-        margin=dict(l=40, r=30, t=70, b=40),
-        coloraxis_colorbar=dict(
-            title="Korelasi",
-            tickfont=dict(color="#f8fafc"),
-            titlefont=dict(color="#f8fafc")
-        )
-    )
+            fig.update_layout(
+                paper_bgcolor="#111827",
+                plot_bgcolor="#111827",
+                font=dict(color="#f8fafc"),
+                margin=dict(l=40, r=30, t=70, b=40),
+                coloraxis_colorbar=dict(
+                    title="Korelasi",
+                    tickfont=dict(color="#f8fafc"),
+                    titlefont=dict(color="#f8fafc")
+                )
+            )
 
-    st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True)
 
+        # =========================
+        # TAB 5 - PROVINCE DEEP DIVE
+        # =========================
         with tab5:
-            province_pick = st.selectbox("Pilih provinsi", filtered_df["Provinsi"].tolist(), key="deep_prov")
+            province_pick = st.selectbox(
+                "Pilih provinsi",
+                filtered_df["Provinsi"].tolist(),
+                key="deep_prov"
+            )
             p_df = filtered_df[filtered_df["Provinsi"] == province_pick]
 
             if not p_df.empty:
@@ -729,8 +757,15 @@ with tab4:
                 }).sort_values("Produksi", ascending=False)
 
                 c1, c2 = st.columns([1.1, 1])
+
                 with c1:
-                    fig = px.bar(profile, x="Komoditas", y="Produksi", text="Produksi", title=f"Profil Produksi {province_pick}")
+                    fig = px.bar(
+                        profile,
+                        x="Komoditas",
+                        y="Produksi",
+                        text="Produksi",
+                        title=f"Profil Produksi {province_pick}"
+                    )
                     fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
                     fig = apply_dark_layout(fig, 500)
                     st.plotly_chart(fig, use_container_width=True)
@@ -743,7 +778,13 @@ with tab4:
                     st.metric("Total Produksi Provinsi", format_num(total_p))
                     st.metric("Komoditas Dominan", dom_comm, format_num(dom_val))
 
-                    fig2 = px.pie(profile, names="Komoditas", values="Produksi", hole=0.45, title="Komposisi Komoditas")
+                    fig2 = px.pie(
+                        profile,
+                        names="Komoditas",
+                        values="Produksi",
+                        hole=0.45,
+                        title="Komposisi Komoditas"
+                    )
                     fig2.update_traces(textinfo='percent+label')
                     fig2 = apply_dark_layout(fig2, 420)
                     st.plotly_chart(fig2, use_container_width=True)
