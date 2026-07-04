@@ -681,12 +681,12 @@ elif menu == "🔍 EDA Explorer":
                         unsafe_allow_html=True
                     )
 
-       with tab4:
+with tab4:
     corr = filtered_df[numeric_cols].corr()
 
     fig = px.imshow(
         corr,
-        text_auto=".2f",   # menampilkan angka korelasi
+        text_auto=".2f",
         aspect="auto",
         color_continuous_scale="RdBu_r",
         zmin=-1,
@@ -695,7 +695,9 @@ elif menu == "🔍 EDA Explorer":
     )
 
     fig.update_traces(
-        textfont=dict(color="white", size=12)
+        textfont=dict(color="white", size=12),
+        xgap=2,
+        ygap=2
     )
 
     fig.update_xaxes(side="bottom", tickangle=30)
@@ -712,9 +714,6 @@ elif menu == "🔍 EDA Explorer":
             titlefont=dict(color="#f8fafc")
         )
     )
-
-    # beri jarak antar kotak agar heatmap lebih jelas
-    fig.update_traces(xgap=2, ygap=2)
 
     st.plotly_chart(fig, use_container_width=True)
 
