@@ -1,12 +1,9 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-
-# PENTING: Set backend Matplotlib ke 'Agg' SEBELUM import pyplot
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg') # Fallback aman untuk server headless
 import matplotlib.pyplot as plt
-
 import seaborn as sns
 import io
 import math
@@ -16,7 +13,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # Konfigurasi Halaman Streamlit
 st.set_page_config(page_title="Dashboard UAS Sains Data", layout="wide")
 
-# Embed Dataset langsung ke dalam kode (Mencegah Error File Not Found)
+# Embed Dataset langsung ke dalam kode
 csv_data = """Provinsi,Kelapa Sawit,Kelapa,Karet,Kopi,Kakao,Teh,Tebu
 ACEH,1092.71,64.1,51.17,74.13,34.17,0,0
 SUMATERA UTARA,5120.02,103.64,251.52,91.69,38.48,10.14,14.52
@@ -65,12 +62,10 @@ def load_data():
 df = load_data()
 numeric_cols = df.columns[1:]
 
-# Header Dashboard
 st.title("📊 Dashboard Analisis Komoditas Perkebunan Indonesia (2024)")
 st.markdown("**UAS Pengenalan Sains Data - Visualisasi Data dan Analisis Data Dasar**")
 st.markdown("---")
 
-# Sidebar Navigasi
 menu = st.sidebar.radio("Menu Navigasi UAS", [
     "A. Data Understanding",
     "B. Data Cleaning",
@@ -79,7 +74,6 @@ menu = st.sidebar.radio("Menu Navigasi UAS", [
     "F. Insight & Rekomendasi"
 ])
 
-# --- HALAMAN A: DATA UNDERSTANDING ---
 if menu == "A. Data Understanding":
     st.header("A. Data Understanding")
     st.write("Dataset berisi data Produksi Tanaman Perkebunan Menurut Provinsi dan Jenis Tanaman (Ribu Ton) tahun 2024.")
@@ -105,7 +99,6 @@ if menu == "A. Data Understanding":
     st.subheader("Statistical Describe")
     st.dataframe(df.describe())
 
-# --- HALAMAN B: DATA CLEANING ---
 elif menu == "B. Data Cleaning":
     st.header("B. Data Cleaning")
     
@@ -129,58 +122,50 @@ elif menu == "B. Data Cleaning":
     st.pyplot(fig)
     st.info("**Keputusan:** Outlier tidak dihapus karena merepresentasikan provinsi sentra produksi utama (seperti Riau & Kalteng) yang secara alamiah memang produksinya masif.")
 
-# --- HALAMAN C: EDA (6 VISUALISASI) ---
 elif menu == "C. Exploratory Data Analysis (EDA)":
     st.header("C. Exploratory Data Analysis (EDA)")
     
-    # 1. Bar Chart
     st.subheader("1. Bar Chart: Top 10 Provinsi Penghasil Kelapa Sawit")
     top_sawit = df.nlargest(10, 'Kelapa Sawit')
     fig, ax = plt.subplots(figsize=(10, 5))
     sns.barplot(data=top_sawit, x='Kelapa Sawit', y='Provinsi', palette='viridis', ax=ax)
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(fig)
     st.info("**Interpretasi:** Riau mendominasi produksi Kelapa Sawit nasional, disusul Kalimantan Tengah dan Sumatera Utara.")
     
-    # 2. Histogram
     st.subheader("2. Histogram: Distribusi Produksi Kelapa")
     fig, ax = plt.subplots(figsize=(8, 5))
     sns.histplot(df['Kelapa'], bins=15, kde=True, color='green', ax=ax)
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(fig)
     st.info("**Interpretasi:** Distribusi produksi kelapa *right-skewed*. Mayoritas provinsi memproduksi di bawah 200 ribu ton.")
     
-    # 3. Boxplot
     st.subheader("3. Boxplot: Persebaran Seluruh Komoditas")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.boxplot(data=df[numeric_cols], palette='Set2', ax=ax)
     plt.xticks(rotation=45)
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(fig)
     st.info("**Interpretasi:** Kelapa Sawit memiliki varians produksi tertinggi. Teh dan Kakao produksinya relatif rendah dan seragam.")
     
-    # 4. Scatter Plot
     st.subheader("4. Scatter Plot: Hubungan Kelapa Sawit vs Karet")
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.scatterplot(data=df, x='Kelapa Sawit', y='Karet', s=100, color='orange', ax=ax)
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(fig)
     st.info("**Interpretasi:** Tidak ada pola linear yang kuat. Provinsi penghasil sawit tinggi tidak otomatis menjadi penghasil karet tinggi.")
     
-    # 5. Line Plot
     st.subheader("5. Line Plot: Penurunan Produksi Tebu (Sorted)")
     df_tebu_sorted = df.sort_values(by='Tebu', ascending=False).reset_index(drop=True)
     fig, ax = plt.subplots(figsize=(12, 5))
     ax.plot(df_tebu_sorted['Tebu'], marker='o', linestyle='-', color='purple')
     ax.set_ylabel('Produksi (Ribu Ton)')
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(fig)
     st.info("**Interpretasi:** Produksi Tebu sangat terpusat (monopoli) di Jawa Timur dan Lampung. Provinsi lain produksinya mendekati nol.")
     
-    # 6. Heatmap Correlation
     st.subheader("6. Heatmap Correlation")
     fig, ax = plt.subplots(figsize=(10, 8))
     corr = df[numeric_cols].corr()
     sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, ax=ax)
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(fig)
     st.info("**Interpretasi:** Korelasi antar komoditas sangat lemah (mendekati 0). Menunjukkan adanya spesialisasi wilayah yang kuat (faktor geografis/iklim).")
 
-# --- HALAMAN D & E: REGRESI ---
 elif menu == "D & E. Analisis Hubungan & Regresi":
     st.header("D & E. Pemodelan Regresi Linear")
     
@@ -194,12 +179,10 @@ elif menu == "D & E. Analisis Hubungan & Regresi":
         X = df[[x_var]].values
         y = df[y_var].values
         
-        # Modeling
         model = LinearRegression()
         model.fit(X, y)
         y_pred = model.predict(X)
         
-        # Metrics
         mae = mean_absolute_error(y, y_pred)
         rmse = math.sqrt(mean_squared_error(y, y_pred))
         r2 = r2_score(y, y_pred)
@@ -222,11 +205,10 @@ elif menu == "D & E. Analisis Hubungan & Regresi":
         ax.plot(X.flatten(), y_pred, color='red', label='Garis Regresi')
         ax.set_xlabel(x_var)
         ax.set_ylabel(y_var)
-        st.pyplot(fig, use_container_width=True)
+        st.pyplot(fig)
     else:
         st.error("Variabel X dan y tidak boleh sama!")
 
-# --- HALAMAN F: INSIGHT & REKOMENDASI ---
 elif menu == "F. Insight & Rekomendasi":
     st.header("F. Insight dan Rekomendasi")
     
