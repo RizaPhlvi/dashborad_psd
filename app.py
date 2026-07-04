@@ -641,48 +641,56 @@ elif menu == "📈 Proyeksi & Model":
                 st.markdown(f'<div class="insight-card">🌱 <b>{imp.idxmax()}</b> menjadi driver utama untuk <b>{tgt}</b> (score: {imp.max():.3f}).</div>', unsafe_allow_html=True)
             else: st.warning("Data terlalu sedikit.")
         
-        # --- TAB 4: DECISION TREE (Importance + Tree Diagram) ---
-              # --- TAB 4: DECISION TREE (100% BULLETPROOF) ---
-        with tab_dt:
-            st.markdown("### 🌳 Decision Tree Regression")
-            tgt_dt = st.selectbox("Target Prediksi", numeric_cols, key="dt_tgt")
-            feats_dt = [c for c in numeric_cols if c != tgt_dt]
-            dt_df = active_df[feats_dt+[tgt_dt]].dropna()
+         # -------------------------------------------------
+    # DECISION TREE
+    # -------------------------------------------------
+    with tab_dt:
+        st.markdown("### Decision Tree Regression")
+        target_dt = st.selectbox("Pilih target prediksi", numeric_cols, key="dt_target")
+        feature_cols_dt = [c for c in numeric_cols if c != target_dt]
+        dt_df = filtered_df[feature_cols_dt + [target_dt]].dropna().copy()
+        if len(dt_df) < 8:
+            st.warning("Data terlalu sedikit untuk Decision Tree yang stabil.")
+        else:
+            X = dt_df[feature_cols_dt]
+            y = dt_df[target_dt]
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.3, random_state=42
+            )
+            dt = DecisionTreeRegressor(max_depth=3, random_state=42)
+            dt.fit(X_train, y_train)
+            y_pred = dt.predict(X_test)
+            mae = mean_absolute_error(y_test, y_pred)
+            rmse = math.sqrt(mean_squared_error(y_test, y_pred))
+            r2 = r2_score(y_test, y_pred)
+            k1, k2, k3 = st.columns(3)
+            k1.metric("MAE", f"{mae:.2f}")
+            k2.metric("RMSE", f"{rmse:.2f}")
+            k3.metric("R²", f"{r2:.4f}")
+            importance = pd.Series(dt.feature_importances_, index=feature_cols_dt).sort_values(ascending=False).reset_index()
+            importance.columns = ["Fitur", "Importance"]
+            fig = px.bar(
+                importance,
+                x="Importance",
+                y="Fitur",
+                orientation="h",
+                text="Importance",
+                title=f"Feature Importance Decision Tree - {target_dt}"
+            )
+            fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
+            fig = apply_dark_layout(fig, 500)
+            st.plotly_chart(fig, use_container_width=True, key="dt_chart")
             
-            if len(dt_df) >= 8:
-                X, y = dt_df[feats_dt], dt_df[tgt_dt]
-                X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3, random_state=42)
-                dt = DecisionTreeRegressor(max_depth=3, random_state=42).fit(X_tr, y_tr)
-                y_pred = dt.predict(X_te)
-                
-                k1,k2,k3 = st.columns(3)
-                k1.metric("MAE", f"{mean_absolute_error(y_te,y_pred):.2f}")
-                k2.metric("RMSE", f"{math.sqrt(mean_squared_error(y_te,y_pred)):.2f}")
-                k3.metric("R²", f"{r2_score(y_te,y_pred):.4f}")
-                
-                # VISUALISASI 1: FEATURE IMPORTANCE (PLOTLY)
-                imp_dt = pd.Series(dt.feature_importances_, index=feats_dt).sort_values(ascending=True)
-                fig_imp_dt = px.bar(x=imp_dt.values, y=imp_dt.index, orientation='h', 
-                                    title="Feature Importance (Pembagi Utama)", 
-                                    color_discrete_sequence=["#84cc16"])
-                st.plotly_chart(apply_plantation_layout(fig_imp_dt, 400), use_container_width=True, key="dt_imp")
-                
-                # VISUALISASI 2: ATURAN LOGIKA POHON (TEXT-BASED)
-                st.markdown("#### 🌳 Logika Percabangan Pohon Keputusan")
-                st.markdown("""
-                <div class="insight-card">
-                Alih-alih menggunakan gambar statis yang berat dan rawan error di server cloud, 
-                dashboard intelijen ini menampilkan <b>rules (aturan logika)</b> langsung dari model. 
-                Ini menunjukkan secara transparan bagaimana model membagi wilayah berdasarkan threshold komoditas lain.
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Generate text rules dari sklearn
-                tree_rules = export_text(dt, features=feats_dt)
-                st.code(tree_rules, language="text")
-                
-            else: 
-                st.warning("Data terlalu sedikit untuk membangun Decision Tree.")
+            # PERBAIKAN: Menggunakan feature_names (bukan features)
+            st.markdown("### 🌳 Logika Percabangan Pohon Keputusan")
+            st.markdown(
+                '<div class="info-box">Aturan logika (rules) di bawah menunjukkan secara transparan '
+                'bagaimana model Decision Tree membagi wilayah perkebunan berdasarkan threshold komoditas lain.</div>',
+                unsafe_allow_html=True
+            )
+            from sklearn.tree import export_text
+            tree_rules = export_text(dt, feature_names=list(feature_cols_dt))
+            st.code(tree_rules, language="text")
 # =========================================================
 # PAGE 8: INSIGHT & STRATEGI
 # =========================================================
