@@ -1,4 +1,3 @@
-
 import io
 import math
 import numpy as np
@@ -17,150 +16,225 @@ from sklearn.model_selection import train_test_split
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Dashboard Premium Komoditas Perkebunan Indonesia",
+    page_title="Premium Dashboard Komoditas Perkebunan Indonesia",
     page_icon="🌾",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # =========================================================
-# PREMIUM CSS
+# DARK PREMIUM CSS
 # =========================================================
 st.markdown("""
 <style>
-    /* ===== Global ===== */
+    /* =========================================================
+       GLOBAL
+    ========================================================= */
     .stApp {
-        background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+        background: linear-gradient(180deg, #0b1220 0%, #111827 45%, #0f172a 100%);
+        color: #e5e7eb;
     }
 
     .block-container {
+        max-width: 1450px;
         padding-top: 1.5rem;
         padding-bottom: 2rem;
-        max-width: 1450px;
     }
 
-    /* ===== Hero ===== */
+    /* =========================================================
+       HERO
+    ========================================================= */
     .hero-wrap {
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f766e 100%);
+        background: linear-gradient(135deg, #111827 0%, #1e3a8a 45%, #0f766e 100%);
         padding: 1.8rem 2rem;
-        border-radius: 22px;
-        color: white;
-        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.18);
+        border-radius: 24px;
+        color: #ffffff;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.08);
         margin-bottom: 1.2rem;
     }
 
     .hero-title {
-        font-size: 2.25rem;
+        font-size: 2.3rem;
         font-weight: 800;
-        margin-bottom: 0.2rem;
         line-height: 1.2;
+        margin-bottom: 0.35rem;
+        color: #ffffff;
     }
 
     .hero-subtitle {
         font-size: 1rem;
-        color: rgba(255,255,255,0.9);
-        line-height: 1.5;
+        line-height: 1.6;
+        color: rgba(255,255,255,0.88);
         margin-top: 0.35rem;
     }
 
     .hero-badge {
         display: inline-block;
-        padding: 0.35rem 0.75rem;
+        padding: 0.42rem 0.9rem;
         border-radius: 999px;
-        background: rgba(255,255,255,0.15);
-        border: 1px solid rgba(255,255,255,0.18);
-        font-size: 0.85rem;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.12);
+        font-size: 0.9rem;
+        color: #f8fafc;
         margin-right: 0.5rem;
-        margin-top: 0.5rem;
+        margin-top: 0.7rem;
     }
 
-    /* ===== Section title ===== */
+    /* =========================================================
+       SECTION TITLE
+    ========================================================= */
     .section-title {
-        font-size: 1.25rem;
+        font-size: 1.28rem;
         font-weight: 800;
-        color: #0f172a;
-        margin-top: 0.4rem;
-        margin-bottom: 0.8rem;
+        color: #f8fafc;
+        margin-top: 0.35rem;
+        margin-bottom: 0.9rem;
     }
 
     .subtle-text {
-        color: #475569;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        color: #cbd5e1;
+        font-size: 0.96rem;
+        line-height: 1.6;
     }
 
-    /* ===== Cards ===== */
+    /* =========================================================
+       CARD / INFO BOX
+    ========================================================= */
     .premium-card {
-        background: rgba(255,255,255,0.88);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(148, 163, 184, 0.18);
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+        border: 1px solid rgba(255,255,255,0.08);
         border-radius: 18px;
-        padding: 1rem 1.15rem;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        padding: 1rem 1.1rem;
+        box-shadow: 0 10px 26px rgba(0,0,0,0.28);
     }
 
     .info-box {
-        background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
-        border-left: 5px solid #2563eb;
-        padding: 0.95rem 1rem;
+        background: linear-gradient(135deg, rgba(37,99,235,0.18) 0%, rgba(59,130,246,0.12) 100%);
+        border-left: 5px solid #60a5fa;
+        padding: 1rem 1rem;
         border-radius: 14px;
-        color: #1e3a8a;
-        margin: 0.5rem 0 0.8rem 0;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+        color: #dbeafe;
+        margin: 0.5rem 0 0.9rem 0;
+        box-shadow: 0 6px 18px rgba(37,99,235,0.10);
     }
 
     .success-box {
-        background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
-        border-left: 5px solid #10b981;
-        padding: 0.95rem 1rem;
+        background: linear-gradient(135deg, rgba(16,185,129,0.16) 0%, rgba(34,197,94,0.10) 100%);
+        border-left: 5px solid #34d399;
+        padding: 1rem 1rem;
         border-radius: 14px;
-        color: #065f46;
-        margin: 0.5rem 0 0.8rem 0;
-        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);
+        color: #d1fae5;
+        margin: 0.5rem 0 0.9rem 0;
+        box-shadow: 0 6px 18px rgba(16,185,129,0.10);
     }
 
     .warn-box {
-        background: linear-gradient(135deg, #fff7ed 0%, #fffbeb 100%);
-        border-left: 5px solid #f59e0b;
-        padding: 0.95rem 1rem;
+        background: linear-gradient(135deg, rgba(245,158,11,0.16) 0%, rgba(251,191,36,0.10) 100%);
+        border-left: 5px solid #fbbf24;
+        padding: 1rem 1rem;
         border-radius: 14px;
-        color: #92400e;
-        margin: 0.5rem 0 0.8rem 0;
-        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.08);
+        color: #fde68a;
+        margin: 0.5rem 0 0.9rem 0;
+        box-shadow: 0 6px 18px rgba(245,158,11,0.10);
     }
 
     .footer-box {
         text-align: center;
         padding: 1.35rem;
-        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
-        color: white;
+        background: linear-gradient(135deg, #111827 0%, #1e40af 100%);
+        color: #ffffff;
         border-radius: 18px;
         margin-top: 1.25rem;
-        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+        border: 1px solid rgba(255,255,255,0.08);
     }
 
-    /* ===== Streamlit metric ===== */
-    div[data-testid="stMetric"] {
-        background: rgba(255,255,255,0.92);
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        padding: 0.85rem;
-        border-radius: 16px;
-        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
-    }
-
-    /* ===== Sidebar ===== */
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+        background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+        border-right: 1px solid rgba(255,255,255,0.06);
     }
 
     section[data-testid="stSidebar"] * {
         color: #f8fafc !important;
     }
 
-    /* ===== Tabs ===== */
+    /* =========================================================
+       METRIC CARD
+    ========================================================= */
+    div[data-testid="stMetric"] {
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 1rem 1rem;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #cbd5e1 !important;
+        font-weight: 600 !important;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #f8fafc !important;
+        font-weight: 800 !important;
+    }
+
+    div[data-testid="stMetricDelta"] {
+        color: #34d399 !important;
+    }
+
+    /* =========================================================
+       TABS
+    ========================================================= */
     button[data-baseweb="tab"] {
         border-radius: 10px !important;
         font-weight: 700 !important;
+        background: #111827 !important;
+        color: #e5e7eb !important;
+        border: 1px solid rgba(255,255,255,0.06) !important;
+    }
+
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, #1d4ed8 0%, #0f766e 100%) !important;
+        color: white !important;
+        border: none !important;
+    }
+
+    /* =========================================================
+       DATAFRAME / TABLE / EXPANDER
+    ========================================================= */
+    .stDataFrame, .stTable {
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    div[data-testid="stExpander"] {
+        background: #111827;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
+    }
+
+    /* =========================================================
+       INPUTS
+    ========================================================= */
+    .stSelectbox label,
+    .stSlider label,
+    .stRadio label,
+    .stMultiSelect label,
+    .stNumberInput label {
+        color: #f8fafc !important;
+        font-weight: 600;
+    }
+
+    /* =========================================================
+       HIDE STREAMLIT SMALL HEADER SPACE
+    ========================================================= */
+    header[data-testid="stHeader"] {
+        background: rgba(0,0,0,0);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -210,42 +284,23 @@ PAPUA PEGUNUNGAN,0,0.02,0,3.27,0,0,0
 """
 
 # =========================================================
-# DATA LOADER
+# LOAD DATA
 # =========================================================
 @st.cache_data
 def load_data():
-    df_ = pd.read_csv(io.StringIO(CSV_DATA))
-    return df_
+    return pd.read_csv(io.StringIO(CSV_DATA))
 
 df = load_data()
 numeric_cols = [c for c in df.columns if c != "Provinsi"]
 
 # =========================================================
-# HELPER FUNCTIONS
+# HELPER
 # =========================================================
 def format_num(x):
     try:
         return f"{float(x):,.2f}".replace(",", "_").replace(".", ",").replace("_", ".")
-    except Exception:
+    except:
         return str(x)
-
-def safe_mae(y_true, y_pred):
-    try:
-        return mean_absolute_error(y_true, y_pred)
-    except Exception:
-        return np.nan
-
-def safe_rmse(y_true, y_pred):
-    try:
-        return math.sqrt(mean_squared_error(y_true, y_pred))
-    except Exception:
-        return np.nan
-
-def safe_r2(y_true, y_pred):
-    try:
-        return r2_score(y_true, y_pred)
-    except Exception:
-        return np.nan
 
 def get_filtered_df(base_df, province_filter, show_zero_rows):
     data = base_df.copy()
@@ -280,26 +335,23 @@ def generate_dynamic_insight(data, commodity):
     if data.empty:
         return "Tidak ada data yang tersedia untuk filter saat ini."
 
-    if commodity not in data.columns:
-        return "Komoditas tidak ditemukan."
-
     total = data[commodity].sum()
     if total <= 0:
-        return f"Komoditas **{commodity}** tidak memiliki produksi pada filter aktif."
+        return f"Komoditas <b>{commodity}</b> tidak memiliki produksi pada filter aktif."
 
     top_df = data.nlargest(3, commodity)[["Provinsi", commodity]].copy()
     top_df["Share"] = (top_df[commodity] / total) * 100
 
     top1 = top_df.iloc[0]
     msg = (
-        f"Produksi **{commodity}** pada filter aktif mencapai **{format_num(total)} ribu ton**. "
-        f"Kontributor terbesar adalah **{top1['Provinsi']}** dengan produksi **{format_num(top1[commodity])} ribu ton** "
-        f"atau sekitar **{top1['Share']:.1f}%** dari total produksi komoditas ini."
+        f"Produksi <b>{commodity}</b> pada filter aktif mencapai <b>{format_num(total)} ribu ton</b>. "
+        f"Kontributor terbesar adalah <b>{top1['Provinsi']}</b> dengan produksi <b>{format_num(top1[commodity])} ribu ton</b> "
+        f"atau sekitar <b>{top1['Share']:.1f}%</b> dari total produksi komoditas ini."
     )
 
     if len(top_df) >= 3:
         share3 = top_df["Share"].sum()
-        msg += f" Tiga provinsi teratas menyumbang sekitar **{share3:.1f}%** dari total produksi, menandakan konsentrasi produksi yang cukup tinggi."
+        msg += f" Tiga provinsi teratas menyumbang sekitar <b>{share3:.1f}%</b> dari total produksi."
 
     return msg
 
@@ -315,17 +367,41 @@ def generate_recommendations(data, commodity):
     total_selected = data[commodity].sum()
     share = (top_val / total_selected * 100) if total_selected > 0 else 0
 
-    recs = [
-        f"Fokuskan strategi penguatan rantai pasok dan hilirisasi pada **{dominant}**, karena komoditas ini memiliki total produksi tertinggi sebesar **{format_num(dominant_val)} ribu ton** pada filter aktif.",
-        f"Untuk komoditas **{commodity}**, perlu dilakukan mitigasi risiko konsentrasi wilayah karena **{top_prov}** menyumbang sekitar **{share:.1f}%** dari total produksi komoditas tersebut.",
-        "Pengembangan analisis ke depan sebaiknya menambahkan data historis multi-tahun agar evaluasi tren dan forecasting lebih kuat secara metodologis.",
-        "Integrasi data spasial (peta provinsi, sebaran lahan, atau lokasi sentra komoditas) akan memperkaya kualitas analisis visual dan narasi kebijakan.",
-        "Model machine learning pada dashboard ini lebih tepat dibaca sebagai alat eksplorasi pola awal, bukan sebagai model prediksi kebijakan final tanpa validasi tambahan."
+    return [
+        f"Fokuskan strategi hilirisasi pada <b>{dominant}</b> karena memiliki total produksi tertinggi sebesar <b>{format_num(dominant_val)} ribu ton</b>.",
+        f"Untuk komoditas <b>{commodity}</b>, perlu mitigasi risiko konsentrasi wilayah karena <b>{top_prov}</b> menyumbang sekitar <b>{share:.1f}%</b> dari total produksi.",
+        "Pengembangan dashboard berikutnya sebaiknya menambahkan data historis multi-tahun agar forecasting menjadi lebih kuat secara metodologis.",
+        "Integrasi peta spasial provinsi berbasis GeoJSON akan memperkuat kualitas storytelling geografis.",
+        "Model machine learning di dashboard ini lebih tepat dibaca sebagai eksplorasi pola awal, bukan prediksi kebijakan final tanpa validasi tambahan."
     ]
-    return recs
 
 def export_csv(dataframe):
     return dataframe.to_csv(index=False).encode("utf-8")
+
+# =========================================================
+# PLOTLY DARK TEMPLATE
+# =========================================================
+plot_bg = "#111827"
+paper_bg = "#111827"
+font_color = "#f8fafc"
+grid_color = "rgba(255,255,255,0.08)"
+
+def apply_dark_layout(fig, height=500):
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor=paper_bg,
+        plot_bgcolor=plot_bg,
+        font=dict(color=font_color),
+        height=height,
+        margin=dict(l=40, r=30, t=60, b=40),
+        xaxis=dict(gridcolor=grid_color, zerolinecolor=grid_color),
+        yaxis=dict(gridcolor=grid_color, zerolinecolor=grid_color),
+        legend=dict(
+            bgcolor="rgba(0,0,0,0)",
+            bordercolor="rgba(255,255,255,0.08)"
+        )
+    )
+    return fig
 
 # =========================================================
 # HERO HEADER
@@ -334,7 +410,7 @@ st.markdown("""
 <div class="hero-wrap">
     <div class="hero-title">🌾 Premium Dashboard Komoditas Perkebunan Indonesia</div>
     <div class="hero-subtitle">
-        Dashboard analitik interaktif untuk eksplorasi, visualisasi, dan pemodelan data produksi komoditas perkebunan Indonesia per provinsi (2024).
+        Dashboard analitik interaktif untuk eksplorasi, visualisasi, dan pemodelan data produksi komoditas perkebunan Indonesia per provinsi (2024). 
         Dirancang dengan pendekatan executive dashboard, EDA interaktif, predictive analytics, dan insight generator yang lebih presentable untuk konteks akademik maupun demonstrasi proyek.
     </div>
     <div>
@@ -426,10 +502,12 @@ if menu == "🏠 Executive Dashboard":
                 x=x_col,
                 y="Provinsi",
                 orientation="h",
-                text_auto=".2f" if view_mode == "Persentase (%)" else ".2s",
+                text=x_col,
                 title=f"Top {min(top_n, len(top_df))} Provinsi - {selected_commodity}"
             )
-            fig.update_layout(height=540, xaxis_title=x_title, yaxis_title="")
+            fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+            fig.update_layout(xaxis_title=x_title, yaxis_title="")
+            fig = apply_dark_layout(fig, 540)
             st.plotly_chart(fig, use_container_width=True)
 
         with right:
@@ -446,7 +524,8 @@ if menu == "🏠 Executive Dashboard":
                 names="Komoditas",
                 hole=0.5
             )
-            fig2.update_layout(height=540)
+            fig2.update_traces(textinfo='percent+label')
+            fig2 = apply_dark_layout(fig2, 540)
             st.plotly_chart(fig2, use_container_width=True)
 
         st.markdown('<div class="section-title">Quick Insight</div>', unsafe_allow_html=True)
@@ -491,7 +570,7 @@ elif menu == "📊 Data Explorer":
             st.markdown(f"- **Baris duplikat:** {int(duplicate_count)}")
             st.markdown(f"- **Provinsi dengan total produksi 0:** {int(zero_rows)}")
             st.markdown(
-                '<div class="warn-box">Outlier tidak otomatis dihapus karena dapat merepresentasikan sentra produksi riil, bukan kesalahan data.</div>',
+                '<div class="warn-box">Outlier tidak otomatis dihapus karena bisa merepresentasikan sentra produksi riil, bukan kesalahan data.</div>',
                 unsafe_allow_html=True
             )
 
@@ -518,10 +597,11 @@ elif menu == "🔍 EDA Explorer":
                     x=selected_commodity,
                     y="Provinsi",
                     orientation="h",
-                    text_auto=".2s",
+                    text=selected_commodity,
                     title=f"Top {min(top_n, len(top_df))} Provinsi - {selected_commodity}"
                 )
-                fig.update_layout(height=500)
+                fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+                fig = apply_dark_layout(fig, 500)
                 st.plotly_chart(fig, use_container_width=True)
 
             with c2:
@@ -531,11 +611,12 @@ elif menu == "🔍 EDA Explorer":
                     top_total,
                     x="Provinsi",
                     y="Total Produksi",
-                    text_auto=".2s",
+                    text="Total Produksi",
                     title="Top Provinsi berdasarkan Total Produksi"
                 )
+                fig2.update_traces(texttemplate='%{text:.2f}', textposition='outside')
                 fig2.update_xaxes(tickangle=45)
-                fig2.update_layout(height=500)
+                fig2 = apply_dark_layout(fig2, 500)
                 st.plotly_chart(fig2, use_container_width=True)
 
             st.markdown(
@@ -551,10 +632,9 @@ elif menu == "🔍 EDA Explorer":
                     filtered_df,
                     x=selected_commodity,
                     nbins=15,
-                    marginal="box",
                     title=f"Distribusi {selected_commodity}"
                 )
-                fig.update_layout(height=480)
+                fig = apply_dark_layout(fig, 480)
                 st.plotly_chart(fig, use_container_width=True)
 
             with c2:
@@ -572,7 +652,8 @@ elif menu == "🔍 EDA Explorer":
                     title="Perbandingan Persebaran Antar Komoditas"
                 )
                 fig2.update_xaxes(tickangle=35)
-                fig2.update_layout(height=480, showlegend=False)
+                fig2.update_layout(showlegend=False)
+                fig2 = apply_dark_layout(fig2, 480)
                 st.plotly_chart(fig2, use_container_width=True)
 
         with tab3:
@@ -590,7 +671,7 @@ elif menu == "🔍 EDA Explorer":
                     hover_name="Provinsi",
                     title=f"Hubungan {x_var} vs {y_var}"
                 )
-                fig.update_layout(height=550)
+                fig = apply_dark_layout(fig, 550)
                 st.plotly_chart(fig, use_container_width=True)
 
                 corr_val = filtered_df[[x_var, y_var]].corr().iloc[0, 1]
@@ -604,21 +685,18 @@ elif menu == "🔍 EDA Explorer":
             corr = filtered_df[numeric_cols].corr()
             fig = px.imshow(
                 corr,
-                text_auto=".2f",
                 aspect="auto",
                 color_continuous_scale="RdBu_r",
                 title="Heatmap Korelasi Antar Komoditas"
             )
-            fig.update_layout(height=650)
+            fig = apply_dark_layout(fig, 650)
             st.plotly_chart(fig, use_container_width=True)
 
         with tab5:
             province_pick = st.selectbox("Pilih provinsi", filtered_df["Provinsi"].tolist(), key="deep_prov")
             p_df = filtered_df[filtered_df["Provinsi"] == province_pick]
 
-            if p_df.empty:
-                st.warning("Provinsi tidak tersedia.")
-            else:
+            if not p_df.empty:
                 row = p_df.iloc[0]
                 profile = pd.DataFrame({
                     "Komoditas": numeric_cols,
@@ -627,8 +705,9 @@ elif menu == "🔍 EDA Explorer":
 
                 c1, c2 = st.columns([1.1, 1])
                 with c1:
-                    fig = px.bar(profile, x="Komoditas", y="Produksi", text_auto=".2s", title=f"Profil Produksi {province_pick}")
-                    fig.update_layout(height=500)
+                    fig = px.bar(profile, x="Komoditas", y="Produksi", text="Produksi", title=f"Profil Produksi {province_pick}")
+                    fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+                    fig = apply_dark_layout(fig, 500)
                     st.plotly_chart(fig, use_container_width=True)
 
                 with c2:
@@ -640,7 +719,8 @@ elif menu == "🔍 EDA Explorer":
                     st.metric("Komoditas Dominan", dom_comm, format_num(dom_val))
 
                     fig2 = px.pie(profile, names="Komoditas", values="Produksi", hole=0.45, title="Komposisi Komoditas")
-                    fig2.update_layout(height=420)
+                    fig2.update_traces(textinfo='percent+label')
+                    fig2 = apply_dark_layout(fig2, 420)
                     st.plotly_chart(fig2, use_container_width=True)
 
 # =========================================================
@@ -674,9 +754,11 @@ elif menu == "🧭 Profil Provinsi & Komoditas":
                     prov_profile,
                     x="Komoditas",
                     y="Produksi",
-                    text_auto=".2s",
+                    text="Produksi",
                     title=f"Struktur Komoditas - {province_pick}"
                 )
+                fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+                fig = apply_dark_layout(fig, 520)
                 st.plotly_chart(fig, use_container_width=True)
 
                 st.dataframe(prov_profile, use_container_width=True)
@@ -697,10 +779,12 @@ elif menu == "🧭 Profil Provinsi & Komoditas":
                 cdf.head(min(top_n, len(cdf))),
                 x="Provinsi",
                 y=commodity_pick,
-                text_auto=".2s",
+                text=commodity_pick,
                 title=f"Top {min(top_n, len(cdf))} Provinsi - {commodity_pick}"
             )
+            fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
             fig.update_xaxes(tickangle=45)
+            fig = apply_dark_layout(fig, 520)
             st.plotly_chart(fig, use_container_width=True)
 
             st.markdown(
@@ -709,12 +793,12 @@ elif menu == "🧭 Profil Provinsi & Komoditas":
             )
 
 # =========================================================
-# GEO INSIGHT (SIMULASI CHOROPLETH)
+# GEO INSIGHT
 # =========================================================
 elif menu == "🗺️ Geo Insight":
     st.markdown('<div class="section-title">Geo Insight</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="subtle-text">Halaman ini menyajikan persebaran produksi komoditas terpilih antar provinsi dalam bentuk peta simbolik dan ranking spasial sederhana. Karena dashboard ini menggunakan dataset embedded tanpa file geojson provinsi, visualisasi peta disajikan sebagai <b>simulasi geo insight</b> yang tetap mendukung storytelling spasial tingkat presentasi.</div>',
+        '<div class="subtle-text">Halaman ini menampilkan persebaran produksi komoditas terpilih dalam bentuk ranking spasial dan bubble geo-insight. Jika nanti kamu ingin, halaman ini bisa saya upgrade ke peta Indonesia provinsi berbasis GeoJSON.</div>',
         unsafe_allow_html=True
     )
 
@@ -731,15 +815,16 @@ elif menu == "🗺️ Geo Insight":
                 x="Provinsi",
                 y=selected_commodity,
                 color=selected_commodity,
-                text_auto=".2s",
+                text=selected_commodity,
                 title=f"Ranking Spasial Produksi {selected_commodity}"
             )
+            fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
             fig.update_xaxes(tickangle=45)
-            fig.update_layout(height=520, showlegend=False)
+            fig.update_layout(showlegend=False)
+            fig = apply_dark_layout(fig, 520)
             st.plotly_chart(fig, use_container_width=True)
 
         with c2:
-            # pseudo map style bubble chart
             pseudo_geo = geo_df.head(min(15, len(geo_df))).copy()
             pseudo_geo["Rank"] = range(1, len(pseudo_geo) + 1)
 
@@ -753,11 +838,11 @@ elif menu == "🗺️ Geo Insight":
                 title="Bubble Geo-Insight (Simulasi Sebaran Prioritas)"
             )
             fig2.update_traces(textposition="top center")
-            fig2.update_layout(height=520, xaxis_title="Urutan Prioritas Wilayah", yaxis_title="Produksi")
+            fig2 = apply_dark_layout(fig2, 520)
             st.plotly_chart(fig2, use_container_width=True)
 
         st.markdown(
-            f'<div class="info-box">Dalam konteks spasial, komoditas <b>{selected_commodity}</b> menunjukkan konsentrasi produksi pada sejumlah provinsi utama. Untuk pengembangan premium berikutnya, halaman ini dapat ditingkatkan menjadi <b>choropleth map provinsi Indonesia berbasis GeoJSON</b> agar persebaran regional terlihat lebih kuat secara visual.</div>',
+            f'<div class="info-box">Komoditas <b>{selected_commodity}</b> memperlihatkan konsentrasi produksi pada sejumlah provinsi utama. Versi premium berikutnya bisa ditingkatkan menjadi <b>choropleth map Indonesia</b> berbasis GeoJSON agar narasi geografis lebih kuat.</div>',
             unsafe_allow_html=True
         )
 
@@ -768,7 +853,7 @@ elif menu == "📈 Predictive Analytics":
     st.markdown('<div class="section-title">Predictive Analytics</div>', unsafe_allow_html=True)
 
     if filtered_df.shape[0] < 5:
-        st.warning("Data terlalu sedikit untuk analisis prediktif yang stabil. Gunakan lebih banyak provinsi atau ubah filter.")
+        st.warning("Data terlalu sedikit untuk analisis prediktif yang stabil.")
     else:
         tab_lr, tab_fc, tab_rf, tab_dt = st.tabs([
             "📉 Regresi Linear", "📈 Forecasting", "🌲 Random Forest", "🌳 Decision Tree"
@@ -801,9 +886,9 @@ elif menu == "📈 Predictive Analytics":
                     lr.fit(X, y)
                     y_pred = lr.predict(X)
 
-                    mae = safe_mae(y, y_pred)
-                    rmse = safe_rmse(y, y_pred)
-                    r2 = safe_r2(y, y_pred)
+                    mae = mean_absolute_error(y, y_pred)
+                    rmse = math.sqrt(mean_squared_error(y, y_pred))
+                    r2 = r2_score(y, y_pred)
 
                     k1, k2, k3 = st.columns(3)
                     k1.metric("MAE", f"{mae:.2f}")
@@ -837,9 +922,9 @@ elif menu == "📈 Predictive Analytics":
                     fig.update_layout(
                         title=f"Regresi Linear: {x_var} vs {y_var}",
                         xaxis_title=x_var,
-                        yaxis_title=y_var,
-                        height=540
+                        yaxis_title=y_var
                     )
+                    fig = apply_dark_layout(fig, 540)
                     st.plotly_chart(fig, use_container_width=True)
 
                     st.markdown("### Prediction Playground")
@@ -857,7 +942,7 @@ elif menu == "📈 Predictive Analytics":
         with tab_fc:
             st.markdown("### Forecasting 2025 (Simulasi Growth Rate)")
             st.markdown(
-                '<div class="warn-box">Dataset bersifat cross-sectional (1 tahun), sehingga forecasting pada dashboard ini diposisikan sebagai <b>simulasi pertumbuhan</b>, bukan time-series forecasting historis.</div>',
+                '<div class="warn-box">Dataset bersifat cross-sectional (1 tahun), sehingga forecasting di dashboard ini diposisikan sebagai simulasi pertumbuhan, bukan time-series forecasting historis.</div>',
                 unsafe_allow_html=True
             )
 
@@ -877,9 +962,9 @@ elif menu == "📈 Predictive Analytics":
                 barmode="group",
                 title=f"Perbandingan {commodity_target}: 2024 vs 2025",
                 xaxis_title="Provinsi",
-                yaxis_title="Produksi",
-                height=550
+                yaxis_title="Produksi"
             )
+            fig = apply_dark_layout(fig, 550)
             st.plotly_chart(fig, use_container_width=True)
 
             total_now = fc_df[commodity_target].sum()
@@ -920,9 +1005,9 @@ elif menu == "📈 Predictive Analytics":
                 rf.fit(X_train, y_train)
                 y_pred = rf.predict(X_test)
 
-                mae = safe_mae(y_test, y_pred)
-                rmse = safe_rmse(y_test, y_pred)
-                r2 = safe_r2(y_test, y_pred)
+                mae = mean_absolute_error(y_test, y_pred)
+                rmse = math.sqrt(mean_squared_error(y_test, y_pred))
+                r2 = r2_score(y_test, y_pred)
 
                 k1, k2, k3 = st.columns(3)
                 k1.metric("MAE", f"{mae:.2f}")
@@ -937,10 +1022,11 @@ elif menu == "📈 Predictive Analytics":
                     x="Importance",
                     y="Fitur",
                     orientation="h",
-                    text_auto=".3f",
+                    text="Importance",
                     title=f"Feature Importance Random Forest - {target_rf}"
                 )
-                fig.update_layout(height=500)
+                fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
+                fig = apply_dark_layout(fig, 500)
                 st.plotly_chart(fig, use_container_width=True)
 
                 compare_df = pd.DataFrame({
@@ -973,9 +1059,9 @@ elif menu == "📈 Predictive Analytics":
                 dt.fit(X_train, y_train)
                 y_pred = dt.predict(X_test)
 
-                mae = safe_mae(y_test, y_pred)
-                rmse = safe_rmse(y_test, y_pred)
-                r2 = safe_r2(y_test, y_pred)
+                mae = mean_absolute_error(y_test, y_pred)
+                rmse = math.sqrt(mean_squared_error(y_test, y_pred))
+                r2 = r2_score(y_test, y_pred)
 
                 k1, k2, k3 = st.columns(3)
                 k1.metric("MAE", f"{mae:.2f}")
@@ -990,10 +1076,11 @@ elif menu == "📈 Predictive Analytics":
                     x="Importance",
                     y="Fitur",
                     orientation="h",
-                    text_auto=".3f",
+                    text="Importance",
                     title=f"Feature Importance Decision Tree - {target_dt}"
                 )
-                fig.update_layout(height=500)
+                fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
+                fig = apply_dark_layout(fig, 500)
                 st.plotly_chart(fig, use_container_width=True)
 
                 st.markdown(
@@ -1019,10 +1106,10 @@ elif menu == "🧠 Insight & Rekomendasi":
         share_top = (top_val / total_selected * 100) if total_selected > 0 else 0
 
         insights = [
-            f"Komoditas dengan total produksi terbesar pada filter aktif adalah **{dominant_comm}** sebesar **{format_num(dominant_val)} ribu ton**.",
-            f"Untuk komoditas **{selected_commodity}**, provinsi tertinggi adalah **{top_prov}** dengan produksi **{format_num(top_val)} ribu ton**.",
-            f"Kontribusi **{top_prov}** terhadap total **{selected_commodity}** mencapai sekitar **{share_top:.1f}%**.",
-            "Korelasi antar komoditas perlu dibaca secara hati-hati karena produksi perkebunan dipengaruhi oleh spesialisasi wilayah, kondisi agroklimat, dan struktur ekonomi regional.",
+            f"Komoditas dengan total produksi terbesar pada filter aktif adalah <b>{dominant_comm}</b> sebesar <b>{format_num(dominant_val)} ribu ton</b>.",
+            f"Untuk komoditas <b>{selected_commodity}</b>, provinsi tertinggi adalah <b>{top_prov}</b> dengan produksi <b>{format_num(top_val)} ribu ton</b>.",
+            f"Kontribusi <b>{top_prov}</b> terhadap total <b>{selected_commodity}</b> mencapai sekitar <b>{share_top:.1f}%</b>.",
+            "Korelasi antar komoditas perlu dibaca hati-hati karena produksi perkebunan dipengaruhi spesialisasi wilayah, kondisi agroklimat, dan struktur ekonomi regional.",
             "Forecasting pada dashboard ini bersifat simulatif sehingga lebih tepat digunakan untuk eksplorasi skenario awal daripada prediksi kebijakan final."
         ]
 
@@ -1077,7 +1164,6 @@ elif menu == "📥 Export Center":
 st.markdown("""
 <div class="footer-box">
     <h3>🎓 Premium Dashboard — UAS Pengenalan Sains Data</h3>
-    <p>Versi final dengan executive dashboard, EDA interaktif, geo insight, predictive analytics, dan export center.</p>
+    <p>Versi dark theme dengan executive dashboard, EDA interaktif, predictive analytics, dan export center.</p>
 </div>
 """, unsafe_allow_html=True)
-
