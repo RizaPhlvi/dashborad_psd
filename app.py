@@ -636,34 +636,47 @@ elif menu == "📈 Proyeksi & Model":
             else: st.warning("Data terlalu sedikit.")
         
         # --- TAB 4: DECISION TREE (Importance + Tree Diagram) ---
+              # --- TAB 4: DECISION TREE (100% BULLETPROOF) ---
         with tab_dt:
             st.markdown("### 🌳 Decision Tree Regression")
             tgt_dt = st.selectbox("Target Prediksi", numeric_cols, key="dt_tgt")
             feats_dt = [c for c in numeric_cols if c != tgt_dt]
             dt_df = active_df[feats_dt+[tgt_dt]].dropna()
+            
             if len(dt_df) >= 8:
                 X, y = dt_df[feats_dt], dt_df[tgt_dt]
                 X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.3, random_state=42)
                 dt = DecisionTreeRegressor(max_depth=3, random_state=42).fit(X_tr, y_tr)
                 y_pred = dt.predict(X_te)
+                
                 k1,k2,k3 = st.columns(3)
                 k1.metric("MAE", f"{mean_absolute_error(y_te,y_pred):.2f}")
                 k2.metric("RMSE", f"{math.sqrt(mean_squared_error(y_te,y_pred)):.2f}")
                 k3.metric("R²", f"{r2_score(y_te,y_pred):.4f}")
+                
+                # VISUALISASI 1: FEATURE IMPORTANCE (PLOTLY)
                 imp_dt = pd.Series(dt.feature_importances_, index=feats_dt).sort_values(ascending=True)
-                fig_imp_dt = px.bar(x=imp_dt.values, y=imp_dt.index, orientation='h', title="Feature Importance (Pembagi Utama)", color_discrete_sequence=["#84cc16"])
+                fig_imp_dt = px.bar(x=imp_dt.values, y=imp_dt.index, orientation='h', 
+                                    title="Feature Importance (Pembagi Utama)", 
+                                    color_discrete_sequence=["#84cc16"])
                 st.plotly_chart(apply_plantation_layout(fig_imp_dt, 400), use_container_width=True, key="dt_imp")
                 
-                # VISUALISASI DIAGRAM POHON
-                st.markdown("#### 🌳 Diagram Struktur Pohon Keputusan")
-                st.markdown('<div class="insight-card">Diagram menunjukkan bagaimana model membagi wilayah berdasarkan threshold komoditas lain (max_depth=3).</div>', unsafe_allow_html=True)
-                fig_tree, ax = plt.subplots(figsize=(14, 8))
-                plot_tree(dt, feature_names=feats_dt, filled=True, rounded=True, fontsize=10, ax=ax, cmap='YlGn')
-                ax.set_title(f"Struktur Decision Tree untuk {tgt_dt}", color="#e8f0e4", fontsize=14, fontweight="bold")
-                fig_tree.patch.set_facecolor('#0d1b12')
-                st.pyplot(fig_tree, use_container_width=True)
-            else: st.warning("Data terlalu sedikit.")
-
+                # VISUALISASI 2: ATURAN LOGIKA POHON (TEXT-BASED)
+                st.markdown("#### 🌳 Logika Percabangan Pohon Keputusan")
+                st.markdown("""
+                <div class="insight-card">
+                Alih-alih menggunakan gambar statis yang berat dan rawan error di server cloud, 
+                dashboard intelijen ini menampilkan <b>rules (aturan logika)</b> langsung dari model. 
+                Ini menunjukkan secara transparan bagaimana model membagi wilayah berdasarkan threshold komoditas lain.
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Generate text rules dari sklearn
+                tree_rules = export_text(dt, features=feats_dt)
+                st.code(tree_rules, language="text")
+                
+            else: 
+                st.warning("Data terlalu sedikit untuk membangun Decision Tree.")
 # =========================================================
 # PAGE 8: INSIGHT & STRATEGI
 # =========================================================
