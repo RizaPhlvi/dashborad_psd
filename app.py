@@ -23,301 +23,199 @@ st.set_page_config(
 )
 
 # =========================================================
-# PROFESSIONAL CSS - TABLEAU/POWER BI STYLE
+# DARK PREMIUM CSS
 # =========================================================
 st.markdown("""
 <style>
     /* =========================================================
-       GLOBAL - PROFESSIONAL DARK THEME
+       GLOBAL
     ========================================================= */
     .stApp {
-        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-        color: #e8eaed;
+        background: linear-gradient(180deg, #0b1220 0%, #111827 45%, #0f172a 100%);
+        color: #e5e7eb;
     }
 
     .block-container {
-        max-width: 1600px;
-        padding: 1rem 2rem 3rem 2rem;
-    }
-
-    /* Hide default Streamlit menu */
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-
-    /* =========================================================
-       SIDEBAR - PROFESSIONAL FILTER PANEL
-    ========================================================= */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f1429 0%, #1a1f3a 100%);
-        border-right: 2px solid #2d3561;
-        padding: 1rem 0.5rem;
-    }
-
-    section[data-testid="stSidebar"] > div {
-        padding-top: 0.5rem;
-    }
-
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.02em;
-    }
-
-    section[data-testid="stSidebar"] .stMarkdown {
-        color: #cbd5e1 !important;
-    }
-
-    /* Filter section styling */
-    .filter-section {
-        background: rgba(45, 53, 97, 0.3);
-        border: 1px solid rgba(100, 116, 139, 0.3);
-        border-radius: 12px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .filter-title {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.5rem;
+        max-width: 1450px;
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
     }
 
     /* =========================================================
-       HERO SECTION - PROFESSIONAL HEADER
+       HERO
     ========================================================= */
-    .hero-container {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #0f766e 100%);
-        border-radius: 20px;
-        padding: 2rem 2.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 20px 60px rgba(30, 58, 138, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero-container::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        border-radius: 50%;
+    .hero-wrap {
+        background: linear-gradient(135deg, #111827 0%, #1e3a8a 45%, #0f766e 100%);
+        padding: 1.8rem 2rem;
+        border-radius: 24px;
+        color: #ffffff;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.08);
+        margin-bottom: 1.2rem;
     }
 
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.3rem;
         font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 0.35rem;
         color: #ffffff;
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.03em;
-        position: relative;
-        z-index: 1;
     }
 
     .hero-subtitle {
-        font-size: 1.05rem;
-        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
         line-height: 1.6;
-        margin-bottom: 1rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .hero-badges {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        position: relative;
-        z-index: 1;
+        color: rgba(255,255,255,0.88);
+        margin-top: 0.35rem;
     }
 
     .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.5rem 1rem;
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 100px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #ffffff;
-    }
-
-    /* =========================================================
-       SECTION HEADERS
-    ========================================================= */
-    .page-title {
-        font-size: 1.875rem;
-        font-weight: 800;
-        color: #ffffff;
-        margin-top: 0.5rem;
-        margin-bottom: 0.25rem;
-        letter-spacing: -0.02em;
-    }
-
-    .page-subtitle {
-        font-size: 0.95rem;
-        color: #94a3b8;
-        margin-bottom: 1.5rem;
-    }
-
-    .section-header {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #ffffff;
-        margin-top: 1.5rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 3px solid #3b82f6;
         display: inline-block;
+        padding: 0.42rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.12);
+        font-size: 0.9rem;
+        color: #f8fafc;
+        margin-right: 0.5rem;
+        margin-top: 0.7rem;
     }
 
     /* =========================================================
-       KPI CARDS - PROFESSIONAL METRICS
+       SECTION TITLE
+    ========================================================= */
+    .section-title {
+        font-size: 1.28rem;
+        font-weight: 800;
+        color: #f8fafc;
+        margin-top: 0.35rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .subtle-text {
+        color: #cbd5e1;
+        font-size: 0.96rem;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+       CARD / INFO BOX
+    ========================================================= */
+    .premium-card {
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+        box-shadow: 0 10px 26px rgba(0,0,0,0.28);
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, rgba(37,99,235,0.18) 0%, rgba(59,130,246,0.12) 100%);
+        border-left: 5px solid #60a5fa;
+        padding: 1rem 1rem;
+        border-radius: 14px;
+        color: #dbeafe;
+        margin: 0.5rem 0 0.9rem 0;
+        box-shadow: 0 6px 18px rgba(37,99,235,0.10);
+    }
+
+    .success-box {
+        background: linear-gradient(135deg, rgba(16,185,129,0.16) 0%, rgba(34,197,94,0.10) 100%);
+        border-left: 5px solid #34d399;
+        padding: 1rem 1rem;
+        border-radius: 14px;
+        color: #d1fae5;
+        margin: 0.5rem 0 0.9rem 0;
+        box-shadow: 0 6px 18px rgba(16,185,129,0.10);
+    }
+
+    .warn-box {
+        background: linear-gradient(135deg, rgba(245,158,11,0.16) 0%, rgba(251,191,36,0.10) 100%);
+        border-left: 5px solid #fbbf24;
+        padding: 1rem 1rem;
+        border-radius: 14px;
+        color: #fde68a;
+        margin: 0.5rem 0 0.9rem 0;
+        box-shadow: 0 6px 18px rgba(245,158,11,0.10);
+    }
+
+    .footer-box {
+        text-align: center;
+        padding: 1.35rem;
+        background: linear-gradient(135deg, #111827 0%, #1e40af 100%);
+        color: #ffffff;
+        border-radius: 18px;
+        margin-top: 1.25rem;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
+        border-right: 1px solid rgba(255,255,255,0.06);
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #f8fafc !important;
+    }
+
+    /* =========================================================
+       METRIC CARD
     ========================================================= */
     div[data-testid="stMetric"] {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        border-radius: 16px;
-        padding: 1.25rem 1.5rem;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        transition: all 0.3s ease;
-    }
-
-    div[data-testid="stMetric"]:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(59, 130, 246, 0.4);
-        border-color: rgba(59, 130, 246, 0.6);
+        background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        padding: 1rem 1rem;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.25);
     }
 
     div[data-testid="stMetricLabel"] {
-        color: #94a3b8 !important;
-        font-size: 0.875rem !important;
+        color: #cbd5e1 !important;
         font-weight: 600 !important;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
     }
 
     div[data-testid="stMetricValue"] {
-        color: #ffffff !important;
-        font-size: 2rem !important;
+        color: #f8fafc !important;
         font-weight: 800 !important;
-        letter-spacing: -0.02em;
     }
 
     div[data-testid="stMetricDelta"] {
-        color: #10b981 !important;
-        font-weight: 600 !important;
+        color: #34d399 !important;
     }
 
     /* =========================================================
-       INFO/SUCCESS/WARNING BOXES
+       TABS
     ========================================================= */
-    .insight-card {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
-        border-left: 4px solid #3b82f6;
-        padding: 1.25rem 1.5rem;
-        border-radius: 12px;
-        margin: 1rem 0;
-        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
-        color: #dbeafe;
-        line-height: 1.7;
+    button[data-baseweb="tab"] {
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        background: #111827 !important;
+        color: #e5e7eb !important;
+        border: 1px solid rgba(255,255,255,0.06) !important;
     }
 
-    .success-card {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.1) 100%);
-        border-left: 4px solid #10b981;
-        padding: 1.25rem 1.5rem;
-        border-radius: 12px;
-        margin: 1rem 0;
-        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
-        color: #d1fae5;
-        line-height: 1.7;
-    }
-
-    .warning-card {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.1) 100%);
-        border-left: 4px solid #f59e0b;
-        padding: 1.25rem 1.5rem;
-        border-radius: 12px;
-        margin: 1rem 0;
-        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
-        color: #fef3c7;
-        line-height: 1.7;
-    }
-
-    /* =========================================================
-       TABS - PROFESSIONAL NAVIGATION
-    ========================================================= */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 0.5rem;
-        background: rgba(30, 41, 59, 0.5);
-        padding: 0.5rem;
-        border-radius: 12px;
-        border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        background: transparent;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        color: #cbd5e1;
-        border: 1px solid transparent;
-        transition: all 0.2s ease;
-    }
-
-    .stTabs [data-baseweb="tab"]:hover {
-        background: rgba(59, 130, 246, 0.1);
-        border-color: rgba(59, 130, 246, 0.3);
-    }
-
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%) !important;
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, #1d4ed8 0%, #0f766e 100%) !important;
         color: white !important;
         border: none !important;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     }
 
     /* =========================================================
-       DATAFRAMES - CLEAN TABLES
+       DATAFRAME / TABLE / EXPANDER
     ========================================================= */
-    .stDataFrame {
-        border-radius: 12px;
+    .stDataFrame, .stTable {
+        border-radius: 14px;
         overflow: hidden;
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
 
-    /* =========================================================
-       BUTTONS
-    ========================================================= */
-    .stButton > button {
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 0.625rem 1.5rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    div[data-testid="stExpander"] {
+        background: #111827;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 14px;
     }
 
     /* =========================================================
@@ -328,83 +226,15 @@ st.markdown("""
     .stRadio label,
     .stMultiSelect label,
     .stNumberInput label {
-        color: #ffffff !important;
-        font-weight: 600 !important;
-        font-size: 0.9rem !important;
-        margin-bottom: 0.5rem !important;
+        color: #f8fafc !important;
+        font-weight: 600;
     }
 
     /* =========================================================
-       EXPANDERS
+       HIDE STREAMLIT SMALL HEADER SPACE
     ========================================================= */
-    div[data-testid="stExpander"] {
-        background: rgba(30, 41, 59, 0.5);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 12px;
-        padding: 0.5rem;
-    }
-
-    /* =========================================================
-       FOOTER
-    ========================================================= */
-    .professional-footer {
-        text-align: center;
-        padding: 2rem;
-        margin-top: 3rem;
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border-radius: 16px;
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    }
-
-    .professional-footer h3 {
-        color: #ffffff;
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .professional-footer p {
-        color: #94a3b8;
-        font-size: 0.9rem;
-        margin: 0.25rem 0;
-    }
-
-    /* =========================================================
-       CHART CONTAINERS
-    ========================================================= */
-    .chart-container {
-        background: rgba(30, 41, 59, 0.3);
-        border: 1px solid rgba(59, 130, 246, 0.15);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    }
-
-    .chart-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #ffffff;
-        margin-bottom: 1rem;
-        letter-spacing: -0.01em;
-    }
-
-    /* =========================================================
-       RESPONSIVE ADJUSTMENTS
-    ========================================================= */
-    @media (max-width: 768px) {
-        .hero-title {
-            font-size: 1.875rem;
-        }
-        
-        .page-title {
-            font-size: 1.5rem;
-        }
-        
-        div[data-testid="stMetricValue"] {
-            font-size: 1.5rem !important;
-        }
+    header[data-testid="stHeader"] {
+        background: rgba(0,0,0,0);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -464,7 +294,7 @@ df = load_data()
 numeric_cols = [c for c in df.columns if c != "Provinsi"]
 
 # =========================================================
-# HELPER FUNCTIONS
+# HELPER
 # =========================================================
 def format_num(x):
     try:
@@ -474,10 +304,13 @@ def format_num(x):
 
 def get_filtered_df(base_df, province_filter, show_zero_rows):
     data = base_df.copy()
+
     if province_filter != "Semua Provinsi":
         data = data[data["Provinsi"] == province_filter].copy()
+
     if not show_zero_rows:
         data = data[(data[numeric_cols].sum(axis=1) > 0)].copy()
+
     return data
 
 def add_total_production(data):
@@ -501,31 +334,39 @@ def province_with_highest_total(data):
 def generate_dynamic_insight(data, commodity):
     if data.empty:
         return "Tidak ada data yang tersedia untuk filter saat ini."
+
     total = data[commodity].sum()
     if total <= 0:
         return f"Komoditas <b>{commodity}</b> tidak memiliki produksi pada filter aktif."
+
     top_df = data.nlargest(3, commodity)[["Provinsi", commodity]].copy()
     top_df["Share"] = (top_df[commodity] / total) * 100
+
     top1 = top_df.iloc[0]
     msg = (
         f"Produksi <b>{commodity}</b> pada filter aktif mencapai <b>{format_num(total)} ribu ton</b>. "
         f"Kontributor terbesar adalah <b>{top1['Provinsi']}</b> dengan produksi <b>{format_num(top1[commodity])} ribu ton</b> "
         f"atau sekitar <b>{top1['Share']:.1f}%</b> dari total produksi komoditas ini."
     )
+
     if len(top_df) >= 3:
         share3 = top_df["Share"].sum()
         msg += f" Tiga provinsi teratas menyumbang sekitar <b>{share3:.1f}%</b> dari total produksi."
+
     return msg
 
 def generate_recommendations(data, commodity):
     if data.empty:
         return ["Tidak ada data yang tersedia untuk menghasilkan rekomendasi."]
+
     total_by_commodity = data[numeric_cols].sum().sort_values(ascending=False)
     dominant = total_by_commodity.index[0]
     dominant_val = total_by_commodity.iloc[0]
+
     top_prov, top_val = top_province_for_commodity(data, commodity)
     total_selected = data[commodity].sum()
     share = (top_val / total_selected * 100) if total_selected > 0 else 0
+
     return [
         f"Fokuskan strategi hilirisasi pada <b>{dominant}</b> karena memiliki total produksi tertinggi sebesar <b>{format_num(dominant_val)} ribu ton</b>.",
         f"Untuk komoditas <b>{commodity}</b>, perlu mitigasi risiko konsentrasi wilayah karena <b>{top_prov}</b> menyumbang sekitar <b>{share:.1f}%</b> dari total produksi.",
@@ -538,35 +379,26 @@ def export_csv(dataframe):
     return dataframe.to_csv(index=False).encode("utf-8")
 
 # =========================================================
-# PLOTLY PROFESSIONAL TEMPLATE
+# PLOTLY DARK TEMPLATE
 # =========================================================
-def apply_professional_layout(fig, height=500):
+plot_bg = "#111827"
+paper_bg = "#111827"
+font_color = "#f8fafc"
+grid_color = "rgba(255,255,255,0.08)"
+
+def apply_dark_layout(fig, height=500):
     fig.update_layout(
         template="plotly_dark",
-        paper_bgcolor="rgba(30, 41, 59, 0.3)",
-        plot_bgcolor="rgba(30, 41, 59, 0.3)",
-        font=dict(color="#e8eaed", size=12),
+        paper_bgcolor=paper_bg,
+        plot_bgcolor=plot_bg,
+        font=dict(color=font_color),
         height=height,
-        margin=dict(l=50, r=40, t=70, b=50),
-        xaxis=dict(
-            gridcolor="rgba(148, 163, 184, 0.1)",
-            zerolinecolor="rgba(148, 163, 184, 0.2)",
-            title_font=dict(size=13, weight=600)
-        ),
-        yaxis=dict(
-            gridcolor="rgba(148, 163, 184, 0.1)",
-            zerolinecolor="rgba(148, 163, 184, 0.2)",
-            title_font=dict(size=13, weight=600)
-        ),
+        margin=dict(l=40, r=30, t=60, b=40),
+        xaxis=dict(gridcolor=grid_color, zerolinecolor=grid_color),
+        yaxis=dict(gridcolor=grid_color, zerolinecolor=grid_color),
         legend=dict(
             bgcolor="rgba(0,0,0,0)",
-            bordercolor="rgba(148, 163, 184, 0.2)",
-            font=dict(size=11)
-        ),
-        title=dict(
-            font=dict(size=16, weight=700, color="#ffffff"),
-            x=0.5,
-            xanchor="center"
+            bordercolor="rgba(255,255,255,0.08)"
         )
     )
     return fig
@@ -575,86 +407,54 @@ def apply_professional_layout(fig, height=500):
 # HERO HEADER
 # =========================================================
 st.markdown("""
-<div class="hero-container">
+<div class="hero-wrap">
     <div class="hero-title">🌾 Dashboard Komoditas Perkebunan Indonesia</div>
     <div class="hero-subtitle">
-        Platform analitik interaktif untuk eksplorasi, visualisasi, dan pemodelan data produksi komoditas perkebunan Indonesia per provinsi. 
-        Dirancang dengan pendekatan executive dashboard modern untuk kebutuhan akademik dan presentasi profesional.
+        Dashboard analitik interaktif untuk eksplorasi, visualisasi, dan pemodelan data produksi komoditas perkebunan Indonesia per provinsi (2024). 
+        Dirancang dengan pendekatan executive dashboard, EDA interaktif, predictive analytics, dan insight generator yang lebih presentable untuk konteks akademik maupun demonstrasi proyek.
     </div>
-    <div class="hero-badges">
-        <span class="hero-badge">📊 Executive Dashboard</span>
-        <span class="hero-badge">🔍 Interactive EDA</span>
-        <span class="hero-badge">🤖 ML Playground</span>
-        <span class="hero-badge">📥 Export Ready</span>
+    <div>
+        <span class="hero-badge">Executive Dashboard</span>
+        <span class="hero-badge">Interactive EDA</span>
+        <span class="hero-badge">Machine Learning Playground</span>
+        <span class="hero-badge">Export Ready</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # =========================================================
-# SIDEBAR - PROFESSIONAL FILTER PANEL
+# SIDEBAR
 # =========================================================
-with st.sidebar:
-    st.markdown("## 🧭 Navigasi")
-    
-    menu = st.radio(
-        "Pilih Halaman",
-        [
-            "🏠 Executive Dashboard",
-            "📊 Data Explorer",
-            "🔍 EDA Explorer",
-            "🧭 Profil Provinsi & Komoditas",
-            "🗺️ Geo Insight",
-            "📈 Predictive Analytics",
-            "🧠 Insight & Rekomendasi",
-            "📥 Export Center"
-        ],
-        label_visibility="collapsed"
-    )
-    
-    st.markdown("---")
-    st.markdown("## 🎛️ Filter Global")
-    
-    with st.container():
-        st.markdown('<div class="filter-section">', unsafe_allow_html=True)
-        
-        st.markdown('<div class="filter-title">Komoditas Utama</div>', unsafe_allow_html=True)
-        selected_commodity = st.selectbox(
-            "Komoditas",
-            numeric_cols,
-            index=0,
-            label_visibility="collapsed"
-        )
-        
-        st.markdown('<div class="filter-title">Provinsi</div>', unsafe_allow_html=True)
-        province_options = ["Semua Provinsi"] + df["Provinsi"].tolist()
-        selected_province = st.selectbox(
-            "Provinsi",
-            province_options,
-            index=0,
-            label_visibility="collapsed"
-        )
-        
-        st.markdown('<div class="filter-title">Top N Provinsi</div>', unsafe_allow_html=True)
-        top_n = st.slider(
-            "Jumlah",
-            min_value=5,
-            max_value=20,
-            value=10,
-            label_visibility="collapsed"
-        )
-        
-        show_zero_rows = st.checkbox(
-            "Tampilkan provinsi dengan total produksi 0",
-            value=True
-        )
-        
-        view_mode = st.radio(
-            "Mode Tampilan",
-            ["Nilai Absolut", "Persentase (%)"],
-            index=0
-        )
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+st.sidebar.title("🧭 Dashboard Navigation")
+
+menu = st.sidebar.radio(
+    "Pilih Halaman",
+    [
+        "🏠 Executive Dashboard",
+        "📊 Data Explorer",
+        "🔍 EDA Explorer",
+        "🧭 Profil Provinsi & Komoditas",
+        "🗺️ Geo Insight",
+        "📈 Predictive Analytics",
+        "🧠 Insight & Rekomendasi",
+        "📥 Export Center"
+    ]
+)
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("🎛️ Global Filter")
+
+selected_commodity = st.sidebar.selectbox("Komoditas utama", numeric_cols, index=0)
+province_options = ["Semua Provinsi"] + df["Provinsi"].tolist()
+selected_province = st.sidebar.selectbox("Provinsi", province_options, index=0)
+top_n = st.sidebar.slider("Top N Provinsi", min_value=5, max_value=20, value=10)
+show_zero_rows = st.sidebar.checkbox("Tampilkan provinsi dengan total produksi 0", value=True)
+
+view_mode = st.sidebar.radio(
+    "Mode tampilan",
+    ["Nilai Absolut", "Persentase (%)"],
+    index=0
+)
 
 filtered_df = get_filtered_df(df, selected_province, show_zero_rows)
 
@@ -662,13 +462,11 @@ filtered_df = get_filtered_df(df, selected_province, show_zero_rows)
 # EXECUTIVE DASHBOARD
 # =========================================================
 if menu == "🏠 Executive Dashboard":
-    st.markdown('<div class="page-title">Executive Dashboard</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Ringkasan eksekutif kondisi perkebunan nasional berdasarkan filter aktif</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Executive Dashboard</div>', unsafe_allow_html=True)
 
     if filtered_df.empty:
         st.warning("Tidak ada data yang cocok dengan filter aktif.")
     else:
-        # KPI Cards Row
         total_production = filtered_df[numeric_cols].sum().sum()
         total_province = filtered_df.shape[0]
         commodity_totals = filtered_df[numeric_cols].sum().sort_values(ascending=False)
@@ -676,27 +474,19 @@ if menu == "🏠 Executive Dashboard":
         top_commodity_val = commodity_totals.iloc[0]
         best_prov, best_total = province_with_highest_total(filtered_df)
 
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            st.metric("Jumlah Provinsi", total_province, "Provinsi aktif")
-        with col2:
-            st.metric("Total Produksi", format_num(total_production), "Ribu ton")
-        with col3:
-            st.metric("Komoditas Dominan", top_commodity, format_num(top_commodity_val))
-        with col4:
-            st.metric("Provinsi Tertinggi", best_prov[:15], format_num(best_total))
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Jumlah Provinsi", total_province)
+        c2.metric("Total Produksi", format_num(total_production))
+        c3.metric("Komoditas Dominan", top_commodity, format_num(top_commodity_val))
+        c4.metric("Provinsi Tertinggi", best_prov, format_num(best_total))
 
-        st.markdown("---")
+        st.markdown("")
 
-        # Main Charts Row
-        col_left, col_right = st.columns([3, 2])
+        left, right = st.columns([1.2, 1])
 
-        with col_left:
-            st.markdown('<div class="section-header">Top Provinsi berdasarkan Komoditas Terpilih</div>', unsafe_allow_html=True)
-            top_df = filtered_df[["Provinsi", selected_commodity]].sort_values(
-                selected_commodity, ascending=False
-            ).head(min(top_n, len(filtered_df))).copy()
+        with left:
+            st.markdown('<div class="section-title">Top Provinsi berdasarkan Komoditas Terpilih</div>', unsafe_allow_html=True)
+            top_df = filtered_df[["Provinsi", selected_commodity]].sort_values(selected_commodity, ascending=False).head(min(top_n, len(filtered_df))).copy()
 
             if view_mode == "Persentase (%)":
                 total_val = top_df[selected_commodity].sum()
@@ -717,11 +507,11 @@ if menu == "🏠 Executive Dashboard":
             )
             fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
             fig.update_layout(xaxis_title=x_title, yaxis_title="")
-            fig = apply_professional_layout(fig, 540)
+            fig = apply_dark_layout(fig, 540)
             st.plotly_chart(fig, use_container_width=True)
 
-        with col_right:
-            st.markdown('<div class="section-header">Komposisi Produksi Antar Komoditas</div>', unsafe_allow_html=True)
+        with right:
+            st.markdown('<div class="section-title">Komposisi Produksi Antar Komoditas</div>', unsafe_allow_html=True)
             comp_df = filtered_df[numeric_cols].sum().reset_index()
             comp_df.columns = ["Komoditas", "Produksi"]
             if view_mode == "Persentase (%)":
@@ -732,72 +522,55 @@ if menu == "🏠 Executive Dashboard":
                 comp_df,
                 values="Produksi",
                 names="Komoditas",
-                hole=0.5,
-                title="Distribusi Produksi per Komoditas"
+                hole=0.5
             )
             fig2.update_traces(textinfo='percent+label')
-            fig2 = apply_professional_layout(fig2, 540)
+            fig2 = apply_dark_layout(fig2, 540)
             st.plotly_chart(fig2, use_container_width=True)
 
-        # Quick Insight
-        st.markdown('<div class="section-header">Quick Insight</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Quick Insight</div>', unsafe_allow_html=True)
         st.markdown(
-            f'<div class="insight-card">{generate_dynamic_insight(filtered_df, selected_commodity)}</div>',
+            f'<div class="info-box">{generate_dynamic_insight(filtered_df, selected_commodity)}</div>',
             unsafe_allow_html=True
         )
 
-        # Summary Table
-        st.markdown('<div class="section-header">Ringkasan Produksi per Provinsi</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">Ringkasan Produksi per Provinsi</div>', unsafe_allow_html=True)
         summary_df = add_total_production(filtered_df)
-        st.dataframe(summary_df, use_container_width=True, hide_index=True)
+        st.dataframe(summary_df, use_container_width=True)
 
 # =========================================================
 # DATA EXPLORER
 # =========================================================
 elif menu == "📊 Data Explorer":
-    st.markdown('<div class="page-title">Data Explorer</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Eksplorasi struktur, kualitas, dan statistik deskriptif dataset</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Data Explorer</div>', unsafe_allow_html=True)
 
     if filtered_df.empty:
         st.warning("Tidak ada data untuk filter aktif.")
     else:
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Jumlah Observasi", filtered_df.shape[0])
-        with col2:
-            st.metric("Jumlah Variabel", filtered_df.shape[1])
-        with col3:
-            st.metric("Missing Value", int(filtered_df.isnull().sum().sum()))
-
-        st.markdown("---")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Jumlah Observasi", filtered_df.shape[0])
+        c2.metric("Jumlah Variabel", filtered_df.shape[1])
+        c3.metric("Missing Value", int(filtered_df.isnull().sum().sum()))
 
         tab1, tab2, tab3 = st.tabs(["📋 Dataset", "📈 Statistik Deskriptif", "🧹 Kualitas Data"])
 
         with tab1:
-            st.markdown('<div class="section-header">Data Lengkap (Filtered)</div>', unsafe_allow_html=True)
-            st.dataframe(filtered_df, use_container_width=True, hide_index=True)
+            st.dataframe(filtered_df, use_container_width=True)
 
         with tab2:
-            st.markdown('<div class="section-header">Statistik Deskriptif</div>', unsafe_allow_html=True)
             desc = filtered_df[numeric_cols].describe().T
             desc["range"] = desc["max"] - desc["min"]
             st.dataframe(desc, use_container_width=True)
 
         with tab3:
-            st.markdown('<div class="section-header">Laporan Kualitas Data</div>', unsafe_allow_html=True)
             duplicate_count = filtered_df.duplicated().sum()
             zero_rows = (filtered_df[numeric_cols].sum(axis=1) == 0).sum()
 
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Missing Values", int(filtered_df.isnull().sum().sum()))
-            with col2:
-                st.metric("Baris Duplikat", int(duplicate_count))
-            with col3:
-                st.metric("Provinsi Produksi 0", int(zero_rows))
-
+            st.markdown(f"- **Missing values:** {int(filtered_df.isnull().sum().sum())}")
+            st.markdown(f"- **Baris duplikat:** {int(duplicate_count)}")
+            st.markdown(f"- **Provinsi dengan total produksi 0:** {int(zero_rows)}")
             st.markdown(
-                '<div class="warning-card">Outlier tidak otomatis dihapus karena bisa merepresentasikan sentra produksi riil, bukan kesalahan data.</div>',
+                '<div class="warn-box">Outlier tidak otomatis dihapus karena bisa merepresentasikan sentra produksi riil, bukan kesalahan data.</div>',
                 unsafe_allow_html=True
             )
 
@@ -805,8 +578,7 @@ elif menu == "📊 Data Explorer":
 # EDA EXPLORER
 # =========================================================
 elif menu == "🔍 EDA Explorer":
-    st.markdown('<div class="page-title">EDA Explorer</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Eksplorasi visual interaktif dengan berbagai jenis grafik</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">EDA Explorer</div>', unsafe_allow_html=True)
 
     if filtered_df.empty:
         st.warning("Tidak ada data untuk filter aktif.")
@@ -819,12 +591,13 @@ elif menu == "🔍 EDA Explorer":
             "📍 Province Deep Dive"
         ])
 
+        # =========================
         # TAB 1 - OVERVIEW
+        # =========================
         with tab1:
-            col1, col2 = st.columns([3, 2])
+            c1, c2 = st.columns([1.2, 1])
 
-            with col1:
-                st.markdown('<div class="section-header">Top Provinsi - Komoditas Terpilih</div>', unsafe_allow_html=True)
+            with c1:
                 top_df = filtered_df[["Provinsi", selected_commodity]].sort_values(
                     selected_commodity, ascending=False
                 ).head(min(top_n, len(filtered_df))).copy()
@@ -838,11 +611,10 @@ elif menu == "🔍 EDA Explorer":
                     title=f"Top {min(top_n, len(top_df))} Provinsi - {selected_commodity}"
                 )
                 fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-                fig = apply_professional_layout(fig, 500)
+                fig = apply_dark_layout(fig, 500)
                 st.plotly_chart(fig, use_container_width=True)
 
-            with col2:
-                st.markdown('<div class="section-header">Top Provinsi - Total Produksi</div>', unsafe_allow_html=True)
+            with c2:
                 temp = add_total_production(filtered_df)
                 top_total = temp.sort_values("Total Produksi", ascending=False).head(min(top_n, len(temp)))
 
@@ -855,31 +627,31 @@ elif menu == "🔍 EDA Explorer":
                 )
                 fig2.update_traces(texttemplate='%{text:.2f}', textposition='outside')
                 fig2.update_xaxes(tickangle=45)
-                fig2 = apply_professional_layout(fig2, 500)
+                fig2 = apply_dark_layout(fig2, 500)
                 st.plotly_chart(fig2, use_container_width=True)
 
             st.markdown(
-                f'<div class="insight-card">{generate_dynamic_insight(filtered_df, selected_commodity)}</div>',
+                f'<div class="info-box">{generate_dynamic_insight(filtered_df, selected_commodity)}</div>',
                 unsafe_allow_html=True
             )
 
+        # =========================
         # TAB 2 - DISTRIBUTION
+        # =========================
         with tab2:
-            col1, col2 = st.columns(2)
+            c1, c2 = st.columns(2)
 
-            with col1:
-                st.markdown('<div class="section-header">Histogram Distribusi</div>', unsafe_allow_html=True)
+            with c1:
                 fig = px.histogram(
                     filtered_df,
                     x=selected_commodity,
                     nbins=15,
                     title=f"Distribusi {selected_commodity}"
                 )
-                fig = apply_professional_layout(fig, 480)
+                fig = apply_dark_layout(fig, 480)
                 st.plotly_chart(fig, use_container_width=True)
 
-            with col2:
-                st.markdown('<div class="section-header">Boxplot Perbandingan</div>', unsafe_allow_html=True)
+            with c2:
                 melted = filtered_df.melt(
                     id_vars="Provinsi",
                     value_vars=numeric_cols,
@@ -896,19 +668,16 @@ elif menu == "🔍 EDA Explorer":
                 )
                 fig2.update_xaxes(tickangle=35)
                 fig2.update_layout(showlegend=False)
-                fig2 = apply_professional_layout(fig2, 480)
+                fig2 = apply_dark_layout(fig2, 480)
                 st.plotly_chart(fig2, use_container_width=True)
 
+        # =========================
         # TAB 3 - RELATIONSHIP
+        # =========================
         with tab3:
-            st.markdown('<div class="section-header">Analisis Hubungan Dua Variabel</div>', unsafe_allow_html=True)
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                x_var = st.selectbox("Variabel X", numeric_cols, index=0, key="eda_x")
-            with col2:
-                y_default = 1 if len(numeric_cols) > 1 else 0
-                y_var = st.selectbox("Variabel Y", numeric_cols, index=y_default, key="eda_y")
+            x_var = st.selectbox("Variabel X", numeric_cols, index=0, key="eda_x")
+            y_default = 1 if len(numeric_cols) > 1 else 0
+            y_var = st.selectbox("Variabel Y", numeric_cols, index=y_default, key="eda_y")
 
             if x_var == y_var:
                 st.warning("Pilih dua variabel yang berbeda untuk analisis hubungan.")
@@ -920,20 +689,29 @@ elif menu == "🔍 EDA Explorer":
                     hover_name="Provinsi",
                     title=f"Hubungan {x_var} vs {y_var}"
                 )
-                fig = apply_professional_layout(fig, 550)
+                fig = apply_dark_layout(fig, 550)
                 st.plotly_chart(fig, use_container_width=True)
 
                 corr_val = filtered_df[[x_var, y_var]].corr().iloc[0, 1]
                 if pd.notna(corr_val):
                     st.markdown(
-                        f'<div class="insight-card">Nilai korelasi Pearson antara <b>{x_var}</b> dan <b>{y_var}</b> adalah <b>{corr_val:.3f}</b>.</div>',
+                        f'<div class="info-box">Nilai korelasi Pearson antara <b>{x_var}</b> dan <b>{y_var}</b> adalah <b>{corr_val:.3f}</b>.</div>',
                         unsafe_allow_html=True
                     )
 
+        # =========================
         # TAB 4 - CORRELATION
+        # =========================
+              # =========================
+        # TAB 4 - CORRELATION
+        # =========================
+               # =========================
+        # TAB 4 - CORRELATION
+        # =========================
+              # =========================
+        # TAB 4 - CORRELATION
+        # =========================
         with tab4:
-            st.markdown('<div class="section-header">Heatmap Korelasi Antar Komoditas</div>', unsafe_allow_html=True)
-            
             corr = filtered_df[numeric_cols].corr()
 
             fig = px.imshow(
@@ -943,29 +721,51 @@ elif menu == "🔍 EDA Explorer":
                 zmin=-1,
                 zmax=1,
                 color_continuous_scale=[
-                    [0.0, "#dc2626"],
-                    [0.5, "#1e293b"],
-                    [1.0, "#059669"]
+                    [0.0, "#7f1d1d"],
+                    [0.25, "#b91c1c"],
+                    [0.5, "#1f2937"],
+                    [0.75, "#0f766e"],
+                    [1.0, "#14b8a6"]
                 ],
-                title="Matriks Korelasi"
+                title="Heatmap Korelasi Antar Komoditas"
             )
 
             fig.update_traces(
                 textfont=dict(color="white", size=12),
-                xgap=3,
-                ygap=3
+                xgap=2,
+                ygap=2
             )
 
             fig.update_xaxes(side="bottom", tickangle=30)
             fig.update_yaxes(autorange="reversed")
 
-            fig = apply_professional_layout(fig, 600)
-            st.plotly_chart(fig, use_container_width=True)
+            fig.update_layout(
+                paper_bgcolor="#111827",
+                plot_bgcolor="#111827",
+                font=dict(color="#f8fafc"),
+                margin=dict(l=40, r=30, t=70, b=40)
+            )
 
-        # TAB 5 - PROVINCE DEEP DIVE
-        with tab5:
-            st.markdown('<div class="section-header">Analisis Mendalam per Provinsi</div>', unsafe_allow_html=True)
+            fig.update_coloraxes(
+                colorbar=dict(
+                    title=dict(
+                        text="Korelasi",
+                        font=dict(color="#f8fafc")
+                    ),
+                    tickfont=dict(color="#f8fafc")
+                )
+            )
+
+            st.plotly_chart(
+                fig,
+                use_container_width=True,
+                key="corr_heatmap_chart"
+            )
             
+        # =========================
+        # TAB 5 - PROVINCE DEEP DIVE
+        # =========================
+        with tab5:
             province_pick = st.selectbox(
                 "Pilih provinsi",
                 filtered_df["Provinsi"].tolist(),
@@ -980,9 +780,9 @@ elif menu == "🔍 EDA Explorer":
                     "Produksi": [row[c] for c in numeric_cols]
                 }).sort_values("Produksi", ascending=False)
 
-                col1, col2 = st.columns([3, 2])
+                c1, c2 = st.columns([1.1, 1])
 
-                with col1:
+                with c1:
                     fig = px.bar(
                         profile,
                         x="Komoditas",
@@ -991,10 +791,10 @@ elif menu == "🔍 EDA Explorer":
                         title=f"Profil Produksi {province_pick}"
                     )
                     fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-                    fig = apply_professional_layout(fig, 500)
+                    fig = apply_dark_layout(fig, 500)
                     st.plotly_chart(fig, use_container_width=True)
 
-                with col2:
+                with c2:
                     total_p = profile["Produksi"].sum()
                     dom_comm = profile.iloc[0]["Komoditas"]
                     dom_val = profile.iloc[0]["Produksi"]
@@ -1010,15 +810,14 @@ elif menu == "🔍 EDA Explorer":
                         title="Komposisi Komoditas"
                     )
                     fig2.update_traces(textinfo='percent+label')
-                    fig2 = apply_professional_layout(fig2, 420)
+                    fig2 = apply_dark_layout(fig2, 420)
                     st.plotly_chart(fig2, use_container_width=True)
 
 # =========================================================
 # PROFIL PROVINSI & KOMODITAS
 # =========================================================
 elif menu == "🧭 Profil Provinsi & Komoditas":
-    st.markdown('<div class="page-title">Profil Provinsi & Komoditas</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Analisis mendalam untuk provinsi dan komoditas tertentu</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Profil Provinsi & Komoditas</div>', unsafe_allow_html=True)
 
     if filtered_df.empty:
         st.warning("Tidak ada data untuk filter aktif.")
@@ -1026,8 +825,7 @@ elif menu == "🧭 Profil Provinsi & Komoditas":
         tab_p, tab_k = st.tabs(["📍 Profil Provinsi", "🌾 Profil Komoditas"])
 
         with tab_p:
-            st.markdown('<div class="section-header">Pilih Provinsi</div>', unsafe_allow_html=True)
-            province_pick = st.selectbox("Provinsi", filtered_df["Provinsi"].tolist(), key="profile_province", label_visibility="collapsed")
+            province_pick = st.selectbox("Pilih provinsi", filtered_df["Provinsi"].tolist(), key="profile_province")
             p_df = filtered_df[filtered_df["Provinsi"] == province_pick]
 
             if not p_df.empty:
@@ -1037,13 +835,10 @@ elif menu == "🧭 Profil Provinsi & Komoditas":
                     "Produksi": [row[c] for c in numeric_cols]
                 }).sort_values("Produksi", ascending=False)
 
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("Total Produksi", format_num(prov_profile["Produksi"].sum()))
-                with col2:
-                    st.metric("Komoditas Dominan", prov_profile.iloc[0]["Komoditas"])
-                with col3:
-                    st.metric("Nilai Tertinggi", format_num(prov_profile.iloc[0]["Produksi"]))
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Total Produksi", format_num(prov_profile["Produksi"].sum()))
+                c2.metric("Komoditas Dominan", prov_profile.iloc[0]["Komoditas"])
+                c3.metric("Nilai Tertinggi", format_num(prov_profile.iloc[0]["Produksi"]))
 
                 fig = px.bar(
                     prov_profile,
@@ -1053,26 +848,22 @@ elif menu == "🧭 Profil Provinsi & Komoditas":
                     title=f"Struktur Komoditas - {province_pick}"
                 )
                 fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-                fig = apply_professional_layout(fig, 520)
+                fig = apply_dark_layout(fig, 520)
                 st.plotly_chart(fig, use_container_width=True)
 
-                st.dataframe(prov_profile, use_container_width=True, hide_index=True)
+                st.dataframe(prov_profile, use_container_width=True)
 
         with tab_k:
-            st.markdown('<div class="section-header">Pilih Komoditas</div>', unsafe_allow_html=True)
-            commodity_pick = st.selectbox("Komoditas", numeric_cols, key="profile_commodity", label_visibility="collapsed")
+            commodity_pick = st.selectbox("Pilih komoditas", numeric_cols, key="profile_commodity")
             cdf = filtered_df[["Provinsi", commodity_pick]].sort_values(commodity_pick, ascending=False).copy()
             total = cdf[commodity_pick].sum()
 
             top_prov, top_val = top_province_for_commodity(filtered_df, commodity_pick)
 
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Total Nasional", format_num(total))
-            with col2:
-                st.metric("Provinsi Tertinggi", top_prov)
-            with col3:
-                st.metric("Produksi Tertinggi", format_num(top_val))
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Total Nasional", format_num(total))
+            c2.metric("Provinsi Tertinggi", top_prov)
+            c3.metric("Produksi Tertinggi", format_num(top_val))
 
             fig = px.bar(
                 cdf.head(min(top_n, len(cdf))),
@@ -1083,11 +874,11 @@ elif menu == "🧭 Profil Provinsi & Komoditas":
             )
             fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
             fig.update_xaxes(tickangle=45)
-            fig = apply_professional_layout(fig, 520)
+            fig = apply_dark_layout(fig, 520)
             st.plotly_chart(fig, use_container_width=True)
 
             st.markdown(
-                f'<div class="insight-card">{generate_dynamic_insight(filtered_df, commodity_pick)}</div>',
+                f'<div class="info-box">{generate_dynamic_insight(filtered_df, commodity_pick)}</div>',
                 unsafe_allow_html=True
             )
 
@@ -1095,18 +886,20 @@ elif menu == "🧭 Profil Provinsi & Komoditas":
 # GEO INSIGHT
 # =========================================================
 elif menu == "🗺️ Geo Insight":
-    st.markdown('<div class="page-title">Geo Insight</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Visualisasi persebaran spasial produksi komoditas</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Geo Insight</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="subtle-text">Halaman ini menampilkan persebaran produksi komoditas terpilih dalam bentuk ranking spasial dan bubble geo-insight. Jika nanti kamu ingin, halaman ini bisa saya upgrade ke peta Indonesia provinsi berbasis GeoJSON.</div>',
+        unsafe_allow_html=True
+    )
 
     if filtered_df.empty:
         st.warning("Tidak ada data untuk filter aktif.")
     else:
         geo_df = filtered_df[["Provinsi", selected_commodity]].copy().sort_values(selected_commodity, ascending=False)
 
-        col1, col2 = st.columns([3, 2])
+        c1, c2 = st.columns([1.2, 1])
 
-        with col1:
-            st.markdown('<div class="section-header">Ranking Spasial Produksi</div>', unsafe_allow_html=True)
+        with c1:
             fig = px.bar(
                 geo_df.head(min(top_n, len(geo_df))),
                 x="Provinsi",
@@ -1118,11 +911,10 @@ elif menu == "🗺️ Geo Insight":
             fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
             fig.update_xaxes(tickangle=45)
             fig.update_layout(showlegend=False)
-            fig = apply_professional_layout(fig, 520)
+            fig = apply_dark_layout(fig, 520)
             st.plotly_chart(fig, use_container_width=True)
 
-        with col2:
-            st.markdown('<div class="section-header">Bubble Geo-Insight</div>', unsafe_allow_html=True)
+        with c2:
             pseudo_geo = geo_df.head(min(15, len(geo_df))).copy()
             pseudo_geo["Rank"] = range(1, len(pseudo_geo) + 1)
 
@@ -1133,14 +925,14 @@ elif menu == "🗺️ Geo Insight":
                 size=selected_commodity,
                 hover_name="Provinsi",
                 text="Provinsi",
-                title="Bubble Chart Prioritas Wilayah"
+                title="Bubble Geo-Insight (Simulasi Sebaran Prioritas)"
             )
             fig2.update_traces(textposition="top center")
-            fig2 = apply_professional_layout(fig2, 520)
+            fig2 = apply_dark_layout(fig2, 520)
             st.plotly_chart(fig2, use_container_width=True)
 
         st.markdown(
-            f'<div class="insight-card">Komoditas <b>{selected_commodity}</b> memperlihatkan konsentrasi produksi pada sejumlah provinsi utama. Versi premium berikutnya bisa ditingkatkan menjadi <b>choropleth map Indonesia</b> berbasis GeoJSON.</div>',
+            f'<div class="info-box">Komoditas <b>{selected_commodity}</b> memperlihatkan konsentrasi produksi pada sejumlah provinsi utama. Versi premium berikutnya bisa ditingkatkan menjadi <b>choropleth map Indonesia</b> berbasis GeoJSON agar narasi geografis lebih kuat.</div>',
             unsafe_allow_html=True
         )
 
@@ -1148,8 +940,7 @@ elif menu == "🗺️ Geo Insight":
 # PREDICTIVE ANALYTICS
 # =========================================================
 elif menu == "📈 Predictive Analytics":
-    st.markdown('<div class="page-title">Predictive Analytics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Pemodelan prediktif dengan Machine Learning</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Predictive Analytics</div>', unsafe_allow_html=True)
 
     if filtered_df.shape[0] < 5:
         st.warning("Data terlalu sedikit untuk analisis prediktif yang stabil.")
@@ -1158,14 +949,16 @@ elif menu == "📈 Predictive Analytics":
             "📉 Regresi Linear", "📈 Forecasting", "🌲 Random Forest", "🌳 Decision Tree"
         ])
 
+        # -------------------------------------------------
         # REGRESI LINEAR
+        # -------------------------------------------------
         with tab_lr:
-            st.markdown('<div class="section-header">Regresi Linear Interaktif</div>', unsafe_allow_html=True)
+            st.markdown("### Regresi Linear Interaktif")
 
-            col1, col2 = st.columns(2)
-            with col1:
+            c1, c2 = st.columns(2)
+            with c1:
                 x_var = st.selectbox("Variabel independen (X)", numeric_cols, index=1 if len(numeric_cols) > 1 else 0, key="lr_x")
-            with col2:
+            with c2:
                 y_var = st.selectbox("Variabel dependen (Y)", numeric_cols, index=0, key="lr_y")
 
             if x_var == y_var:
@@ -1187,16 +980,13 @@ elif menu == "📈 Predictive Analytics":
                     rmse = math.sqrt(mean_squared_error(y, y_pred))
                     r2 = r2_score(y, y_pred)
 
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("MAE", f"{mae:.2f}")
-                    with col2:
-                        st.metric("RMSE", f"{rmse:.2f}")
-                    with col3:
-                        st.metric("R²", f"{r2:.4f}")
+                    k1, k2, k3 = st.columns(3)
+                    k1.metric("MAE", f"{mae:.2f}")
+                    k2.metric("RMSE", f"{rmse:.2f}")
+                    k3.metric("R²", f"{r2:.4f}")
 
                     st.markdown(
-                        f'<div class="insight-card"><b>Persamaan model:</b> {y_var} = {lr.coef_[0]:.4f} × {x_var} + {lr.intercept_:.4f}</div>',
+                        f'<div class="info-box"><b>Persamaan model:</b> {y_var} = {lr.coef_[0]:.4f} × {x_var} + {lr.intercept_:.4f}</div>',
                         unsafe_allow_html=True
                     )
 
@@ -1208,8 +998,7 @@ elif menu == "📈 Predictive Analytics":
                         x=plot_df[x_var],
                         y=plot_df[y_var],
                         mode="markers",
-                        name="Aktual",
-                        marker=dict(color="#3b82f6", size=10)
+                        name="Aktual"
                     ))
 
                     sort_idx = np.argsort(plot_df[x_var].values)
@@ -1217,8 +1006,7 @@ elif menu == "📈 Predictive Analytics":
                         x=plot_df[x_var].values[sort_idx],
                         y=plot_df["Prediksi"].values[sort_idx],
                         mode="lines",
-                        name="Garis Regresi",
-                        line=dict(color="#10b981", width=3)
+                        name="Garis Regresi"
                     ))
 
                     fig.update_layout(
@@ -1226,69 +1014,64 @@ elif menu == "📈 Predictive Analytics":
                         xaxis_title=x_var,
                         yaxis_title=y_var
                     )
-                    fig = apply_professional_layout(fig, 540)
+                    fig = apply_dark_layout(fig, 540)
                     st.plotly_chart(fig, use_container_width=True)
 
-                    st.markdown('<div class="section-header">Prediction Playground</div>', unsafe_allow_html=True)
+                    st.markdown("### Prediction Playground")
                     x_input = st.number_input(
                         f"Masukkan nilai {x_var} untuk memprediksi {y_var}",
                         min_value=0.0,
                         value=float(np.median(model_df[x_var]))
                     )
                     pred_val = lr.predict(np.array([[x_input]]))[0]
-                    st.markdown(
-                        f'<div class="success-card">Prediksi <b>{y_var}</b> untuk nilai <b>{x_var} = {x_input:.2f}</b> adalah <b>{pred_val:.2f}</b> ribu ton.</div>',
-                        unsafe_allow_html=True
-                    )
+                    st.success(f"Prediksi **{y_var}** untuk nilai **{x_var} = {x_input:.2f}** adalah **{pred_val:.2f}**.")
 
+        # -------------------------------------------------
         # FORECASTING
+        # -------------------------------------------------
         with tab_fc:
-            st.markdown('<div class="section-header">Forecasting 2025 (Simulasi Growth Rate)</div>', unsafe_allow_html=True)
+            st.markdown("### Forecasting 2025 (Simulasi Growth Rate)")
             st.markdown(
-                '<div class="warning-card">Dataset bersifat cross-sectional (1 tahun), sehingga forecasting di dashboard ini diposisikan sebagai simulasi pertumbuhan, bukan time-series forecasting historis.</div>',
+                '<div class="warn-box">Dataset bersifat cross-sectional (1 tahun), sehingga forecasting di dashboard ini diposisikan sebagai simulasi pertumbuhan, bukan time-series forecasting historis.</div>',
                 unsafe_allow_html=True
             )
 
-            col1, col2 = st.columns([1, 2])
-            with col1:
-                commodity_target = st.selectbox("Pilih komoditas untuk forecast", numeric_cols, key="fc_target")
-                growth_rate = st.slider("Growth Rate (%)", min_value=1, max_value=20, value=7, key="fc_growth") / 100
+            commodity_target = st.selectbox("Pilih komoditas untuk forecast", numeric_cols, key="fc_target")
+            growth_rate = st.slider("Growth Rate (%)", min_value=1, max_value=20, value=7, key="fc_growth") / 100
 
-            with col2:
-                fc_df = filtered_df[["Provinsi", commodity_target]].copy()
-                fc_df["Forecast_2025"] = fc_df[commodity_target] * (1 + growth_rate)
-                fc_df["Peningkatan"] = fc_df["Forecast_2025"] - fc_df[commodity_target]
+            fc_df = filtered_df[["Provinsi", commodity_target]].copy()
+            fc_df["Forecast_2025"] = fc_df[commodity_target] * (1 + growth_rate)
+            fc_df["Peningkatan"] = fc_df["Forecast_2025"] - fc_df[commodity_target]
 
-                top_fc = fc_df.sort_values(commodity_target, ascending=False).head(min(top_n, len(fc_df))).copy()
+            top_fc = fc_df.sort_values(commodity_target, ascending=False).head(min(top_n, len(fc_df))).copy()
 
-                fig = go.Figure()
-                fig.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[commodity_target], name="2024", marker_color="#3b82f6"))
-                fig.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Forecast_2025"], name="2025 (Forecast)", marker_color="#10b981"))
-                fig.update_layout(
-                    barmode="group",
-                    title=f"Perbandingan {commodity_target}: 2024 vs 2025",
-                    xaxis_title="Provinsi",
-                    yaxis_title="Produksi"
-                )
-                fig = apply_professional_layout(fig, 550)
-                st.plotly_chart(fig, use_container_width=True)
+            fig = go.Figure()
+            fig.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[commodity_target], name="2024"))
+            fig.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Forecast_2025"], name="2025 (Forecast)"))
+            fig.update_layout(
+                barmode="group",
+                title=f"Perbandingan {commodity_target}: 2024 vs 2025",
+                xaxis_title="Provinsi",
+                yaxis_title="Produksi"
+            )
+            fig = apply_dark_layout(fig, 550)
+            st.plotly_chart(fig, use_container_width=True)
 
             total_now = fc_df[commodity_target].sum()
             total_fc = fc_df["Forecast_2025"].sum()
 
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Total 2024", format_num(total_now))
-            with col2:
-                st.metric("Total 2025 (Forecast)", format_num(total_fc))
-            with col3:
-                st.metric("Kenaikan Total", format_num(total_fc - total_now))
+            k1, k2, k3 = st.columns(3)
+            k1.metric("Total 2024", format_num(total_now))
+            k2.metric("Total 2025 (Forecast)", format_num(total_fc))
+            k3.metric("Kenaikan Total", format_num(total_fc - total_now))
 
-            st.dataframe(fc_df.sort_values("Forecast_2025", ascending=False), use_container_width=True, hide_index=True)
+            st.dataframe(fc_df.sort_values("Forecast_2025", ascending=False), use_container_width=True)
 
+        # -------------------------------------------------
         # RANDOM FOREST
+        # -------------------------------------------------
         with tab_rf:
-            st.markdown('<div class="section-header">Random Forest Regression</div>', unsafe_allow_html=True)
+            st.markdown("### Random Forest Regression")
             target_rf = st.selectbox("Pilih target prediksi", numeric_cols, key="rf_target")
 
             feature_cols = [c for c in numeric_cols if c != target_rf]
@@ -1316,13 +1099,10 @@ elif menu == "📈 Predictive Analytics":
                 rmse = math.sqrt(mean_squared_error(y_test, y_pred))
                 r2 = r2_score(y_test, y_pred)
 
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("MAE", f"{mae:.2f}")
-                with col2:
-                    st.metric("RMSE", f"{rmse:.2f}")
-                with col3:
-                    st.metric("R²", f"{r2:.4f}")
+                k1, k2, k3 = st.columns(3)
+                k1.metric("MAE", f"{mae:.2f}")
+                k2.metric("RMSE", f"{rmse:.2f}")
+                k3.metric("R²", f"{r2:.4f}")
 
                 importance = pd.Series(rf.feature_importances_, index=feature_cols).sort_values(ascending=False).reset_index()
                 importance.columns = ["Fitur", "Importance"]
@@ -1336,18 +1116,20 @@ elif menu == "📈 Predictive Analytics":
                     title=f"Feature Importance Random Forest - {target_rf}"
                 )
                 fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
-                fig = apply_professional_layout(fig, 500)
+                fig = apply_dark_layout(fig, 500)
                 st.plotly_chart(fig, use_container_width=True)
 
                 compare_df = pd.DataFrame({
                     "Aktual": y_test.values,
                     "Prediksi": y_pred
                 })
-                st.dataframe(compare_df, use_container_width=True, hide_index=True)
+                st.dataframe(compare_df, use_container_width=True)
 
+        # -------------------------------------------------
         # DECISION TREE
+        # -------------------------------------------------
         with tab_dt:
-            st.markdown('<div class="section-header">Decision Tree Regression</div>', unsafe_allow_html=True)
+            st.markdown("### Decision Tree Regression")
             target_dt = st.selectbox("Pilih target prediksi", numeric_cols, key="dt_target")
 
             feature_cols_dt = [c for c in numeric_cols if c != target_dt]
@@ -1371,13 +1153,10 @@ elif menu == "📈 Predictive Analytics":
                 rmse = math.sqrt(mean_squared_error(y_test, y_pred))
                 r2 = r2_score(y_test, y_pred)
 
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("MAE", f"{mae:.2f}")
-                with col2:
-                    st.metric("RMSE", f"{rmse:.2f}")
-                with col3:
-                    st.metric("R²", f"{r2:.4f}")
+                k1, k2, k3 = st.columns(3)
+                k1.metric("MAE", f"{mae:.2f}")
+                k2.metric("RMSE", f"{rmse:.2f}")
+                k3.metric("R²", f"{r2:.4f}")
 
                 importance = pd.Series(dt.feature_importances_, index=feature_cols_dt).sort_values(ascending=False).reset_index()
                 importance.columns = ["Fitur", "Importance"]
@@ -1391,11 +1170,11 @@ elif menu == "📈 Predictive Analytics":
                     title=f"Feature Importance Decision Tree - {target_dt}"
                 )
                 fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
-                fig = apply_professional_layout(fig, 500)
+                fig = apply_dark_layout(fig, 500)
                 st.plotly_chart(fig, use_container_width=True)
 
                 st.markdown(
-                    '<div class="insight-card">Visualisasi pohon keputusan penuh tidak ditampilkan agar dashboard tetap ringan dan stabil. Interpretasi model difokuskan pada <b>feature importance</b>.</div>',
+                    '<div class="info-box">Visualisasi pohon keputusan penuh tidak ditampilkan agar dashboard tetap ringan dan stabil. Interpretasi model difokuskan pada <b>feature importance</b>.</div>',
                     unsafe_allow_html=True
                 )
 
@@ -1403,8 +1182,7 @@ elif menu == "📈 Predictive Analytics":
 # INSIGHT & REKOMENDASI
 # =========================================================
 elif menu == "🧠 Insight & Rekomendasi":
-    st.markdown('<div class="page-title">Insight & Rekomendasi</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Temuan analitis dan rekomendasi strategis berbasis data</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Insight & Rekomendasi</div>', unsafe_allow_html=True)
 
     if filtered_df.empty:
         st.warning("Tidak ada data untuk filter aktif.")
@@ -1417,8 +1195,6 @@ elif menu == "🧠 Insight & Rekomendasi":
         total_selected = filtered_df[selected_commodity].sum()
         share_top = (top_val / total_selected * 100) if total_selected > 0 else 0
 
-        st.markdown('<div class="section-header">💡 Insight Utama</div>', unsafe_allow_html=True)
-        
         insights = [
             f"Komoditas dengan total produksi terbesar pada filter aktif adalah <b>{dominant_comm}</b> sebesar <b>{format_num(dominant_val)} ribu ton</b>.",
             f"Untuk komoditas <b>{selected_commodity}</b>, provinsi tertinggi adalah <b>{top_prov}</b> dengan produksi <b>{format_num(top_val)} ribu ton</b>.",
@@ -1427,67 +1203,57 @@ elif menu == "🧠 Insight & Rekomendasi":
             "Forecasting pada dashboard ini bersifat simulatif sehingga lebih tepat digunakan untuk eksplorasi skenario awal daripada prediksi kebijakan final."
         ]
 
+        st.markdown("### 💡 Insight Utama")
         for i, ins in enumerate(insights, start=1):
-            st.markdown(f'<div class="insight-card"><b>{i}.</b> {ins}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="info-box"><b>{i}.</b> {ins}</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="section-header">🚀 Rekomendasi Strategis</div>', unsafe_allow_html=True)
-        
+        st.markdown("### 🚀 Rekomendasi Strategis")
         recs = generate_recommendations(filtered_df, selected_commodity)
         for i, rec in enumerate(recs, start=1):
-            st.markdown(f'<div class="success-card"><b>{i}.</b> {rec}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="success-box"><b>{i}.</b> {rec}</div>', unsafe_allow_html=True)
 
 # =========================================================
 # EXPORT CENTER
 # =========================================================
 elif menu == "📥 Export Center":
-    st.markdown('<div class="page-title">Export Center</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Unduh dataset dan hasil analisis untuk kebutuhan pelaporan</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Export Center</div>', unsafe_allow_html=True)
 
     if filtered_df.empty:
         st.warning("Tidak ada data untuk diekspor.")
     else:
-        st.markdown('<div class="section-header">Export Dataset Terfilter</div>', unsafe_allow_html=True)
-        
+        st.markdown("Unduh data hasil filter aktif atau hasil forecast untuk kebutuhan pelaporan dan presentasi.")
+
         export_df = add_total_production(filtered_df)
         st.download_button(
             label="⬇️ Download dataset hasil filter (CSV)",
             data=export_csv(export_df),
             file_name="dataset_hasil_filter.csv",
-            mime="text/csv",
-            use_container_width=True
+            mime="text/csv"
         )
 
-        st.markdown("---")
-        st.markdown('<div class="section-header">Export Forecast 2025</div>', unsafe_allow_html=True)
-        
-        col1, col2 = st.columns([1, 2])
-        with col1:
-            exp_comm = st.selectbox("Komoditas untuk forecast", numeric_cols, key="exp_comm")
-            exp_growth = st.slider("Growth rate forecast (%)", 1, 20, 7, key="exp_growth") / 100
+        st.markdown("### Export Forecast")
+        exp_comm = st.selectbox("Komoditas untuk file forecast", numeric_cols, key="exp_comm")
+        exp_growth = st.slider("Growth rate forecast (%)", 1, 20, 7, key="exp_growth") / 100
 
-        with col2:
-            export_fc = filtered_df[["Provinsi", exp_comm]].copy()
-            export_fc["Forecast_2025"] = export_fc[exp_comm] * (1 + exp_growth)
-            export_fc["Peningkatan"] = export_fc["Forecast_2025"] - export_fc[exp_comm]
+        export_fc = filtered_df[["Provinsi", exp_comm]].copy()
+        export_fc["Forecast_2025"] = export_fc[exp_comm] * (1 + exp_growth)
+        export_fc["Peningkatan"] = export_fc["Forecast_2025"] - export_fc[exp_comm]
 
-            st.dataframe(export_fc, use_container_width=True, hide_index=True)
+        st.dataframe(export_fc, use_container_width=True)
 
         st.download_button(
             label="⬇️ Download forecast 2025 (CSV)",
             data=export_csv(export_fc),
             file_name=f"forecast_{exp_comm.lower().replace(' ', '_')}_2025.csv",
-            mime="text/csv",
-            use_container_width=True
+            mime="text/csv"
         )
 
 # =========================================================
-# PROFESSIONAL FOOTER
+# FOOTER
 # =========================================================
 st.markdown("""
-<div class="professional-footer">
+<div class="footer-box">
     <h3>🎓 Dashboard UAS Pengenalan Sains Data</h3>
-    <p>Versi Professional Dashboard dengan Executive View, Interactive EDA, dan Predictive Analytics</p>
-    <p style="margin-top: 1rem;">Dibuat dengan Streamlit, Plotly, dan Scikit-Learn</p>
-    <p>© 2026 | Data Source: BPS - Produksi Tanaman Perkebunan 2024</p>
+    <p>Versi dark theme dengan executive dashboard, EDA interaktif, predictive analytics, dan export center.</p>
 </div>
 """, unsafe_allow_html=True)
