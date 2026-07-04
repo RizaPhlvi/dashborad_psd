@@ -5,248 +5,320 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
+
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import warnings
 
+import warnings
 warnings.filterwarnings('ignore')
 
 # =========================================================
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="Indonesian Plantation Intelligence Dashboard",
-    page_icon="🌾",
+    page_title="Dashboard Intelijen Komoditas Perkebunan Indonesia",
+    page_icon="🌴",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # =========================================================
-# ULTRA PREMIUM DARK THEME CSS
+# PLANTATION PREMIUM DARK THEME CSS
 # =========================================================
 st.markdown("""
 <style>
-    /* Global Styles */
+    /* =========================================================
+       GLOBAL - AGRO-FOREST DARK THEME
+    ========================================================= */
     .stApp {
-        background-color: #0b1220;
-        color: #f8fafc;
+        background: linear-gradient(180deg, #0a1410 0%, #0d1b12 45%, #102015 100%);
+        color: #e8f0e4;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    
+
     .block-container {
-        max-width: 1600px;
-        padding: 1rem 2rem 3rem 2rem;
+        max-width: 1500px;
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
     }
-    
-    /* Custom KPI Cards */
-    .custom-kpi-card {
-        background: linear-gradient(145deg, #111827, #0b1220);
-        border-radius: 16px;
-        padding: 1.25rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        border-left: 5px solid #3b82f6;
-        transition: all 0.3s ease;
-    }
-    
-    .custom-kpi-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.3);
-    }
-    
-    .kpi-title {
-        font-size: 0.8rem;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 0.5rem;
-        font-weight: 600;
-    }
-    
-    .kpi-value {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: #f8fafc;
-        line-height: 1.2;
-        letter-spacing: -0.02em;
-    }
-    
-    .kpi-subtitle {
-        font-size: 0.75rem;
-        color: #64748b;
-        margin-top: 0.25rem;
-        font-weight: 500;
-    }
-    
-    /* Info Boxes */
-    .premium-info-box {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
-        border-left: 3px solid #3b82f6;
-        padding: 1rem 1.25rem;
-        border-radius: 12px;
-        color: #e2e8f0;
-        line-height: 1.6;
-        margin: 1rem 0;
-        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
-    }
-    
-    .warning-box {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
-        border-left: 3px solid #f59e0b;
-        padding: 1rem 1.25rem;
-        border-radius: 12px;
-        color: #fde68a;
-        line-height: 1.6;
-        margin: 1rem 0;
-    }
-    
-    .success-box {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.05) 100%);
-        border-left: 3px solid #10b981;
-        padding: 1rem 1.25rem;
-        border-radius: 12px;
-        color: #d1fae5;
-        line-height: 1.6;
-        margin: 1rem 0;
-    }
-    
-    /* Sidebar Styles */
-    section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
-        border-right: 1px solid rgba(59, 130, 246, 0.2);
-    }
-    
-    section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3,
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] .stMarkdown {
-        color: #cbd5e1 !important;
-    }
-    
-    /* Metric Cards */
-    div[data-testid="stMetric"] {
-        background: linear-gradient(145deg, #111827, #0b1220);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 12px;
-        padding: 1rem;
-    }
-    
-    div[data-testid="stMetricLabel"] {
-        color: #94a3b8 !important;
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-    }
-    
-    div[data-testid="stMetricValue"] {
-        color: #f8fafc !important;
-        font-size: 1.8rem !important;
-        font-weight: 800 !important;
-    }
-    
-    /* Buttons */
-    .stButton > button {
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-    }
-    
-    /* DataFrames */
-    .stDataFrame {
-        border-radius: 12px;
-        border: 1px solid rgba(59, 130, 246, 0.2) !important;
-    }
-    
-    /* Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 0.5rem;
-        background: rgba(17, 24, 39, 0.6);
-        padding: 0.5rem;
-        border-radius: 12px;
-        border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        background: transparent;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        color: #cbd5e1;
-    }
-    
-    .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%) !important;
-        color: white !important;
-    }
-    
-    /* Hero Header */
-    .hero-container {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #0f766e 100%);
+
+    /* =========================================================
+       HERO - PLANTATION INTELLIGENCE HEADER
+    ========================================================= */
+    .hero-wrap {
+        background: linear-gradient(135deg, #0d1b12 0%, #1a4d2e 45%, #2f855a 100%);
+        padding: 2rem 2.5rem;
         border-radius: 24px;
-        padding: 2.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 20px 60px rgba(30, 58, 138, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        box-shadow: 0 20px 50px rgba(47, 133, 90, 0.3), 0 0 80px rgba(74, 222, 128, 0.08) inset;
+        border: 1px solid rgba(186, 230, 170, 0.15);
+        margin-bottom: 1.5rem;
         position: relative;
         overflow: hidden;
     }
-    
+
+    .hero-wrap::before {
+        content: '🌴';
+        position: absolute;
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 8rem;
+        opacity: 0.08;
+    }
+
     .hero-title {
-        font-size: 2.8rem;
+        font-size: 2.4rem;
         font-weight: 800;
-        color: #ffffff;
+        line-height: 1.2;
         margin-bottom: 0.5rem;
-        letter-spacing: -0.03em;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.1rem;
-        color: rgba(255, 255, 255, 0.85);
-        line-height: 1.6;
-    }
-    
-    /* Section Headers */
-    .section-header {
-        font-size: 1.25rem;
-        font-weight: 700;
         color: #ffffff;
-        margin-top: 1.5rem;
+        letter-spacing: -0.02em;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-subtitle {
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 0.35rem;
+        max-width: 85%;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        background: rgba(47, 133, 90, 0.25);
+        border: 1px solid rgba(186, 230, 170, 0.3);
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #a7f3d0;
+        margin-right: 0.5rem;
+        margin-top: 0.8rem;
+        backdrop-filter: blur(10px);
+        position: relative;
+        z-index: 1;
+    }
+
+    /* =========================================================
+       SECTION TITLE
+    ========================================================= */
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #a7f3d0;
+        margin-top: 1rem;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
-        border-bottom: 3px solid #3b82f6;
+        border-bottom: 2px solid rgba(74, 222, 128, 0.3);
         display: inline-block;
     }
-    
-    /* Filter Section */
-    .filter-title {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #94a3b8;
+
+    .section-subtitle {
+        font-size: 0.95rem;
+        color: #93a39a;
+        margin-bottom: 1.5rem;
+        font-style: italic;
+    }
+
+    .subtle-text {
+        color: #c7d2c0;
+        font-size: 0.96rem;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+       PLANTATION INFO BOXES
+    ========================================================= */
+    .plantation-card {
+        background: linear-gradient(180deg, #13261a 0%, #0d1b12 100%);
+        border: 1px solid rgba(186, 230, 170, 0.1);
+        border-radius: 18px;
+        padding: 1.1rem 1.25rem;
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, rgba(47, 133, 90, 0.18) 0%, rgba(74, 222, 128, 0.08) 100%);
+        border-left: 4px solid #4ade80;
+        padding: 1.1rem 1.25rem;
+        border-radius: 14px;
+        color: #d1fae5;
+        margin: 0.5rem 0 1rem 0;
+        box-shadow: 0 6px 18px rgba(47, 133, 90, 0.15);
+        line-height: 1.65;
+    }
+
+    .success-box {
+        background: linear-gradient(135deg, rgba(132, 204, 22, 0.16) 0%, rgba(163, 230, 53, 0.08) 100%);
+        border-left: 4px solid #84cc16;
+        padding: 1.1rem 1.25rem;
+        border-radius: 14px;
+        color: #ecfccb;
+        margin: 0.5rem 0 1rem 0;
+        box-shadow: 0 6px 18px rgba(132, 204, 22, 0.12);
+        line-height: 1.65;
+    }
+
+    .warn-box {
+        background: linear-gradient(135deg, rgba(212, 160, 23, 0.18) 0%, rgba(251, 191, 36, 0.08) 100%);
+        border-left: 4px solid #d4a017;
+        padding: 1.1rem 1.25rem;
+        border-radius: 14px;
+        color: #fef3c7;
+        margin: 0.5rem 0 1rem 0;
+        box-shadow: 0 6px 18px rgba(212, 160, 23, 0.12);
+        line-height: 1.65;
+    }
+
+    .insight-box {
+        background: linear-gradient(135deg, rgba(124, 79, 42, 0.15) 0%, rgba(139, 94, 52, 0.08) 100%);
+        border-left: 4px solid #c7815e;
+        padding: 1.1rem 1.25rem;
+        border-radius: 14px;
+        color: #fef3c7;
+        margin: 0.5rem 0 1rem 0;
+        box-shadow: 0 6px 18px rgba(124, 79, 42, 0.12);
+        line-height: 1.65;
+    }
+
+    .footer-box {
+        text-align: center;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #0d1b12 0%, #1a4d2e 100%);
+        color: #a7f3d0;
+        border-radius: 18px;
+        margin-top: 1.5rem;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(186, 230, 170, 0.12);
+    }
+
+    /* =========================================================
+       SIDEBAR - PLANTATION CONTROL CENTER
+    ========================================================= */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0a1410 0%, #0d1b12 100%);
+        border-right: 1px solid rgba(186, 230, 170, 0.1);
+    }
+
+    section[data-testid="stSidebar"] * {
+        color: #e8f0e4 !important;
+    }
+
+    section[data-testid="stSidebar"] h2 {
+        color: #4ade80 !important;
+        font-weight: 700 !important;
+    }
+
+    /* =========================================================
+       METRIC CARDS - PLANTATION STYLE
+    ========================================================= */
+    div[data-testid="stMetric"] {
+        background: linear-gradient(180deg, #13261a 0%, #0d1b12 100%);
+        border: 1px solid rgba(186, 230, 170, 0.1);
+        border-radius: 18px;
+        padding: 1.1rem 1.25rem;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    div[data-testid="stMetric"]:hover {
+        border-color: rgba(74, 222, 128, 0.4);
+        box-shadow: 0 12px 28px rgba(74, 222, 128, 0.15);
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #93a39a !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 0.5rem;
-        margin-top: 1rem;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #a7f3d0 !important;
+        font-weight: 800 !important;
+        font-size: 1.9rem !important;
+    }
+
+    div[data-testid="stMetricDelta"] {
+        color: #4ade80 !important;
+    }
+
+    /* =========================================================
+       TABS - PLANTATION NAVIGATION
+    ========================================================= */
+    button[data-baseweb="tab"] {
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        background: #13261a !important;
+        color: #c7d2c0 !important;
+        border: 1px solid rgba(186, 230, 170, 0.1) !important;
+        padding: 0.75rem 1.25rem !important;
+    }
+
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, #1a4d2e 0%, #2f855a 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 4px 14px rgba(47, 133, 90, 0.4) !important;
+    }
+
+    /* =========================================================
+       DATAFRAME / TABLE
+    ========================================================= */
+    .stDataFrame, .stTable {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(186, 230, 170, 0.1) !important;
+    }
+
+    div[data-testid="stExpander"] {
+        background: #13261a;
+        border: 1px solid rgba(186, 230, 170, 0.1);
+        border-radius: 14px;
+    }
+
+    /* =========================================================
+       INPUTS
+    ========================================================= */
+    .stSelectbox label,
+    .stSlider label,
+    .stRadio label,
+    .stMultiSelect label,
+    .stNumberInput label {
+        color: #c7d2c0 !important;
+        font-weight: 600;
+    }
+
+    /* =========================================================
+       PLANTATION COMMODITY PILLS
+    ========================================================= */
+    .commodity-pill {
+        display: inline-block;
+        padding: 0.35rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 0.2rem;
+        color: white;
+    }
+
+    header[data-testid="stHeader"] {
+        background: rgba(0, 0, 0, 0);
     }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================================================
-# DATASET EMBEDDED (BPS 2024 Data)
+# DATASET EMBEDDED - DATA PERKEBUNAN INDONESIA 2024
 # =========================================================
 CSV_DATA = """Provinsi,Kelapa Sawit,Kelapa,Karet,Kopi,Kakao,Teh,Tebu
 ACEH,1092.71,64.1,51.17,74.13,34.17,0,0
@@ -299,10 +371,75 @@ df = load_data()
 numeric_cols = [c for c in df.columns if c != "Provinsi"]
 
 # =========================================================
+# PLANTATION COMMODITY IDENTITY MAP
+# =========================================================
+COMMODITY_IDENTITY = {
+    "Kelapa Sawit": {
+        "icon": "🌴",
+        "color": "#2f855a",
+        "color_light": "#4ade80",
+        "character": "Komoditas primadona ekspor Indonesia. Mendominasi perkebunan Sumatera dan Kalimantan sebagai sentra CPO nasional.",
+        "sector": "Perkebunan Besar"
+    },
+    "Kelapa": {
+        "icon": "🥥",
+        "color": "#38bdf8",
+        "color_light": "#7dd3fc",
+        "character": "Tanaman rakyat yang tersebar luas di pesisir Nusantara. Potensi hilirisasi minyak kelapa dan turunan sabut sangat tinggi.",
+        "sector": "Perkebunan Rakyat"
+    },
+    "Karet": {
+        "icon": "🌳",
+        "color": "#7c4f2a",
+        "color_light": "#c7815e",
+        "character": "Komoditas strategis dengan sentra utama di Sumatera. Menghadapi tantangan fluktuasi harga global dan peremajaan lahan.",
+        "sector": "Perkebunan Campuran"
+    },
+    "Kopi": {
+        "icon": "☕",
+        "color": "#8b5e34",
+        "color_light": "#d4a574",
+        "character": "Identitas budaya Indonesia. Kopi Gayo, Toraja, Kintamani, dan Java Preanger menjadi ikon specialty coffee dunia.",
+        "sector": "Perkebunan Rakyat"
+    },
+    "Kakao": {
+        "icon": "🍫",
+        "color": "#6b3410",
+        "color_light": "#a0522d",
+        "character": "Sulawesi sebagai tulang punggung produksi kakao nasional. Perlu peremajaan pohon dan peningkatan fermentasi pasca panen.",
+        "sector": "Perkebunan Rakyat"
+    },
+    "Teh": {
+        "icon": "🍃",
+        "color": "#059669",
+        "color_light": "#34d399",
+        "character": "Eksklusif tumbuh di dataran tinggi berhawa dingin. Jawa Barat dan Sumatera Utara menjadi sentra utama perkebunan teh.",
+        "sector": "Perkebunan Besar"
+    },
+    "Tebu": {
+        "icon": "🌾",
+        "color": "#84cc16",
+        "color_light": "#bef264",
+        "character": "Bahan baku gula nasional yang terkonsentrasi di Jawa Timur dan Lampung. Vital untuk ketahanan pangan dan gula domestik.",
+        "sector": "Perkebunan Strategis"
+    }
+}
+
+def get_commodity_color(commodity, light=False):
+    """Ambil warna identitas komoditas"""
+    if commodity in COMMODITY_IDENTITY:
+        return COMMODITY_IDENTITY[commodity]["color_light"] if light else COMMODITY_IDENTITY[commodity]["color"]
+    return "#4ade80"
+
+def get_commodity_icon(commodity):
+    """Ambil icon komoditas"""
+    return COMMODITY_IDENTITY.get(commodity, {}).get("icon", "🌱")
+
+# =========================================================
 # HELPER FUNCTIONS
 # =========================================================
 def format_num(x):
-    """Format angka dengan suffix K/M"""
+    """Format angka ke K/M suffix"""
     try:
         val = float(x)
         if val >= 1_000_000:
@@ -313,231 +450,411 @@ def format_num(x):
     except:
         return str(x)
 
+def format_ton(x):
+    """Format ribu ton"""
+    try:
+        return f"{float(x):,.2f}"
+    except:
+        return str(x)
+
+def get_filtered_df(base_df, province_filter, show_zero_rows):
+    """Filter data perkebunan"""
+    data = base_df.copy()
+    if province_filter != "Semua Provinsi":
+        data = data[data["Provinsi"] == province_filter].copy()
+    if not show_zero_rows:
+        data = data[(data[numeric_cols].sum(axis=1) > 0)].copy()
+    return data
+
 def add_total_production(data):
-    """Tambahkan kolom total produksi"""
+    """Tambah kolom total produksi perkebunan"""
     temp = data.copy()
     temp["Total Produksi"] = temp[numeric_cols].sum(axis=1)
     return temp
 
-def apply_dark_layout(fig, height=500):
-    """Apply dark theme ke Plotly chart"""
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="rgba(11, 18, 32, 0)",
-        plot_bgcolor="rgba(17, 24, 39, 0.4)",
-        font=dict(color="#f8fafc", family="Inter, sans-serif"),
-        height=height,
-        margin=dict(l=40, r=30, t=60, b=40),
-        xaxis=dict(gridcolor="rgba(148, 163, 184, 0.1)", zerolinecolor="rgba(148, 163, 184, 0.2)"),
-        yaxis=dict(gridcolor="rgba(148, 163, 184, 0.1)", zerolinecolor="rgba(148, 163, 184, 0.2)"),
-        legend=dict(bgcolor="rgba(0,0,0,0)", bordercolor="rgba(148, 163, 184, 0.2)")
-    )
-    return fig
+def top_province_for_commodity(data, commodity):
+    """Cari provinsi sentra produksi komoditas"""
+    if data.empty or commodity not in data.columns:
+        return "-", 0
+    idx = data[commodity].idxmax()
+    return data.loc[idx, "Provinsi"], data.loc[idx, commodity]
 
-def create_kpi_card(title, value, subtitle="", icon="📊", color="#3b82f6"):
-    """Buat custom KPI card"""
-    return f"""
-    <div class="custom-kpi-card" style="border-left-color: {color};">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div class="kpi-title">{title}</div>
-            <div style="font-size: 1.5rem;">{icon}</div>
-        </div>
-        <div class="kpi-value">{value}</div>
-        <div class="kpi-subtitle">{subtitle}</div>
-    </div>
-    """
+def province_with_highest_total(data):
+    """Cari provinsi dengan total produksi perkebunan tertinggi"""
+    temp = add_total_production(data)
+    if temp.empty:
+        return "-", 0
+    idx = temp["Total Produksi"].idxmax()
+    return temp.loc[idx, "Provinsi"], temp.loc[idx, "Total Produksi"]
 
-def generate_insight_box(text, box_type="info"):
-    """Generate insight box"""
-    if box_type == "warning":
-        return f'<div class="warning-box">{text}</div>'
-    elif box_type == "success":
-        return f'<div class="success-box">{text}</div>'
-    return f'<div class="premium-info-box">{text}</div>'
+def province_with_most_diverse(data):
+    """Cari provinsi dengan portofolio komoditas paling terdiversifikasi"""
+    if data.empty:
+        return "-", 0
+    diversity = (data[numeric_cols] > 0).sum(axis=1)
+    idx = diversity.idxmax()
+    return data.loc[idx, "Provinsi"], diversity[idx]
+
+def generate_dynamic_insight(data, commodity, context="general"):
+    """Generate insight kontekstual perkebunan"""
+    if data.empty:
+        return "Tidak ada data perkebunan yang tersedia untuk filter saat ini."
+
+    total = data[commodity].sum()
+    if total <= 0:
+        return f"Komoditas <b>{commodity}</b> belum tercatat memiliki sentra produksi pada wilayah filter aktif. Potensi pengembangan masih terbuka."
+
+    icon = get_commodity_icon(commodity)
+    top_df = data.nlargest(3, commodity)[["Provinsi", commodity]].copy()
+    top_df["Share"] = (top_df[commodity] / total) * 100
+    top1 = top_df.iloc[0]
+    active_provs = (data[commodity] > 0).sum()
+
+    if context == "commodity":
+        msg = (
+            f"{icon} <b>Profil Produksi {commodity}</b><br>"
+            f"Total produksi nasional pada filter aktif mencapai <b>{format_ton(total)} ribu ton</b>. "
+            f"<b>{top1['Provinsi']}</b> berperan sebagai <b>sentra utama</b> dengan kontribusi <b>{format_ton(top1[commodity])} ribu ton</b> "
+            f"(<b>{top1['Share']:.1f}%</b> dari total). "
+        )
+    elif context == "national":
+        msg = (
+            f"{icon} <b>{commodity}</b> diproduksi oleh <b>{active_provs} dari {len(data)}</b> provinsi aktif, "
+            f"menunjukkan pola <b>spesialisasi geografis</b> yang khas pada sektor perkebunan. "
+            f"Sentra utama <b>{top1['Provinsi']}</b> menguasai <b>{top1['Share']:.1f}%</b> produksi nasional."
+        )
+    else:
+        msg = (
+            f"{icon} Produksi <b>{commodity}</b> pada filter aktif mencapai <b>{format_ton(total)} ribu ton</b>. "
+            f"Kontributor terbesar adalah <b>{top1['Provinsi']}</b> sebagai sentra produksi dengan porsi "
+            f"<b>{top1['Share']:.1f}%</b>."
+        )
+
+    if len(top_df) >= 3:
+        share3 = top_df["Share"].sum()
+        if share3 > 70:
+            msg += f" <br><b>⚠️ Konsentrasi tinggi:</b> tiga provinsi teratas menyumbang <b>{share3:.1f}%</b> — menunjukkan dominasi sentra produksi berskala besar."
+        elif share3 > 50:
+            msg += f" <br><b>📍 Pola sentra:</b> tiga provinsi teratas berkontribusi <b>{share3:.1f}%</b>, menunjukkan basis geografis yang terkonsentrasi."
+        else:
+            msg += f" <br><b>🌱 Distribusi merata:</b> tiga provinsi teratas hanya menyumbang <b>{share3:.1f}%</b>, menunjukkan sebaran produksi yang relatif luas."
+
+    return msg
+
+def generate_province_insight(data, province):
+    """Generate insight khusus profil provinsi perkebunan"""
+    if data.empty:
+        return "Data provinsi tidak tersedia."
+
+    p_row = data[data["Provinsi"] == province].iloc[0]
+    prod_data = {c: p_row[c] for c in numeric_cols}
+    total = sum(prod_data.values())
+
+    if total == 0:
+        return f"🏙️ <b>{province}</b> tidak memiliki basis produksi perkebunan signifikan, cenderung merupakan wilayah urban."
+
+    active = {k: v for k, v in prod_data.items() if v > 0}
+    dominant = max(active.items(), key=lambda x: x[1])
+    diversity = len(active)
+
+    dom_icon = get_commodity_icon(dominant[0])
+    dom_share = (dominant[1] / total) * 100
+
+    msg = f"{dom_icon} <b>{province}</b> memiliki <b>total produksi perkebunan {format_ton(total)} ribu ton</b>. "
+
+    if diversity >= 5:
+        msg += f"Provinsi ini menunjukkan <b>portofolio komoditas terdiversifikasi</b> dengan <b>{diversity} komoditas aktif</b>. "
+    elif diversity >= 3:
+        msg += f"Terdapat <b>{diversity} komoditas aktif</b> yang menopang sektor perkebunan daerah ini. "
+    else:
+        msg += f"Produksi sangat <b>terspesialisasi</b> pada <b>{diversity} komoditas</b>. "
+
+    msg += f"<b>{dominant[0]}</b> berperan sebagai <b>komoditas andalan</b> dengan kontribusi <b>{dom_share:.1f}%</b> dari total produksi provinsi."
+
+    if dom_share > 70:
+        msg += " <br><b>⚠️ Ketergantungan tinggi:</b> struktur produksi sangat bergantung pada satu komoditas — rentan terhadap guncangan harga pasar."
+    elif dom_share > 50:
+        msg += " <br><b>📊 Basis kuat:</b> komoditas dominan menjadi penopang utama, namun diversifikasi dapat memperkuat ketahanan ekonomi daerah."
+
+    return msg
+
+def generate_recommendations(data, commodity):
+    """Generate rekomendasi strategis perkebunan"""
+    if data.empty:
+        return ["Tidak ada data yang tersedia untuk menghasilkan rekomendasi."]
+
+    total_by_commodity = data[numeric_cols].sum().sort_values(ascending=False)
+    dominant = total_by_commodity.index[0]
+    dominant_val = total_by_commodity.iloc[0]
+    dom_icon = get_commodity_icon(dominant)
+
+    top_prov, top_val = top_province_for_commodity(data, commodity)
+    total_selected = data[commodity].sum()
+    share = (top_val / total_selected * 100) if total_selected > 0 else 0
+    comm_icon = get_commodity_icon(commodity)
+
+    recs = [
+        f"{dom_icon} <b>Strategi Hilirisasi {dominant}:</b> Prioritaskan pengembangan pabrik pengolahan di sentra produksi untuk meningkatkan nilai tambah ekspor, bukan sekadar mengekspor bahan mentah ({format_ton(dominant_val)} ribu ton).",
+
+        f"{comm_icon} <b>Mitigasi Konsentrasi Wilayah {commodity}:</b> Dengan <b>{top_prov}</b> menyumbang <b>{share:.1f}%</b> produksi, perlu pengembangan sentra alternatif di provinsi potensial untuk mengurangi risiko iklim dan pasar.",
+
+        "🌳 <b>Program Peremajaan Lahan:</b> Banyak tanaman perkebunan Indonesia telah berusia tua (>25 tahun). Replanting dengan bibit unggul akan meningkatkan produktivitas 40-60% dalam 5 tahun ke depan.",
+
+        "🗺️ <b>Penguatan Klaster Komoditas:</b> Bentuk klaster perkebunan tematik per wilayah (klaster sawit Sumatera, kakao Sulawesi, kopi Jawa) untuk efisiensi supply chain dan penguatan branding.",
+
+        "📊 <b>Monitoring Data Time-Series:</b> Kembangkan sistem pencatatan data perkebunan berbasis time-series untuk forecasting produksi yang lebih akurat dan perencanaan kebijakan strategis."
+    ]
+    return recs
 
 def export_csv(dataframe):
-    """Export dataframe ke CSV"""
     return dataframe.to_csv(index=False).encode("utf-8")
 
 # =========================================================
-# SIDEBAR CONTROL CENTER
+# PLOTLY PLANTATION THEME
 # =========================================================
-with st.sidebar:
-    st.markdown("## 🎛️ Intelligence Control")
-    
-    st.markdown('<div class="filter-title">Primary Commodity Focus</div>', unsafe_allow_html=True)
-    selected_commodity = st.selectbox(
-        "Commodity",
-        numeric_cols,
-        index=0,
-        label_visibility="collapsed",
-        key="side_comm_select"
-    )
-    
-    st.markdown('<div class="filter-title">Province Filter</div>', unsafe_allow_html=True)
-    prov_options = ["All Provinces"] + df["Provinsi"].tolist()
-    selected_province = st.selectbox(
-        "Province",
-        prov_options,
-        index=0,
-        label_visibility="collapsed",
-        key="side_prov_select"
-    )
-    
-    st.markdown('<div class="filter-title">Top-N Ranking Limit</div>', unsafe_allow_html=True)
-    top_n = st.slider(
-        "Top N",
-        min_value=5,
-        max_value=20,
-        value=10,
-        label_visibility="collapsed",
-        key="side_topn_slider"
-    )
-    
-    st.markdown("---")
-    st.markdown("## 🧭 Navigation Matrix")
-    
-    menu = st.radio(
-        "Navigation",
-        [
-            "🏠 Executive Overview",
-            "🌾 Commodity Intelligence",
-            "🗺️ Province Intelligence",
-            "📊 Comparative Analytics",
-            "🤖 Predictive Analytics",
-            "📦 Data & Export"
-        ],
-        label_visibility="collapsed",
-        key="side_menu_radio"
-    )
+plot_bg = "#0d1b12"
+paper_bg = "#0d1b12"
+font_color = "#e8f0e4"
+grid_color = "rgba(186, 230, 170, 0.08)"
 
-# Apply Global Filter
-active_df = df.copy()
-if selected_province != "All Provinces":
-    active_df = active_df[active_df["Provinsi"] == selected_province].copy()
+PLANTATION_PALETTE = [
+    "#2f855a",  # hijau sawit
+    "#8b5e34",  # kopi
+    "#6b3410",  # kakao
+    "#7c4f2a",  # karet
+    "#38bdf8",  # kelapa
+    "#84cc16",  # tebu
+    "#059669",  # teh
+    "#d4a017",  # emas panen
+    "#c7815e",  # amber
+    "#a3e635"   # lime
+]
 
-# =========================================================
-# HERO HEADER (Only on Executive Overview)
-# =========================================================
-if menu == "🏠 Executive Overview":
-    st.markdown("""
-    <div class="hero-container">
-        <div class="hero-title">🌾 Indonesian Plantation Intelligence Matrix</div>
-        <div class="hero-subtitle">
-            Executive analytics dashboard for national commodity performance analysis. 
-            Powered by advanced data science algorithms and premium data visualization. 
-            Data Source: BPS - Produksi Tanaman Perkebunan 2024
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown(f"<h1 style='color: #f8fafc; font-weight: 800; margin-bottom: 0.5rem;'>{menu}</h1>", unsafe_allow_html=True)
-    st.markdown("---")
-
-# =========================================================
-# PAGE 1: EXECUTIVE OVERVIEW
-# =========================================================
-if menu == "🏠 Executive Overview":
-    
-    # Calculate KPIs
-    total_nat_prod = active_df[numeric_cols].sum().sum()
-    total_provs = len(active_df)
-    
-    comm_sums = active_df[numeric_cols].sum().sort_values(ascending=False)
-    dom_comm = comm_sums.index[0] if not comm_sums.empty else "-"
-    dom_val = comm_sums.iloc[0] if not comm_sums.empty else 0
-    
-    temp_avg = total_nat_prod / max(1, total_provs)
-    
-    temp_tot = add_total_production(active_df).sort_values("Total Produksi", ascending=False)
-    top_prov_name = temp_tot.iloc[0]["Provinsi"] if not temp_tot.empty else "-"
-    
-    top5_share = temp_tot.head(5)["Total Produksi"].sum() / max(1, temp_tot["Total Produksi"].sum()) * 100
-    
-    active_provs = (active_df[numeric_cols].sum(axis=1) > 0).sum()
-
-    # Display KPI Cards
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
-    with c1:
-        st.markdown(create_kpi_card("National Production", format_num(total_nat_prod), "Total Ribu Ton", "🇮🇩", "#3b82f6"), unsafe_allow_html=True)
-    with c2:
-        st.markdown(create_kpi_card("Dominant Commodity", dom_comm, format_num(dom_val), "🏆", "#10b981"), unsafe_allow_html=True)
-    with c3:
-        st.markdown(create_kpi_card("Top Producer", top_prov_name, "Highest Yield", "📍", "#f59e0b"), unsafe_allow_html=True)
-    with c4:
-        st.markdown(create_kpi_card("Active Provinces", str(active_provs), f"out of {total_provs}", "🗺️", "#8b5cf6"), unsafe_allow_html=True)
-    with c5:
-        st.markdown(create_kpi_card("Top-5 Share", f"{top5_share:.1f}%", "Market Concentration", "🎯", "#ec4899"), unsafe_allow_html=True)
-    with c6:
-        st.markdown(create_kpi_card("Avg per Province", format_num(temp_avg), "Ribu Ton", "📊", "#06b6d4"), unsafe_allow_html=True)
-
-    st.markdown("### 📈 Strategic Rankings")
-    col_l, col_r = st.columns(2)
-    
-    with col_l:
-        top_comm_df = active_df[["Provinsi", selected_commodity]].sort_values(selected_commodity, ascending=False).head(top_n)
-        fig1 = px.bar(
-            top_comm_df[::-1],
-            x=selected_commodity,
-            y="Provinsi",
-            orientation='h',
-            text=selected_commodity,
-            title=f"Top {top_n} Provinces: {selected_commodity}"
+def apply_plantation_layout(fig, height=500):
+    """Apply plantation theme ke chart Plotly"""
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor=paper_bg,
+        plot_bgcolor=plot_bg,
+        font=dict(color=font_color, family="Inter, sans-serif"),
+        height=height,
+        margin=dict(l=40, r=30, t=60, b=40),
+        xaxis=dict(gridcolor=grid_color, zerolinecolor=grid_color),
+        yaxis=dict(gridcolor=grid_color, zerolinecolor=grid_color),
+        legend=dict(
+            bgcolor="rgba(0,0,0,0)",
+            bordercolor="rgba(186, 230, 170, 0.1)"
         )
-        fig1.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-        fig1 = apply_dark_layout(fig1, 550)
-        fig1.update_layout(xaxis_title="Production (K Ton)", yaxis_title="")
-        st.plotly_chart(fig1, use_container_width=True, key="exec_bar_chart_001")
-        
-    with col_r:
-        comp_df = active_df[numeric_cols].sum().reset_index()
-        comp_df.columns = ["Commodity", "Value"]
-        fig2 = go.Figure(go.Pie(
-            labels=comp_df["Commodity"],
-            values=comp_df["Value"],
-            hole=0.55,
-            marker=dict(colors=px.colors.qualitative.Vivid)
-        ))
-        fig2.update_traces(textinfo='percent+label')
-        fig2 = apply_dark_layout(fig2, 550)
-        fig2.update_layout(title="National Composition Matrix")
-        st.plotly_chart(fig2, use_container_width=True, key="exec_pie_chart_001")
-
-    st.markdown("### 💡 Automated Insights")
-    st.markdown(generate_insight_box(
-        f"<b>Market Concentration Warning:</b> The top 5 provinces control <b>{top5_share:.1f}%</b> of total national output. "
-        f"Currently, <b>{dom_comm}</b> dominates with <b>{format_num(dom_val)}</b> K Ton. "
-        f"Strategic recommendation: Diversify production centers to mitigate regional climate/economic risks."
-    ), unsafe_allow_html=True)
-
+    )
+    return fig
 
 # =========================================================
-# PAGE 2: COMMODITY INTELLIGENCE
+# HERO HEADER - PLANTATION INTELLIGENCE
 # =========================================================
-elif menu == "🌾 Commodity Intelligence":
-    target_comm = st.selectbox("Select Commodity to Analyze", numeric_cols, key="comm_int_select")
-    
-    comm_df = active_df[["Provinsi", target_comm]].copy()
+st.markdown("""
+<div class="hero-wrap">
+    <div class="hero-title">🌴 Dashboard Intelijen Komoditas Perkebunan Indonesia</div>
+    <div class="hero-subtitle">
+        Platform analitik strategis untuk pemetaan sentra produksi, pemetaan komoditas andalan daerah, 
+        dan eksplorasi pola produksi perkebunan nasional per provinsi. 
+        Dirancang sebagai pusat intelijen sektor perkebunan — mendukung perencanaan kebijakan, 
+        investasi hilirisasi, dan pengembangan agro-industri Indonesia.
+    </div>
+    <div>
+        <span class="hero-badge">🌾 Sentra Produksi</span>
+        <span class="hero-badge">📊 Portofolio Komoditas</span>
+        <span class="hero-badge">🗺️ Intelijen Wilayah</span>
+        <span class="hero-badge">📈 Proyeksi Panen</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# =========================================================
+# SIDEBAR - PLANTATION CONTROL CENTER
+# =========================================================
+st.sidebar.title("🎛️ Pusat Kendali Perkebunan")
+
+menu = st.sidebar.radio(
+    "🧭 Navigasi Intelijen",
+    [
+        "🏠 Ringkasan Perkebunan Nasional",
+        "🌴 Profil Komoditas",
+        "🗺️ Profil Provinsi Perkebunan",
+        "📊 Analisis Produksi & Korelasi",
+        "🌍 Sebaran Wilayah Produksi",
+        "📈 Proyeksi & Model Produksi",
+        "🧠 Insight & Strategi Perkebunan",
+        "📦 Data & Ekspor"
+    ]
+)
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("🌱 Filter Komoditas & Wilayah")
+
+selected_commodity = st.sidebar.selectbox(
+    "🌾 Komoditas Fokus",
+    numeric_cols,
+    index=0,
+    help="Pilih komoditas perkebunan untuk dianalisis mendalam"
+)
+
+# Tampilkan identitas komoditas
+comm_info = COMMODITY_IDENTITY[selected_commodity]
+st.sidebar.markdown(f"""
+<div style="padding: 0.8rem; background: rgba(47, 133, 90, 0.15); border-radius: 10px; border-left: 3px solid {comm_info['color']}; margin-top: 0.5rem;">
+    <div style="font-size: 0.75rem; color: #93a39a; text-transform: uppercase;">Sektor</div>
+    <div style="font-size: 0.9rem; color: #a7f3d0; font-weight: 600;">{comm_info['sector']}</div>
+    <div style="font-size: 0.75rem; color: #93a39a; margin-top: 0.3rem;">{comm_info['character'][:80]}...</div>
+</div>
+""", unsafe_allow_html=True)
+
+province_options = ["Semua Provinsi"] + df["Provinsi"].tolist()
+selected_province = st.sidebar.selectbox("🗺️ Wilayah Provinsi", province_options, index=0)
+
+top_n = st.sidebar.slider("🏆 Top N Sentra Produksi", min_value=5, max_value=20, value=10)
+show_zero_rows = st.sidebar.checkbox("Tampilkan wilayah tanpa produksi", value=True)
+
+view_mode = st.sidebar.radio(
+    "📊 Mode Tampilan",
+    ["Volume Produksi (Absolut)", "Pangsa (%)"],
+    index=0
+)
+
+filtered_df = get_filtered_df(df, selected_province, show_zero_rows)
+
+# Ringkasan data aktif di sidebar
+st.sidebar.markdown("---")
+st.sidebar.markdown("""
+<div style="padding: 0.8rem; background: rgba(74, 222, 128, 0.08); border-radius: 10px; border: 1px solid rgba(186, 230, 170, 0.15); font-size: 0.85rem;">
+    <div style="color: #4ade80; font-weight: 700; margin-bottom: 0.3rem;">📡 Status Data Aktif</div>
+    <div style="color: #c7d2c0;">Wilayah aktif: <b>{}</b></div>
+    <div style="color: #c7d2c0;">Total observasi: <b>{}</b></div>
+</div>
+""".format(selected_province, len(filtered_df)), unsafe_allow_html=True)
+
+# =========================================================
+# PAGE 1: RINGKASAN PERKEBUNAN NASIONAL
+# =========================================================
+if menu == "🏠 Ringkasan Perkebunan Nasional":
+    st.markdown('<div class="section-title">🏠 Ringkasan Perkebunan Nasional</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">Potret menyeluruh sektor perkebunan Indonesia — sentra produksi, komoditas dominan, dan struktur wilayah</div>', unsafe_allow_html=True)
+
+    if filtered_df.empty:
+        st.warning("Tidak ada data perkebunan yang cocok dengan filter aktif.")
+    else:
+        total_production = filtered_df[numeric_cols].sum().sum()
+        total_province = filtered_df.shape[0]
+        commodity_totals = filtered_df[numeric_cols].sum().sort_values(ascending=False)
+        top_commodity = commodity_totals.index[0]
+        top_commodity_val = commodity_totals.iloc[0]
+        top_commodity_icon = get_commodity_icon(top_commodity)
+        best_prov, best_total = province_with_highest_total(filtered_df)
+        diverse_prov, diversity_score = province_with_most_diverse(filtered_df)
+
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("🌾 Total Produksi Nasional", format_num(total_production), "Ribu Ton")
+        c2.metric(f"{top_commodity_icon} Komoditas Dominan", top_commodity, format_ton(top_commodity_val))
+        c3.metric("🏆 Sentra Produksi Utama", best_prov[:14], format_ton(best_total))
+        c4.metric("🌱 Provinsi Terdiversifikasi", diverse_prov[:14], f"{int(diversity_score)} komoditas")
+
+        st.markdown("")
+
+        left, right = st.columns([1.2, 1])
+
+        with left:
+            st.markdown(f'<div class="section-title">🌾 Top {top_n} Sentra Produksi — {selected_commodity}</div>', unsafe_allow_html=True)
+            top_df = filtered_df[["Provinsi", selected_commodity]].sort_values(selected_commodity, ascending=False).head(min(top_n, len(filtered_df))).copy()
+
+            if view_mode == "Pangsa (%)":
+                total_val = top_df[selected_commodity].sum()
+                top_df["Display"] = (top_df[selected_commodity] / total_val * 100) if total_val > 0 else 0
+                x_col = "Display"
+                x_title = "Pangsa (%)"
+            else:
+                x_col = selected_commodity
+                x_title = "Produksi (Ribu Ton)"
+
+            comm_color = get_commodity_color(selected_commodity, light=True)
+            fig = px.bar(
+                top_df.sort_values(x_col, ascending=True),
+                x=x_col,
+                y="Provinsi",
+                orientation="h",
+                text=x_col,
+                title=f"Sentra Produksi {selected_commodity}",
+                color_discrete_sequence=[comm_color]
+            )
+            fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+            fig.update_layout(xaxis_title=x_title, yaxis_title="")
+            fig = apply_plantation_layout(fig, 540)
+            st.plotly_chart(fig, use_container_width=True, key="exec_bar_chart_plantation")
+
+        with right:
+            st.markdown('<div class="section-title">🥧 Komposisi Produksi Perkebunan</div>', unsafe_allow_html=True)
+            comp_df = filtered_df[numeric_cols].sum().reset_index()
+            comp_df.columns = ["Komoditas", "Produksi"]
+            if view_mode == "Pangsa (%)":
+                total_comp = comp_df["Produksi"].sum()
+                comp_df["Produksi"] = (comp_df["Produksi"] / total_comp * 100) if total_comp > 0 else 0
+
+            comm_colors = [get_commodity_color(c, light=True) for c in comp_df["Komoditas"]]
+            fig2 = px.pie(
+                comp_df,
+                values="Produksi",
+                names="Komoditas",
+                hole=0.55,
+                color="Komoditas",
+                color_discrete_map={c: get_commodity_color(c, light=True) for c in comp_df["Komoditas"]}
+            )
+            fig2.update_traces(textinfo='percent+label')
+            fig2 = apply_plantation_layout(fig2, 540)
+            fig2.update_layout(showlegend=True, legend=dict(orientation="h", yanchor="bottom", y=-0.2))
+            st.plotly_chart(fig2, use_container_width=True, key="exec_pie_chart_plantation")
+
+        st.markdown('<div class="section-title">💡 Intelijen Singkat</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="info-box">{generate_dynamic_insight(filtered_df, selected_commodity, "national")}</div>',
+            unsafe_allow_html=True
+        )
+
+        st.markdown('<div class="section-title">📋 Peta Produksi per Wilayah</div>', unsafe_allow_html=True)
+        summary_df = add_total_production(filtered_df)
+        st.dataframe(summary_df, use_container_width=True)
+
+# =========================================================
+# PAGE 2: PROFIL KOMODITAS
+# =========================================================
+elif menu == "🌴 Profil Komoditas":
+    target_comm = st.selectbox(
+        "🌾 Pilih Komoditas Perkebunan untuk Dianalisis",
+        numeric_cols,
+        key="comm_int_sel"
+    )
+
+    comm_info = COMMODITY_IDENTITY[target_comm]
+    st.markdown(f'<div class="section-title">{comm_info["icon"]} Profil Komoditas: {target_comm}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-subtitle">Sektor: <b>{comm_info["sector"]}</b> — {comm_info["character"]}</div>', unsafe_allow_html=True)
+
+    comm_df = filtered_df[["Provinsi", target_comm]].copy()
     comm_df = comm_df[comm_df[target_comm] > 0].sort_values(target_comm, ascending=False)
-    
+
     tot_c = comm_df[target_comm].sum()
     top_prov_c = comm_df.iloc[0]["Provinsi"] if not comm_df.empty else "-"
     top_val_c = comm_df.iloc[0][target_comm] if not comm_df.empty else 0
-    med_c = comm_df[target_comm].median()
+    med_c = comm_df[target_comm].median() if not comm_df.empty else 0
     top5_c_share = comm_df.head(5)[target_comm].sum() / max(1, tot_c) * 100
-    
+    active_provs = len(comm_df)
+
     c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.markdown(create_kpi_card("Total Yield", format_num(tot_c), "Ribu Ton", "📦", "#3b82f6"), unsafe_allow_html=True)
-    with c2:
-        st.markdown(create_kpi_card("Market Leader", top_prov_c, format_num(top_val_c), "🥇", "#10b981"), unsafe_allow_html=True)
-    with c3:
-        st.markdown(create_kpi_card("Median Output", format_num(med_c if not pd.isna(med_c) else 0), "Ribu Ton", "⚖️", "#f59e0b"), unsafe_allow_html=True)
-    with c4:
-        st.markdown(create_kpi_card("Top-5 Control", f"{top5_c_share:.1f}%", "Monopoly Index", "🕸️", "#ec4899"), unsafe_allow_html=True)
-    
-    tab1, tab2, tab3 = st.tabs(["Ranking Matrix", "Distribution Profile", "Contribution Treemap"])
-    
+    c1.metric("📦 Total Panen Nasional", format_num(tot_c), "Ribu Ton")
+    c2.metric("🏆 Sentra Utama", top_prov_c[:14], format_ton(top_val_c))
+    c3.metric("⚖️ Median Produksi", format_ton(med_c if not pd.isna(med_c) else 0), "Ribu Ton")
+    c4.metric("🌐 Provinsi Aktif", f"{active_provs}", f"Share Top-5: {top5_c_share:.1f}%")
+
+    tab1, tab2, tab3 = st.tabs(["🏆 Hirarki Sentra Produksi", "📊 Potret Distribusi", "🗺️ Kontribusi Wilayah"])
+
+    comm_color = get_commodity_color(target_comm, light=True)
+
     with tab1:
         fig = px.bar(
             comm_df.head(top_n)[::-1],
@@ -545,13 +862,14 @@ elif menu == "🌾 Commodity Intelligence":
             y="Provinsi",
             orientation='h',
             text=target_comm,
-            title=f"Hierarchical Ranking: {target_comm}"
+            title=f"Hirarki Sentra Produksi {target_comm}",
+            color_discrete_sequence=[comm_color]
         )
         fig.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-        fig = apply_dark_layout(fig, 600)
-        fig.update_layout(xaxis_title="K Ton")
-        st.plotly_chart(fig, use_container_width=True, key=f"comm_rank_{target_comm}_001")
-        
+        fig = apply_plantation_layout(fig, 600)
+        fig.update_layout(xaxis_title="Produksi (Ribu Ton)")
+        st.plotly_chart(fig, use_container_width=True, key=f"comm_rank_{target_comm}")
+
     with tab2:
         c1, c2 = st.columns(2)
         with c1:
@@ -559,515 +877,808 @@ elif menu == "🌾 Commodity Intelligence":
                 comm_df,
                 x=target_comm,
                 nbins=15,
-                color_discrete_sequence=["#3b82f6"],
-                title="Frequency Distribution"
+                color_discrete_sequence=[comm_color],
+                title="Distribusi Volume Produksi"
             )
-            fig_h = apply_dark_layout(fig_h, 450)
-            st.plotly_chart(fig_h, use_container_width=True, key=f"comm_hist_{target_comm}_001")
+            fig_h = apply_plantation_layout(fig_h, 450)
+            st.plotly_chart(fig_h, use_container_width=True, key=f"comm_hist_{target_comm}")
         with c2:
             fig_b = px.box(
                 comm_df,
                 y=target_comm,
-                color_discrete_sequence=["#f59e0b"],
+                color_discrete_sequence=[comm_color],
                 points="all",
-                title="Outlier Detection (Boxplot)"
+                title="Pola Persebaran & Deteksi Sentra Ekstrem"
             )
-            fig_b = apply_dark_layout(fig_b, 450)
-            st.plotly_chart(fig_b, use_container_width=True, key=f"comm_box_{target_comm}_001")
-            
+            fig_b = apply_plantation_layout(fig_b, 450)
+            st.plotly_chart(fig_b, use_container_width=True, key=f"comm_box_{target_comm}")
+
     with tab3:
         fig_t = px.treemap(
             comm_df.head(15),
             path=["Provinsi"],
             values=target_comm,
             color=target_comm,
-            color_continuous_scale="viridis",
-            title="Spatial Contribution Treemap"
+            color_continuous_scale=[comm_info["color"], comm_info["color_light"]],
+            title="Peta Kontribusi Wilayah terhadap Produksi Nasional"
         )
-        fig_t = apply_dark_layout(fig_t, 600)
-        st.plotly_chart(fig_t, use_container_width=True, key=f"comm_tree_{target_comm}_001")
-        
-    st.markdown(generate_insight_box(
-        f"<b>Commodity Deep-Dive:</b> <b>{target_comm}</b> shows high variance (IQR indicates regional disparity). "
-        f"<b>{top_prov_c}</b> acts as the absolute anchor for this commodity."
-    ), unsafe_allow_html=True)
+        fig_t = apply_plantation_layout(fig_t, 600)
+        st.plotly_chart(fig_t, use_container_width=True, key=f"comm_tree_{target_comm}")
 
+    st.markdown(f'<div class="insight-box">{generate_dynamic_insight(filtered_df, target_comm, "commodity")}</div>', unsafe_allow_html=True)
 
 # =========================================================
-# PAGE 3: PROVINCE INTELLIGENCE
+# PAGE 3: PROFIL PROVINSI PERKEBUNAN
 # =========================================================
-elif menu == "🗺️ Province Intelligence":
-    target_prov = st.selectbox("Select Province to Profile", df["Provinsi"].tolist(), key="prov_int_select")
+elif menu == "🗺️ Profil Provinsi Perkebunan":
+    target_prov = st.selectbox(
+        "🗺️ Pilih Provinsi untuk Profil Perkebunan",
+        df["Provinsi"].tolist(),
+        key="prov_int_sel"
+    )
+
     p_df = df[df["Provinsi"] == target_prov].iloc[0]
-    
+
     p_profile = pd.DataFrame({
-        "Commodity": numeric_cols,
-        "Value": [p_df[c] for c in numeric_cols]
-    }).sort_values("Value", ascending=False)
-    
-    tot_p = p_profile["Value"].sum()
-    dom_p = p_profile.iloc[0]["Commodity"] if not p_profile.empty else "-"
-    active_c = (p_profile["Value"] > 0).sum()
-    
-    # National Average comparison
+        "Komoditas": numeric_cols,
+        "Produksi": [p_df[c] for c in numeric_cols]
+    }).sort_values("Produksi", ascending=False)
+
+    tot_p = p_profile["Produksi"].sum()
+    dom_p = p_profile.iloc[0]["Kommodity"] if "Kommodity" in p_profile.columns else p_profile.iloc[0]["Komoditas"]
+    dom_p = p_profile.iloc[0]["Komoditas"]
+    active_c = (p_profile["Produksi"] > 0).sum()
+
+    # National average comparison
     nat_avg = pd.DataFrame({
-        "Commodity": numeric_cols,
-        "Value": [df[c].mean() for c in numeric_cols]
+        "Komoditas": numeric_cols,
+        "Rata_Nasional": [df[c].mean() for c in numeric_cols]
     })
-    comp_df = p_profile.merge(nat_avg, on="Commodity", suffixes=("_Prov", "_Nat"))
-    
+    comp_df = p_profile.merge(nat_avg, on="Komoditas", suffixes=("_Prov", "_Nat"))
+
     c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.markdown(create_kpi_card("Total Output", format_num(tot_p), "Ribu Ton", "📍", "#3b82f6"), unsafe_allow_html=True)
-    with c2:
-        st.markdown(create_kpi_card("Core Commodity", dom_p, "Dominant", "🌾", "#10b981"), unsafe_allow_html=True)
-    with c3:
-        st.markdown(create_kpi_card("Active Sectors", str(active_c), f"out of {len(numeric_cols)}", "⚙️", "#f59e0b"), unsafe_allow_html=True)
-    with c4:
-        dom_share = (p_profile.iloc[0]['Value'] / max(1, tot_p) * 100) if tot_p > 0 else 0
-        st.markdown(create_kpi_card("Specialization", f"{dom_share:.0f}%", "Dominance Share", "🎯", "#06b6d4"), unsafe_allow_html=True)
+    c1.metric("🌾 Total Panen Provinsi", format_num(tot_p), "Ribu Ton")
+    c2.metric(f"{get_commodity_icon(dom_p)} Komoditas Andalan", dom_p)
+    c3.metric("🌱 Sektor Aktif", f"{int(active_c)}", f"dari {len(numeric_cols)} komoditas")
+    dom_share = (p_profile.iloc[0]['Produksi'] / max(1, tot_p) * 100) if tot_p > 0 else 0
+    c4.metric("📊 Konsentrasi Produksi", f"{dom_share:.0f}%", "Share komoditas andalan")
+
+    st.markdown(f'<div class="section-title">🌳 Potret Komoditas Provinsi {target_prov}</div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns([1.2, 1])
-    
+
     with col1:
-        # Radar Chart (Polar)
+        # Radar Chart - Portofolio Komoditas
         fig_r = go.Figure()
+
+        # Normalisasi untuk radar (skala relatif terhadap max)
+        p_values = p_profile["Produksi"].tolist()
+        p_max = max(p_values) if p_values else 1
+        p_norm = [(v / p_max * 100) if p_max > 0 else 0 for v in p_values]
+
+        nat_values = nat_avg["Rata_Nasional"].tolist()
+        nat_max = max(nat_values) if nat_values else 1
+        nat_norm = [(v / nat_max * 100) if nat_max > 0 else 0 for v in nat_values]
+
         fig_r.add_trace(go.Scatterpolar(
-            r=p_profile["Value"].tolist() + [p_profile["Value"].iloc[0]],
-            theta=p_profile["Commodity"].tolist() + [p_profile["Commodity"].iloc[0]],
+            r=p_norm + [p_norm[0]],
+            theta=p_profile["Komoditas"].tolist() + [p_profile["Komoditas"].iloc[0]],
             fill='toself',
             name=target_prov,
-            line_color="#3b82f6",
-            opacity=0.6
+            line_color="#4ade80",
+            fillcolor="rgba(74, 222, 128, 0.3)"
         ))
         fig_r.add_trace(go.Scatterpolar(
-            r=nat_avg["Value"].tolist() + [nat_avg["Value"].iloc[0]],
-            theta=nat_avg["Commodity"].tolist() + [nat_avg["Commodity"].iloc[0]],
+            r=nat_norm + [nat_norm[0]],
+            theta=nat_avg["Komoditas"].tolist() + [nat_avg["Komoditas"].iloc[0]],
             fill='toself',
-            name="National Avg",
-            line_color="#f59e0b",
-            opacity=0.4
+            name="Rata-rata Nasional",
+            line_color="#d4a017",
+            fillcolor="rgba(212, 160, 23, 0.15)"
         ))
         fig_r.update_layout(
             polar=dict(
-                bgcolor="rgba(0,0,0,0)",
-                radialaxis=dict(visible=True, showticklabels=False, gridcolor="rgba(148,163,184,0.2)"),
-                angularaxis=dict(gridcolor="rgba(148,163,184,0.2)")
+                bgcolor="rgba(13, 27, 18, 0.5)",
+                radialaxis=dict(visible=True, showticklabels=False, gridcolor="rgba(186, 230, 170, 0.15)"),
+                angularaxis=dict(gridcolor="rgba(186, 230, 170, 0.15)")
             ),
             showlegend=True,
-            title="Multi-Dimensional Profile (Radar)"
+            title=f"Portofolio Komoditas {target_prov} vs Nasional"
         )
-        fig_r = apply_dark_layout(fig_r, 550)
-        st.plotly_chart(fig_r, use_container_width=True, key=f"prov_radar_{target_prov}_001")
-        
+        fig_r = apply_plantation_layout(fig_r, 550)
+        st.plotly_chart(fig_r, use_container_width=True, key=f"prov_radar_{target_prov}")
+
     with col2:
+        # Bar chart produksi per komoditas
+        color_map = {row["Komoditas"]: get_commodity_color(row["Komoditas"], light=True)
+                    for _, row in p_profile.iterrows()}
+
         fig_bar = px.bar(
             p_profile,
-            x="Commodity",
-            y="Value",
-            text="Value",
-            color="Value",
-            color_continuous_scale="tealgrn",
-            title="Absolute Production Yield"
+            x="Komoditas",
+            y="Produksi",
+            text="Produksi",
+            color="Komoditas",
+            color_discrete_map=color_map,
+            title="Volume Produksi per Komoditas"
         )
         fig_bar.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-        fig_bar = apply_dark_layout(fig_bar, 550)
-        st.plotly_chart(fig_bar, use_container_width=True, key=f"prov_bar_{target_prov}_001")
+        fig_bar.update_layout(showlegend=False)
+        fig_bar = apply_plantation_layout(fig_bar, 550)
+        st.plotly_chart(fig_bar, use_container_width=True, key=f"prov_bar_{target_prov}")
 
-    # Benchmark Diverging
-    st.markdown("### ⚖️ Benchmark vs National Average")
+    # Benchmark diverging
+    st.markdown('<div class="section-title">⚖️ Posisi Relatif terhadap Rata-rata Nasional</div>', unsafe_allow_html=True)
     fig_div = go.Figure()
-    colors = np.where(comp_df["Value_Prov"] >= comp_df["Value_Nat"], "#10b981", "#ef4444")
+    deviation = comp_df["Produksi"] - comp_df["Rata_Nasional"]
+    colors = ["#4ade80" if v >= 0 else "#c7815e" for v in deviation]
     fig_div.add_trace(go.Bar(
-        y=comp_df["Commodity"],
-        x=comp_df["Value_Prov"] - comp_df["Value_Nat"],
+        y=comp_df["Komoditas"],
+        x=deviation,
         orientation='h',
         marker_color=colors,
-        name="Deviation"
+        name="Deviasi"
     ))
     fig_div.update_layout(
-        title="Deviation from National Mean (Green = Above Avg, Red = Below)",
-        xaxis_title="Delta (K Ton)"
+        title=f"Posisi {target_prov} vs Rata-rata Nasional (Hijau = Di Atas, Cokelat = Di Bawah)",
+        xaxis_title="Deviasi (Ribu Ton)"
     )
-    fig_div = apply_dark_layout(fig_div, 450)
-    st.plotly_chart(fig_div, use_container_width=True, key=f"prov_div_{target_prov}_001")
+    fig_div = apply_plantation_layout(fig_div, 450)
+    st.plotly_chart(fig_div, use_container_width=True, key=f"prov_div_{target_prov}")
 
+    st.markdown(f'<div class="insight-box">{generate_province_insight(df, target_prov)}</div>', unsafe_allow_html=True)
 
 # =========================================================
-# PAGE 4: COMPARATIVE ANALYTICS
+# PAGE 4: ANALISIS PRODUKSI & KORELASI
 # =========================================================
-elif menu == "📊 Comparative Analytics":
+elif menu == "📊 Analisis Produksi & Korelasi":
+    st.markdown('<div class="section-title">📊 Analisis Produksi & Korelasi</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">Eksplorasi pola produksi, hubungan antar-komoditas, dan struktur korelasi sektor perkebunan</div>', unsafe_allow_html=True)
+
     tab1, tab2, tab3, tab4 = st.tabs([
-        "Province vs Province",
-        "Commodity Relationship",
-        "Correlation Matrix",
-        "National Benchmark"
+        "⚔️ Duel Dua Wilayah",
+        "🔗 Relasi Antar-Komoditas",
+        "🌡️ Matriks Korelasi",
+        "🎯 Benchmarking Wilayah"
     ])
-    
+
     with tab1:
         c1, c2 = st.columns(2)
         with c1:
-            p1 = st.selectbox("Province A", df["Provinsi"].tolist(), index=0, key="comp_prov_a")
+            p1 = st.selectbox("🏆 Wilayah A", df["Provinsi"].tolist(), index=0, key="comp_prov_a")
         with c2:
-            p2 = st.selectbox("Province B", df["Provinsi"].tolist(), index=3, key="comp_prov_b")
-        
+            p2 = st.selectbox("🏆 Wilayah B", df["Provinsi"].tolist(), index=3, key="comp_prov_b")
+
         p1_data = df[df["Provinsi"] == p1].iloc[0]
         p2_data = df[df["Provinsi"] == p2].iloc[0]
-        
+
         compare_df = pd.DataFrame({
-            "Commodity": numeric_cols,
+            "Komoditas": numeric_cols,
             p1: [p1_data[c] for c in numeric_cols],
             p2: [p2_data[c] for c in numeric_cols]
         })
-        
+
         fig = go.Figure()
-        fig.add_trace(go.Bar(name=p1, x=compare_df["Commodity"], y=compare_df[p1], marker_color="#3b82f6"))
-        fig.add_trace(go.Bar(name=p2, x=compare_df["Commodity"], y=compare_df[p2], marker_color="#f59e0b"))
-        fig.update_layout(barmode='group', title=f"Head-to-Head: {p1} vs {p2}")
-        fig = apply_dark_layout(fig, 500)
-        st.plotly_chart(fig, use_container_width=True, key="comp_prov_vs_prov_001")
-        
-        # Summary
+        fig.add_trace(go.Bar(name=p1, x=compare_df["Komoditas"], y=compare_df[p1], marker_color="#4ade80"))
+        fig.add_trace(go.Bar(name=p2, x=compare_df["Komoditas"], y=compare_df[p2], marker_color="#d4a017"))
+        fig.update_layout(barmode='group', title=f"Perbandingan Portofolio Produksi: {p1} vs {p2}")
+        fig = apply_plantation_layout(fig, 500)
+        st.plotly_chart(fig, use_container_width=True, key="comp_prov_vs_prov")
+
         p1_wins = (compare_df[p1] > compare_df[p2]).sum()
         p2_wins = (compare_df[p2] > compare_df[p1]).sum()
-        st.markdown(generate_insight_box(
-            f"<b>Battle Result:</b> {p1} leads in <b>{p1_wins}</b> commodities, while {p2} leads in <b>{p2_wins}</b> commodities."
-        ), unsafe_allow_html=True)
-    
+        p1_total = compare_df[p1].sum()
+        p2_total = compare_df[p2].sum()
+        leader = p1 if p1_total > p2_total else p2
+
+        st.markdown(f"""
+        <div class="info-box">
+        <b>⚔️ Hasil Perbandingan:</b><br>
+        • <b>{p1}</b> unggul di <b>{p1_wins}</b> komoditas | <b>{p2}</b> unggul di <b>{p2_wins}</b> komoditas<br>
+        • Total produksi: <b>{p1}</b> = {format_ton(p1_total)} | <b>{p2}</b> = {format_ton(p2_total)} ribu ton<br>
+        • <b>{leader}</b> menjadi wilayah dengan portofolio perkebunan lebih kuat secara agregat.
+        </div>
+        """, unsafe_allow_html=True)
+
     with tab2:
         c1, c2 = st.columns(2)
         with c1:
-            x_var = st.selectbox("Variable X", numeric_cols, index=0, key="comp_x_var")
+            x_var = st.selectbox("🌱 Komoditas X", numeric_cols, index=0, key="comp_x_var")
         with c2:
-            y_var = st.selectbox("Variable Y", numeric_cols, index=1, key="comp_y_var")
-        
+            y_var = st.selectbox("🌱 Komoditas Y", numeric_cols, index=1, key="comp_y_var")
+
         if x_var != y_var:
             fig = px.scatter(
-                active_df,
+                filtered_df,
                 x=x_var,
                 y=y_var,
                 hover_name="Provinsi",
-                title=f"Relationship: {x_var} vs {y_var}"
+                title=f"Pola Hubungan Produksi: {x_var} vs {y_var}",
+                color_discrete_sequence=["#4ade80"]
             )
-            fig = apply_dark_layout(fig, 550)
-            st.plotly_chart(fig, use_container_width=True, key="comp_scatter_001")
-            
-            corr_val = active_df[[x_var, y_var]].corr().iloc[0, 1]
+            fig = apply_plantation_layout(fig, 550)
+            st.plotly_chart(fig, use_container_width=True, key="comp_scatter")
+
+            corr_val = filtered_df[[x_var, y_var]].corr().iloc[0, 1]
             if pd.notna(corr_val):
-                st.markdown(generate_insight_box(
-                    f"<b>Pearson Correlation:</b> {corr_val:.3f} - "
-                    f"{'Strong positive' if corr_val > 0.7 else 'Moderate' if corr_val > 0.3 else 'Weak'} relationship."
-                ), unsafe_allow_html=True)
+                strength = "kuat" if abs(corr_val) > 0.6 else "sedang" if abs(corr_val) > 0.3 else "lemah"
+                direction = "positif" if corr_val > 0 else "negatif"
+                interpretation = ""
+                if corr_val > 0.3:
+                    interpretation = "Kedua komoditas cenderung tumbuh bersama di wilayah dengan kondisi agroekologi serupa."
+                elif corr_val < -0.3:
+                    interpretation = "Terdapat pola substitusi wilayah — daerah yang kuat di satu komoditas cenderung lemah di komoditas lainnya."
+                else:
+                    interpretation = "Kedua komoditas berkembang secara independen, menunjukkan spesialisasi wilayah yang berbeda."
+
+                st.markdown(f"""
+                <div class="insight-box">
+                <b>🔗 Korelasi Produksi:</b> {corr_val:.3f} ({strength} {direction})<br>
+                <i>{interpretation}</i>
+                </div>
+                """, unsafe_allow_html=True)
         else:
-            st.warning("Please select two different variables.")
-    
+            st.warning("Pilih dua komoditas yang berbeda untuk dianalisis hubungannya.")
+
     with tab3:
-        st.markdown("### 🔥 Correlation Heatmap")
-        corr_matrix = active_df[numeric_cols].corr()
-        
+        st.markdown("### 🌡️ Matriks Korelasi Antar Komoditas Perkebunan")
+        corr = filtered_df[numeric_cols].corr()
+
+        # Palet agro untuk heatmap: cokelat (negatif) → hijau gelap (0) → hijau terang (positif)
         fig = px.imshow(
-            corr_matrix,
+            corr,
             text_auto=".2f",
             aspect="auto",
             zmin=-1,
             zmax=1,
             color_continuous_scale=[
-                [0.0, "#dc2626"],
-                [0.5, "#1e293b"],
-                [1.0, "#059669"]
+                [0.0, "#7c4f2a"],   # cokelat tanah (korelasi negatif)
+                [0.25, "#a0522d"],
+                [0.5, "#1a4d2e"],   # hijau gelap (netral)
+                [0.75, "#2f855a"],
+                [1.0, "#4ade80"]    # hijau terang (korelasi positif)
             ],
-            title="Commodity Correlation Matrix"
+            title="Pola Korelasi Produksi Perkebunan"
         )
-        fig.update_traces(textfont=dict(color="white", size=11), xgap=2, ygap=2)
+
+        fig.update_traces(
+            textfont=dict(color="white", size=12),
+            xgap=2,
+            ygap=2
+        )
+
         fig.update_xaxes(side="bottom", tickangle=30)
         fig.update_yaxes(autorange="reversed")
-        fig = apply_dark_layout(fig, 600)
-        st.plotly_chart(fig, use_container_width=True, key="comp_heatmap_001")
-        
-        st.markdown(generate_insight_box(
-            "Most commodities show weak correlation, indicating <b>regional specialization</b>. "
-            "Each province tends to focus on specific commodities based on comparative advantages."
-        ), unsafe_allow_html=True)
-    
+
+        fig.update_layout(
+            paper_bgcolor="#0d1b12",
+            plot_bgcolor="#0d1b12",
+            font=dict(color="#e8f0e4"),
+            margin=dict(l=40, r=30, t=70, b=40)
+        )
+
+        fig.update_coloraxes(
+            colorbar=dict(
+                title=dict(text="Korelasi", font=dict(color="#e8f0e4")),
+                tickfont=dict(color="#e8f0e4"),
+                len=0.75
+            )
+        )
+
+        st.plotly_chart(fig, use_container_width=True, key="corr_heatmap_plantation")
+
+        st.markdown("""
+        <div class="insight-box">
+        <b>🌱 Interpretasi Agro-Ekologis:</b> Mayoritas korelasi antar komoditas perkebunan bersifat <b>lemah</b>, 
+        mencerminkan <b>spesialisasi geografis yang kuat</b>. Setiap wilayah mengembangkan komoditas andalan 
+        berdasarkan kesesuaian agroekologi, sejarah budidaya, dan keunggulan komparatif regional.
+        Pola ini mengindikasikan bahwa perkebunan Indonesia tidak monokultur massal, melainkan mosaik 
+        spesialisasi yang kaya.
+        </div>
+        """, unsafe_allow_html=True)
+
     with tab4:
-        bench_prov = st.selectbox("Select Province for Benchmarking", df["Provinsi"].tolist(), key="bench_prov")
+        bench_prov = st.selectbox("🎯 Pilih Wilayah untuk Benchmarking", df["Provinsi"].tolist(), key="bench_prov")
         bench_data = df[df["Provinsi"] == bench_prov].iloc[0]
-        
+
         bench_df = pd.DataFrame({
-            "Commodity": numeric_cols,
-            "Province": [bench_data[c] for c in numeric_cols],
-            "National_Avg": [df[c].mean() for c in numeric_cols]
+            "Komoditas": numeric_cols,
+            "Provinsi": [bench_data[c] for c in numeric_cols],
+            "Rata_Nasional": [df[c].mean() for c in numeric_cols]
         })
-        bench_df["Ratio"] = bench_df["Province"] / bench_df["National_Avg"]
-        
+        bench_df["Rasio"] = bench_df["Provinsi"] / bench_df["Rata_Nasional"].replace(0, 0.01)
+
+        color_map_bench = {row["Komoditas"]: get_commodity_color(row["Komoditas"], light=True)
+                          for _, row in bench_df.iterrows()}
+
         fig = go.Figure()
         fig.add_trace(go.Bar(
-            x=bench_df["Commodity"],
-            y=bench_df["Ratio"],
-            marker_color=np.where(bench_df["Ratio"] >= 1, "#10b981", "#ef4444"),
-            name="Performance Ratio"
+            x=bench_df["Komoditas"],
+            y=bench_df["Rasio"],
+            marker_color=[color_map_bench.get(c, "#4ade80") for c in bench_df["Komoditas"]],
+            name="Rasio Performa"
         ))
-        fig.add_hline(y=1, line_dash="dash", line_color="#f59e0b")
+        fig.add_hline(y=1, line_dash="dash", line_color="#d4a017")
         fig.update_layout(
-            title=f"{bench_prov} vs National Average (1.0 = Average)",
-            yaxis_title="Performance Ratio"
+            title=f"Performa Relatif {bench_prov} (Garis Emas = Rata-rata Nasional)",
+            yaxis_title="Rasio (1.0 = Rata-rata Nasional)"
         )
-        fig = apply_dark_layout(fig, 500)
-        st.plotly_chart(fig, use_container_width=True, key="comp_benchmark_001")
+        fig = apply_plantation_layout(fig, 500)
+        st.plotly_chart(fig, use_container_width=True, key="comp_benchmark")
 
+        above_avg = (bench_df["Rasio"] > 1).sum()
+        below_avg = (bench_df["Rasio"] < 1).sum()
+        strongest = bench_df.loc[bench_df["Rasio"].idxmax()]
+
+        st.markdown(f"""
+        <div class="info-box">
+        <b>🎯 Ringkasan Benchmark:</b><br>
+        • <b>{above_avg}</b> komoditas di atas rata-rata nasional | <b>{below_avg}</b> di bawah<br>
+        • Komoditas <b>unggulan relatif</b>: {get_commodity_icon(strongest['Komoditas'])} <b>{strongest['Komoditas']}</b> 
+          dengan rasio <b>{strongest['Rasio']:.2f}x</b> rata-rata nasional
+        </div>
+        """, unsafe_allow_html=True)
 
 # =========================================================
-# PAGE 5: PREDICTIVE ANALYTICS
+# PAGE 5: SEBARAN WILAYAH PRODUKSI
 # =========================================================
-elif menu == "🤖 Predictive Analytics":
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "Linear Regression",
-        "Forecasting 2025",
-        "Random Forest",
-        "Decision Tree",
-        "K-Means Clustering"
-    ])
-    
-    with tab1:
-        st.markdown("### 📉 Linear Regression Playground")
-        c1, c2 = st.columns(2)
+elif menu == "🌍 Sebaran Wilayah Produksi":
+    st.markdown('<div class="section-title">🌍 Sebaran Wilayah Produksi</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">Pemetaan sentra produksi, intensitas wilayah, dan pola distribusi geografis komoditas perkebunan</div>', unsafe_allow_html=True)
+
+    if filtered_df.empty:
+        st.warning("Tidak ada data untuk filter aktif.")
+    else:
+        geo_df = filtered_df[["Provinsi", selected_commodity]].copy().sort_values(selected_commodity, ascending=False)
+        comm_color = get_commodity_color(selected_commodity, light=True)
+        comm_icon = get_commodity_icon(selected_commodity)
+
+        c1, c2 = st.columns([1.2, 1])
+
         with c1:
-            x_var = st.selectbox("Independent Variable (X)", numeric_cols, index=1, key="lr_x")
+            st.markdown(f'<div class="section-title">{comm_icon} Hirarki Sentra Produksi — {selected_commodity}</div>', unsafe_allow_html=True)
+            fig = px.bar(
+                geo_df.head(min(top_n, len(geo_df))),
+                x="Provinsi",
+                y=selected_commodity,
+                color=selected_commodity,
+                text=selected_commodity,
+                color_continuous_scale=[COMMODITY_IDENTITY[selected_commodity]["color"], COMMODITY_IDENTITY[selected_commodity]["color_light"]],
+                title="Ranking Intensitas Produksi Wilayah"
+            )
+            fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+            fig.update_xaxes(tickangle=45)
+            fig.update_layout(showlegend=False)
+            fig = apply_plantation_layout(fig, 520)
+            st.plotly_chart(fig, use_container_width=True, key="geo_ranking")
+
         with c2:
-            y_var = st.selectbox("Dependent Variable (Y)", numeric_cols, index=0, key="lr_y")
-        
-        if x_var != y_var:
-            model_df = active_df[[x_var, y_var]].dropna()
-            if len(model_df) >= 3:
-                X = model_df[[x_var]].values
-                y = model_df[y_var].values
-                
-                lr = LinearRegression()
-                lr.fit(X, y)
-                y_pred = lr.predict(X)
-                
-                mae = mean_absolute_error(y, y_pred)
-                rmse = math.sqrt(mean_squared_error(y, y_pred))
-                r2 = r2_score(y, y_pred)
-                
-                c1, c2, c3 = st.columns(3)
-                with c1: st.metric("MAE", f"{mae:.2f}")
-                with c2: st.metric("RMSE", f"{rmse:.2f}")
-                with c3: st.metric("R²", f"{r2:.4f}")
-                
-                st.markdown(generate_insight_box(
-                    f"<b>Model Equation:</b> {y_var} = {lr.coef_[0]:.4f} × {x_var} + {lr.intercept_:.4f}"
-                ), unsafe_allow_html=True)
-                
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(x=model_df[x_var], y=model_df[y_var], mode="markers", name="Actual", marker=dict(color="#3b82f6", size=10)))
-                sort_idx = np.argsort(model_df[x_var].values)
-                fig.add_trace(go.Scatter(x=model_df[x_var].values[sort_idx], y=y_pred[sort_idx], mode="lines", name="Regression Line", line=dict(color="#10b981", width=3)))
-                fig.update_layout(title=f"Linear Regression: {x_var} vs {y_var}")
-                fig = apply_dark_layout(fig, 500)
-                st.plotly_chart(fig, use_container_width=True, key="lr_chart_001")
+            st.markdown('<div class="section-title">🎯 Peta Prioritas Wilayah</div>', unsafe_allow_html=True)
+            pseudo_geo = geo_df.head(min(15, len(geo_df))).copy()
+            pseudo_geo["Rank"] = range(1, len(pseudo_geo) + 1)
+
+            fig2 = px.scatter(
+                pseudo_geo,
+                x="Rank",
+                y=selected_commodity,
+                size=selected_commodity,
+                hover_name="Provinsi",
+                text="Provinsi",
+                title="Bubble Prioritas Wilayah Produksi",
+                color_discrete_sequence=[comm_color]
+            )
+            fig2.update_traces(textposition="top center")
+            fig2 = apply_plantation_layout(fig2, 520)
+            st.plotly_chart(fig2, use_container_width=True, key="geo_bubble")
+
+        # Klasifikasi wilayah
+        total_prod = geo_df[selected_commodity].sum()
+        if total_prod > 0:
+            geo_df["Share"] = (geo_df[selected_commodity] / total_prod) * 100
+            geo_df["Kategori"] = pd.cut(
+                geo_df["Share"],
+                bins=[-1, 1, 5, 15, 100],
+                labels=["Wilayah Minor", "Wilayah Penyangga", "Sentra Regional", "Sentra Nasional"]
+            )
+
+            kategori_count = geo_df["Kategori"].value_counts()
+
+            st.markdown('<div class="section-title">🏷️ Klasifikasi Wilayah Produksi</div>', unsafe_allow_html=True)
+            k1, k2, k3, k4 = st.columns(4)
+            k1.metric("🏆 Sentra Nasional", kategori_count.get("Sentra Nasional", 0))
+            k2.metric("🌾 Sentra Regional", kategori_count.get("Sentra Regional", 0))
+            k3.metric("🌱 Wilayah Penyangga", kategori_count.get("Wilayah Penyangga", 0))
+            k4.metric("🍃 Wilayah Minor", kategori_count.get("Wilayah Minor", 0))
+
+        st.markdown(f"""
+        <div class="insight-box">
+        <b>{comm_icon} Pola Sebaran {selected_commodity}:</b><br>
+        Komoditas ini memperlihatkan pola <b>spesialisasi geografis yang jelas</b>, dengan konsentrasi produksi 
+        pada sejumlah provinsi tertentu. Wilayah-wilayah dominan berperan sebagai <b>sentra produksi</b> 
+        yang menopang pasokan nasional, sementara wilayah lain berperan sebagai <b>penyangga</b> 
+        atau memiliki produksi minor. Pola ini mencerminkan kesesuaian agroekologi dan 
+        sejarah pengembangan perkebunan di tiap wilayah.
+        </div>
+        """, unsafe_allow_html=True)
+
+# =========================================================
+# PAGE 6: PROYEKSI & MODEL PRODUKSI
+# =========================================================
+elif menu == "📈 Proyeksi & Model Produksi":
+    st.markdown('<div class="section-title">📈 Proyeksi & Model Produksi</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">Eksplorasi pola produksi dengan machine learning — forecasting, prediksi, dan segmentasi wilayah perkebunan</div>', unsafe_allow_html=True)
+
+    if filtered_df.shape[0] < 5:
+        st.warning("⚠️ Data terlalu sedikit untuk analisis model yang stabil. Silakan perluas filter wilayah.")
+    else:
+        tab_lr, tab_fc, tab_rf, tab_dt = st.tabs([
+            "📐 Model Regresi Linear",
+            "📅 Simulasi Panen 2025",
+            "🌲 Random Forest",
+            "🌳 Decision Tree"
+        ])
+
+        with tab_lr:
+            st.markdown("### 📐 Model Regresi Hubungan Produksi")
+            st.markdown('<div class="section-subtitle">Eksplorasi pola prediktif antar komoditas perkebunan</div>', unsafe_allow_html=True)
+
+            c1, c2 = st.columns(2)
+            with c1:
+                x_var = st.selectbox("🌱 Komoditas Prediktor (X)", numeric_cols, index=1 if len(numeric_cols) > 1 else 0, key="lr_x")
+            with c2:
+                y_var = st.selectbox("🌾 Komoditas Target (Y)", numeric_cols, index=0, key="lr_y")
+
+            if x_var == y_var:
+                st.warning("Pilih dua komoditas yang berbeda.")
             else:
-                st.warning("Insufficient data for regression.")
-        else:
-            st.warning("X and Y must be different variables.")
-    
-    with tab2:
-        st.markdown("### 📈 Forecasting 2025 (Growth Rate Simulation)")
-        st.markdown(generate_insight_box(
-            "This dataset is cross-sectional (1 year). Forecasting uses <b>growth rate simulation</b>, not time-series."
-        , "warning"), unsafe_allow_html=True)
-        
-        fc_comm = st.selectbox("Select Commodity", numeric_cols, key="fc_comm")
-        growth = st.slider("Growth Rate (%)", 1, 20, 7, key="fc_growth") / 100
-        
-        fc_df = active_df[["Provinsi", fc_comm]].copy()
-        fc_df["Forecast_2025"] = fc_df[fc_comm] * (1 + growth)
-        fc_df["Increase"] = fc_df["Forecast_2025"] - fc_df[fc_comm]
-        
-        top_fc = fc_df.sort_values(fc_comm, ascending=False).head(top_n)
-        
-        fig = go.Figure()
-        fig.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[fc_comm], name="2024", marker_color="#3b82f6"))
-        fig.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Forecast_2025"], name="2025 (Forecast)", marker_color="#10b981"))
-        fig.update_layout(barmode="group", title=f"{fc_comm}: 2024 vs 2025 Forecast")
-        fig = apply_dark_layout(fig, 500)
-        st.plotly_chart(fig, use_container_width=True, key="fc_chart_001")
-        
-        total_2024 = fc_df[fc_comm].sum()
-        total_2025 = fc_df["Forecast_2025"].sum()
-        c1, c2, c3 = st.columns(3)
-        with c1: st.metric("Total 2024", format_num(total_2024))
-        with c2: st.metric("Total 2025", format_num(total_2025))
-        with c3: st.metric("Increase", format_num(total_2025 - total_2024))
-    
-    with tab3:
-        st.markdown("### 🌲 Random Forest Regression")
-        target_rf = st.selectbox("Target Variable", numeric_cols, key="rf_target")
-        features = [c for c in numeric_cols if c != target_rf]
-        
-        rf_df = active_df[features + [target_rf]].dropna()
-        if len(rf_df) >= 8:
-            X = rf_df[features]
-            y = rf_df[target_rf]
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-            
-            rf = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
-            rf.fit(X_train, y_train)
-            y_pred = rf.predict(X_test)
-            
-            mae = mean_absolute_error(y_test, y_pred)
-            rmse = math.sqrt(mean_squared_error(y_test, y_pred))
-            r2 = r2_score(y_test, y_pred)
-            
-            c1, c2, c3 = st.columns(3)
-            with c1: st.metric("MAE", f"{mae:.2f}")
-            with c2: st.metric("RMSE", f"{rmse:.2f}")
-            with c3: st.metric("R²", f"{r2:.4f}")
-            
-            importance = pd.Series(rf.feature_importances_, index=features).sort_values(ascending=True)
-            fig = px.bar(x=importance.values, y=importance.index, orientation='h', title=f"Feature Importance - {target_rf}")
-            fig = apply_dark_layout(fig, 500)
-            st.plotly_chart(fig, use_container_width=True, key="rf_chart_001")
-        else:
-            st.warning("Insufficient data for Random Forest.")
-    
-    with tab4:
-        st.markdown("### 🌳 Decision Tree Regression")
-        target_dt = st.selectbox("Target Variable", numeric_cols, key="dt_target")
-        features_dt = [c for c in numeric_cols if c != target_dt]
-        
-        dt_df = active_df[features_dt + [target_dt]].dropna()
-        if len(dt_df) >= 8:
-            X = dt_df[features_dt]
-            y = dt_df[target_dt]
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-            
-            dt = DecisionTreeRegressor(max_depth=3, random_state=42)
-            dt.fit(X_train, y_train)
-            y_pred = dt.predict(X_test)
-            
-            mae = mean_absolute_error(y_test, y_pred)
-            rmse = math.sqrt(mean_squared_error(y_test, y_pred))
-            r2 = r2_score(y_test, y_pred)
-            
-            c1, c2, c3 = st.columns(3)
-            with c1: st.metric("MAE", f"{mae:.2f}")
-            with c2: st.metric("RMSE", f"{rmse:.2f}")
-            with c3: st.metric("R²", f"{r2:.4f}")
-            
-            importance = pd.Series(dt.feature_importances_, index=features_dt).sort_values(ascending=True)
-            fig = px.bar(x=importance.values, y=importance.index, orientation='h', title=f"Feature Importance - {target_dt}")
-            fig = apply_dark_layout(fig, 500)
-            st.plotly_chart(fig, use_container_width=True, key="dt_chart_001")
-        else:
-            st.warning("Insufficient data for Decision Tree.")
-    
-    with tab5:
-        st.markdown("### 🎯 K-Means Clustering")
-        st.markdown(generate_insight_box(
-            "Clustering provinces based on production patterns to identify regional segments."
-        ), unsafe_allow_html=True)
-        
-        n_clusters = st.slider("Number of Clusters", 2, 6, 4, key="km_clusters")
-        
-        cluster_df = df[numeric_cols].copy()
-        scaler = StandardScaler()
-        cluster_scaled = scaler.fit_transform(cluster_df)
-        
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
-        clusters = kmeans.fit_predict(cluster_scaled)
-        
-        df_cluster = df.copy()
-        df_cluster["Cluster"] = clusters
-        
-        # PCA for 2D visualization
-        pca = PCA(n_components=2)
-        pca_result = pca.fit_transform(cluster_scaled)
-        df_cluster["PCA1"] = pca_result[:, 0]
-        df_cluster["PCA2"] = pca_result[:, 1]
-        
-        fig = px.scatter(
-            df_cluster,
-            x="PCA1",
-            y="PCA2",
-            color="Cluster",
-            hover_name="Provinsi",
-            title="Province Clusters (PCA 2D Projection)"
-        )
-        fig = apply_dark_layout(fig, 550)
-        st.plotly_chart(fig, use_container_width=True, key="km_chart_001")
-        
-        # Cluster summary
-        cluster_summary = df_cluster.groupby("Cluster")[numeric_cols].mean()
-        st.dataframe(cluster_summary, use_container_width=True)
+                model_df = filtered_df[[x_var, y_var]].dropna().copy()
+                if len(model_df) < 3:
+                    st.warning("Data tidak cukup untuk membangun model regresi.")
+                else:
+                    X = model_df[[x_var]].values
+                    y = model_df[y_var].values
 
+                    lr = LinearRegression()
+                    lr.fit(X, y)
+                    y_pred = lr.predict(X)
+
+                    mae = mean_absolute_error(y, y_pred)
+                    rmse = math.sqrt(mean_squared_error(y, y_pred))
+                    r2 = r2_score(y, y_pred)
+
+                    k1, k2, k3 = st.columns(3)
+                    k1.metric("MAE", f"{mae:.2f}")
+                    k2.metric("RMSE", f"{rmse:.2f}")
+                    k3.metric("R²", f"{r2:.4f}")
+
+                    st.markdown(f"""
+                    <div class="info-box">
+                    <b>📐 Persamaan Model:</b><br>
+                    <code>{y_var} = {lr.coef_[0]:.4f} × {x_var} + {lr.intercept_:.4f}</code><br>
+                    <i>Model ini mengeksplorasi pola prediktif antar komoditas perkebunan, bukan prediksi absolut.</i>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    plot_df = model_df.copy()
+                    plot_df["Prediksi"] = y_pred
+
+                    fig = go.Figure()
+                    fig.add_trace(go.Scatter(
+                        x=plot_df[x_var], y=plot_df[y_var], mode="markers", name="Data Wilayah",
+                        marker=dict(color="#4ade80", size=10)
+                    ))
+                    sort_idx = np.argsort(plot_df[x_var].values)
+                    fig.add_trace(go.Scatter(
+                        x=plot_df[x_var].values[sort_idx], y=plot_df["Prediksi"].values[sort_idx],
+                        mode="lines", name="Garis Regresi", line=dict(color="#d4a017", width=3)
+                    ))
+                    fig.update_layout(title=f"Pola Hubungan: {x_var} → {y_var}", xaxis_title=x_var, yaxis_title=y_var)
+                    fig = apply_plantation_layout(fig, 540)
+                    st.plotly_chart(fig, use_container_width=True, key="lr_chart")
+
+                    st.markdown("### 🎮 Playground Prediksi")
+                    x_input = st.number_input(
+                        f"🌱 Masukkan volume {x_var} (Ribu Ton):",
+                        min_value=0.0,
+                        value=float(np.median(model_df[x_var]))
+                    )
+                    pred_val = lr.predict(np.array([[x_input]]))[0]
+                    st.markdown(f"""
+                    <div class="success-box">
+                    🌾 Prediksi <b>{y_var}</b> untuk <b>{x_var} = {x_input:.2f}</b> ribu ton: <b>{pred_val:.2f} ribu ton</b>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        with tab_fc:
+            st.markdown("### 📅 Simulasi Panen 2025")
+            st.markdown("""
+            <div class="warn-box">
+            <b>⚠️ Catatan Metodologi:</b> Dataset perkebunan ini bersifat <i>cross-sectional</i> (1 tahun). 
+            Simulasi proyeksi dilakukan berdasarkan <b>skenario growth rate</b>, bukan time-series forecasting historis. 
+            Berguna untuk eksplorasi skenario kebijakan, bukan prediksi absolut.
+            </div>
+            """, unsafe_allow_html=True)
+
+            commodity_target = st.selectbox("🌾 Komoditas untuk Disimulasikan", numeric_cols, key="fc_target")
+            growth_rate = st.slider("📈 Growth Rate Panen (%)", min_value=1, max_value=20, value=7, key="fc_growth") / 100
+
+            fc_df = filtered_df[["Provinsi", commodity_target]].copy()
+            fc_df["Proyeksi_2025"] = fc_df[commodity_target] * (1 + growth_rate)
+            fc_df["Peningkatan"] = fc_df["Proyeksi_2025"] - fc_df[commodity_target]
+
+            top_fc = fc_df.sort_values(commodity_target, ascending=False).head(min(top_n, len(fc_df))).copy()
+            comm_color = get_commodity_color(commodity_target, light=True)
+
+            fig = go.Figure()
+            fig.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[commodity_target], name="Panen 2024", marker_color="#c7815e"))
+            fig.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Proyeksi_2025"], name="Proyeksi 2025", marker_color="#4ade80"))
+            fig.update_layout(barmode="group", title=f"Perbandingan Panen {commodity_target}: 2024 vs 2025")
+            fig = apply_plantation_layout(fig, 550)
+            st.plotly_chart(fig, use_container_width=True, key="fc_chart")
+
+            total_now = fc_df[commodity_target].sum()
+            total_fc = fc_df["Proyeksi_2025"].sum()
+
+            k1, k2, k3 = st.columns(3)
+            k1.metric("🌾 Panen 2024", format_num(total_now), "Ribu Ton")
+            k2.metric("📅 Proyeksi 2025", format_num(total_fc), "Ribu Ton")
+            k3.metric("📈 Potensi Peningkatan", format_num(total_fc - total_now), f"+{growth_rate*100:.0f}%")
+
+            st.dataframe(fc_df.sort_values("Proyeksi_2025", ascending=False), use_container_width=True)
+
+        with tab_rf:
+            st.markdown("### 🌲 Random Forest — Prediksi Volume Produksi")
+            st.markdown('<div class="section-subtitle">Model ensemble berbasis hutan keputusan untuk eksplorasi pola produksi</div>', unsafe_allow_html=True)
+
+            target_rf = st.selectbox("🎯 Target Prediksi", numeric_cols, key="rf_target")
+            feature_cols = [c for c in numeric_cols if c != target_rf]
+            rf_df = filtered_df[feature_cols + [target_rf]].dropna().copy()
+
+            if len(rf_df) < 8:
+                st.warning("Data terlalu sedikit untuk Random Forest yang stabil.")
+            else:
+                X = rf_df[feature_cols]
+                y = rf_df[target_rf]
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+                rf = RandomForestRegressor(n_estimators=150, max_depth=5, random_state=42)
+                rf.fit(X_train, y_train)
+                y_pred = rf.predict(X_test)
+
+                mae = mean_absolute_error(y_test, y_pred)
+                rmse = math.sqrt(mean_squared_error(y_test, y_pred))
+                r2 = r2_score(y_test, y_pred)
+
+                k1, k2, k3 = st.columns(3)
+                k1.metric("MAE", f"{mae:.2f}")
+                k2.metric("RMSE", f"{rmse:.2f}")
+                k3.metric("R²", f"{r2:.4f}")
+
+                importance = pd.Series(rf.feature_importances_, index=feature_cols).sort_values(ascending=False).reset_index()
+                importance.columns = ["Komoditas", "Kepentingan"]
+
+                color_map_rf = {row["Komoditas"]: get_commodity_color(row["Komoditas"], light=True)
+                               for _, row in importance.iterrows()}
+
+                fig = px.bar(
+                    importance.sort_values("Kepentingan", ascending=True),
+                    x="Kepentingan",
+                    y="Komoditas",
+                    orientation="h",
+                    text="Kepentingan",
+                    color="Komoditas",
+                    color_discrete_map=color_map_rf,
+                    title=f"Komoditas Paling Berpengaruh terhadap {target_rf}"
+                )
+                fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
+                fig.update_layout(showlegend=False)
+                fig = apply_plantation_layout(fig, 500)
+                st.plotly_chart(fig, use_container_width=True, key="rf_chart")
+
+                top_feat = importance.iloc[-1]
+                st.markdown(f"""
+                <div class="insight-box">
+                🌱 <b>{top_feat['Komoditas']}</b> menjadi komoditas paling berpengaruh dalam memprediksi produksi 
+                <b>{target_rf}</b> dengan skor kepentingan <b>{top_feat['Kepentingan']:.3f}</b>. 
+                Ini menunjukkan adanya pola agro-ekologis atau geografis yang berkaitan antara kedua komoditas.
+                </div>
+                """, unsafe_allow_html=True)
+
+        with tab_dt:
+            st.markdown("### 🌳 Decision Tree — Segmentasi Wilayah Produksi")
+            st.markdown('<div class="section-subtitle">Model pohon keputusan untuk memahami pola segmentasi produksi komoditas</div>', unsafe_allow_html=True)
+
+            target_dt = st.selectbox("🎯 Target Prediksi", numeric_cols, key="dt_target")
+            feature_cols_dt = [c for c in numeric_cols if c != target_dt]
+            dt_df = filtered_df[feature_cols_dt + [target_dt]].dropna().copy()
+
+            if len(dt_df) < 8:
+                st.warning("Data terlalu sedikit untuk Decision Tree yang stabil.")
+            else:
+                X = dt_df[feature_cols_dt]
+                y = dt_df[target_dt]
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+                dt = DecisionTreeRegressor(max_depth=3, random_state=42)
+                dt.fit(X_train, y_train)
+                y_pred = dt.predict(X_test)
+
+                mae = mean_absolute_error(y_test, y_pred)
+                rmse = math.sqrt(mean_squared_error(y_test, y_pred))
+                r2 = r2_score(y_test, y_pred)
+
+                k1, k2, k3 = st.columns(3)
+                k1.metric("MAE", f"{mae:.2f}")
+                k2.metric("RMSE", f"{rmse:.2f}")
+                k3.metric("R²", f"{r2:.4f}")
+
+                importance = pd.Series(dt.feature_importances_, index=feature_cols_dt).sort_values(ascending=False).reset_index()
+                importance.columns = ["Komoditas", "Kepentingan"]
+
+                color_map_dt = {row["Komoditas"]: get_commodity_color(row["Komoditas"], light=True)
+                               for _, row in importance.iterrows()}
+
+                fig = px.bar(
+                    importance.sort_values("Kepentingan", ascending=True),
+                    x="Kepentingan",
+                    y="Komoditas",
+                    orientation="h",
+                    text="Kepentingan",
+                    color="Komoditas",
+                    color_discrete_map=color_map_dt,
+                    title=f"Pembagi Utama Segmentasi {target_dt}"
+                )
+                fig.update_traces(texttemplate='%{text:.3f}', textposition='outside')
+                fig.update_layout(showlegend=False)
+                fig = apply_plantation_layout(fig, 500)
+                st.plotly_chart(fig, use_container_width=True, key="dt_chart")
+
+                st.markdown(f"""
+                <div class="insight-box">
+                🌳 Model Decision Tree dengan kedalaman 3 level menunjukkan bahwa <b>{importance.iloc[-1]['Komoditas']}</b> 
+                menjadi variabel pembagi utama segmentasi wilayah produksi <b>{target_dt}</b>. 
+                Model ini membantu memahami bagaimana pola segmentasi alami wilayah perkebunan Indonesia.
+                </div>
+                """, unsafe_allow_html=True)
 
 # =========================================================
-# PAGE 6: DATA & EXPORT
+# PAGE 7: INSIGHT & STRATEGI PERKEBUNAN
 # =========================================================
-elif menu == "📦 Data & Export":
-    st.markdown("### 📊 Dataset Overview")
-    
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: st.metric("Total Observations", len(active_df))
-    with c2: st.metric("Total Variables", len(active_df.columns))
-    with c3: st.metric("Missing Values", int(active_df.isnull().sum().sum()))
-    with c4: st.metric("Duplicates", int(active_df.duplicated().sum()))
-    
-    tab1, tab2, tab3 = st.tabs(["Dataset", "Descriptive Statistics", "Export"])
-    
-    with tab1:
-        st.dataframe(active_df, use_container_width=True, hide_index=True)
-    
-    with tab2:
-        desc = active_df[numeric_cols].describe().T
-        desc["range"] = desc["max"] - desc["min"]
-        st.dataframe(desc, use_container_width=True)
-    
-    with tab3:
-        st.markdown("### 📥 Download Options")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("#### Filtered Dataset")
-            export_data = add_total_production(active_df)
-            st.download_button(
-                label="⬇️ Download Filtered Data (CSV)",
-                data=export_csv(export_data),
-                file_name="filtered_dataset.csv",
-                mime="text/csv",
-                use_container_width=True,
-                key="export_filtered_btn"
-            )
-        
-        with col2:
-            st.markdown("#### Descriptive Statistics")
-            st.download_button(
-                label="⬇️ Download Statistics (CSV)",
-                data=export_csv(desc),
-                file_name="descriptive_statistics.csv",
-                mime="text/csv",
-                use_container_width=True,
-                key="export_stats_btn"
-            )
-        
+elif menu == "🧠 Insight & Strategi Perkebunan":
+    st.markdown('<div class="section-title">🧠 Insight & Strategi Perkebunan</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">Temuan strategis dan rekomendasi implementatif untuk pengembangan sektor perkebunan Indonesia</div>', unsafe_allow_html=True)
+
+    if filtered_df.empty:
+        st.warning("Tidak ada data untuk filter aktif.")
+    else:
+        total_by_comm = filtered_df[numeric_cols].sum().sort_values(ascending=False)
+        dominant_comm = total_by_comm.index[0]
+        dominant_val = total_by_comm.iloc[0]
+        dom_icon = get_commodity_icon(dominant_comm)
+
+        top_prov, top_val = top_province_for_commodity(filtered_df, selected_commodity)
+        comm_icon = get_commodity_icon(selected_commodity)
+        total_selected = filtered_df[selected_commodity].sum()
+        share_top = (top_val / total_selected * 100) if total_selected > 0 else 0
+
+        diverse_prov, diversity_score = province_with_most_diverse(filtered_df)
+        top5_share = add_total_production(filtered_df).sort_values("Total Produksi", ascending=False).head(5)["Total Produksi"].sum() / max(1, add_total_production(filtered_df)["Total Produksi"].sum()) * 100
+
+        st.markdown("### 🌾 Insight Strategis Nasional")
+
+        insights = [
+            f"{dom_icon} <b>{dominant_comm}</b> merupakan komoditas perkebunan paling dominan secara nasional dengan volume <b>{format_ton(dominant_val)} ribu ton</b>, menjadikannya tulang punggung sektor perkebunan Indonesia.",
+
+            f"{comm_icon} Pada komoditas <b>{selected_commodity}</b>, <b>{top_prov}</b> berperan sebagai sentra utama dengan kontribusi <b>{share_top:.1f}%</b> terhadap total produksi.",
+
+            f"🗺️ <b>Konsentrasi Wilayah:</b> Top 5 provinsi menguasai <b>{top5_share:.1f}%</b> total produksi perkebunan nasional, menunjukkan pola konsentrasi spasial yang perlu diwaspadai dari sisi risiko iklim dan pasar.",
+
+            f"🌱 <b>{diverse_prov}</b> teridentifikasi sebagai provinsi dengan portofolio komoditas paling terdiversifikasi (<b>{int(diversity_score)}</b> komoditas aktif), menjadi contoh ketahanan struktural yang baik.",
+
+            "🌳 Korelasi lemah antar komoditas menunjukkan pola <b>spesialisasi geografis yang sehat</b>, di mana setiap wilayah mengembangkan keunggulan komparatifnya masing-masing — fondasi penting untuk ketahanan sektor perkebunan nasional."
+        ]
+
+        for i, ins in enumerate(insights, start=1):
+            st.markdown(f'<div class="insight-box"><b>#{i}.</b> {ins}</div>', unsafe_allow_html=True)
+
+        st.markdown("### 🚀 Strategi Implementatif")
+        recs = generate_recommendations(filtered_df, selected_commodity)
+        for i, rec in enumerate(recs, start=1):
+            st.markdown(f'<div class="success-box"><b>#{i}.</b> {rec}</div>', unsafe_allow_html=True)
+
+# =========================================================
+# PAGE 8: DATA & EKSPOR
+# =========================================================
+elif menu == "📦 Data & Ekspor":
+    st.markdown('<div class="section-title">📦 Data & Ekspor Perkebunan</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">Dokumentasi dataset, kualitas data, dan ekspor untuk kebutuhan analisis lanjutan</div>', unsafe_allow_html=True)
+
+    if filtered_df.empty:
+        st.warning("Tidak ada data untuk diekspor.")
+    else:
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("📋 Total Observasi", filtered_df.shape[0])
+        c2.metric("🌾 Variabel Komoditas", len(numeric_cols))
+        c3.metric("✅ Missing Values", int(filtered_df.isnull().sum().sum()))
+        c4.metric("🔄 Data Duplikat", int(filtered_df.duplicated().sum()))
+
+        tab1, tab2, tab3 = st.tabs(["📋 Dataset Mentah", "📊 Statistik Deskriptif", "🧹 Kualitas Data"])
+
+        with tab1:
+            st.markdown('<div class="section-subtitle">Data produksi perkebunan per provinsi (Ribu Ton)</div>', unsafe_allow_html=True)
+            st.dataframe(filtered_df, use_container_width=True)
+
+        with tab2:
+            st.markdown('<div class="section-subtitle">Statistik deskriptif komoditas perkebunan</div>', unsafe_allow_html=True)
+            desc = filtered_df[numeric_cols].describe().T
+            desc["range"] = desc["max"] - desc["min"]
+            st.dataframe(desc, use_container_width=True)
+
+        with tab3:
+            st.markdown("### 🧹 Laporan Kualitas Data")
+            duplicate_count = filtered_df.duplicated().sum()
+            zero_rows = (filtered_df[numeric_cols].sum(axis=1) == 0).sum()
+
+            st.markdown(f"- ✅ **Missing values:** {int(filtered_df.isnull().sum().sum())}")
+            st.markdown(f"- ✅ **Baris duplikat:** {int(duplicate_count)}")
+            st.markdown(f"- ⚠️ **Wilayah tanpa produksi:** {int(zero_rows)} (termasuk wilayah urban seperti DKI Jakarta)")
+
+            st.markdown("""
+            <div class="warn-box">
+            <b>📌 Catatan Kualitas Data:</b><br>
+            Outlier yang terdeteksi (seperti Riau untuk sawit, Jatim untuk tebu) <b>bukan kesalahan data</b>, 
+            melainkan representasi dari <b>sentra produksi riil</b> sektor perkebunan Indonesia. 
+            Data ini bersumber dari laporan resmi BPS dan dapat dipercaya untuk analisis strategis.
+            </div>
+            """, unsafe_allow_html=True)
+
         st.markdown("---")
-        st.markdown("### 📝 Data Quality Notes")
-        st.markdown(generate_insight_box(
-            "<b>✅ Data Quality:</b> Dataset is clean with no missing values or duplicates. "
-            "Outliers in Kelapa Sawit (Riau, Kalteng) represent actual production centers, not errors."
-        , "success"), unsafe_allow_html=True)
+        st.markdown("### 📥 Ekspor Dataset")
+        export_df = add_total_production(filtered_df)
+        st.download_button(
+            label="⬇️ Ekspor Dataset Terfilter (CSV)",
+            data=export_csv(export_df),
+            file_name="data_perkebunan_terfilter.csv",
+            mime="text/csv"
+        )
 
+        st.markdown("### 📅 Ekspor Simulasi Panen 2025")
+        exp_comm = st.selectbox("🌾 Komoditas untuk Diekspor", numeric_cols, key="exp_comm")
+        exp_growth = st.slider("📈 Growth rate simulasi (%)", 1, 20, 7, key="exp_growth") / 100
+
+        export_fc = filtered_df[["Provinsi", exp_comm]].copy()
+        export_fc["Proyeksi_2025"] = export_fc[exp_comm] * (1 + exp_growth)
+        export_fc["Peningkatan"] = export_fc["Proyeksi_2025"] - export_fc[exp_comm]
+
+        st.dataframe(export_fc, use_container_width=True)
+
+        st.download_button(
+            label=f"⬇️ Ekspor Proyeksi {exp_comm} 2025 (CSV)",
+            data=export_csv(export_fc),
+            file_name=f"proyeksi_{exp_comm.lower().replace(' ', '_')}_2025.csv",
+            mime="text/csv"
+        )
+
+        st.markdown("### 📊 Ekspor Statistik Deskriptif")
+        st.download_button(
+            label="⬇️ Ekspor Statistik Deskriptif (CSV)",
+            data=export_csv(desc),
+            file_name="statistik_perkebunan.csv",
+            mime="text/csv"
+        )
 
 # =========================================================
 # FOOTER
 # =========================================================
-st.markdown("---")
 st.markdown("""
-<div style="text-align: center; padding: 2rem; color: #64748b; font-size: 0.9rem;">
-    <h3 style="color: #f8fafc; margin-bottom: 0.5rem;">🎓 Indonesian Plantation Intelligence Dashboard</h3>
-    <p>UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
-    <p style="margin-top: 1rem;">Built with Streamlit, Plotly, and Scikit-Learn</p>
-    <p>© 2026 | Data Source: BPS - Produksi Tanaman Perkebunan 2024</p>
+<div class="footer-box">
+    <h3 style="color: #4ade80;">🌴 Dashboard Intelijen Komoditas Perkebunan Indonesia</h3>
+    <p style="color: #c7d2c0;">UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
+    <p style="color: #93a39a; font-size: 0.85rem; margin-top: 1rem;">
+        Dibangun dengan Streamlit, Plotly, dan Scikit-Learn untuk mendukung perencanaan strategis sektor perkebunan Indonesia
+    </p>
+    <p style="color: #93a39a; font-size: 0.8rem;">
+        © 2026 | Sumber Data: BPS — Produksi Tanaman Perkebunan Menurut Provinsi, 2024
+    </p>
 </div>
 """, unsafe_allow_html=True)
