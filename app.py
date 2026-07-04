@@ -678,7 +678,7 @@ elif menu == "📈 Proyeksi & Model":
                 """, unsafe_allow_html=True)
                 
                 # Generate text rules dari sklearn
-               tree_rules = export_text(dt, feature_names=list(feats_dt))
+                tree_rules = export_text(dt, features=feats_dt)
                 st.code(tree_rules, language="text")
                 
             else: 
