@@ -1,7 +1,12 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+
+# PENTING: Set backend Matplotlib ke 'Agg' SEBELUM import pyplot
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 import seaborn as sns
 import io
 import math
