@@ -5,22 +5,18 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
-import matplotlib
-matplotlib.use('Agg')  # WAJIB untuk Streamlit Cloud
-import matplotlib.pyplot as plt
-from sklearn.tree import plot_tree
 from sklearn.tree import export_text
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 import warnings
 warnings.filterwarnings('ignore')
 
+# =========================================================
+# PAGE CONFIG
+# =========================================================
 # =========================================================
 # PAGE CONFIG
 # =========================================================
