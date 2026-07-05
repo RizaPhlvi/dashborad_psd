@@ -1450,9 +1450,7 @@ def load_data():
 df = load_data()
 numeric_cols = [c for c in df.columns if c != "Provinsi"]
 
-=========================================================
-COMMODITY IDENTITY MAP
-=========================================================
+
 COMMODITY_IDENTITY = {
     "Kelapa Sawit": {"icon": "🌴", "color": "#3E5F4D", "color_light": "#6B9278", "sector": "Perkebunan Besar", "desc": "Primadona ekspor. Mendominasi Sumatera & Kalimantan."},
     "Kelapa": {"icon": "🥥", "color": "#5A7B8A", "color_light": "#89AAB8", "sector": "Perkebunan Rakyat", "desc": "Tanaman pesisir Nusantara. Potensi hilirisasi minyak & sabut."},
