@@ -26,7 +26,7 @@ st.setpageconfig(
 )
 
 =========================================================
-🗺️ GEOJSON & PROVINCE MAPPING
+#🗺️ GEOJSON & PROVINCE MAPPING
 =========================================================
 PROVINCE_MAPPING = {
     "DKI JAKARTA": "Jakarta Raya",
