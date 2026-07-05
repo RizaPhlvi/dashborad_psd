@@ -26,7 +26,7 @@ st.set_page_config(
 )
 
 # =========================================================
-# GEOJSON AND PROVINCE MAPPING
+# GEOJSON CACHE
 # =========================================================
 PROVINCE_MAPPING = {
     "DKI JAKARTA": "Jakarta Raya",
@@ -50,48 +50,34 @@ PROVINCE_MAPPING = {
     "PAPUA TENGAH": "Papua",
 }
 
-@st.cache_data(show_spinner="Memuat peta Indonesia...")
+@st.cache_data(ttl=3600, show_spinner=False)
 def load_indonesia_geojson():
-    urls = [
-        "https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province.json",
-    ]
-    for url in urls:
-        try:
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                return response.json()
-        except:
-            continue
+    try:
+        url = "https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province.json"
+        response = requests.get(url, timeout=8)
+        if response.status_code == 200:
+            return response.json()
+    except:
+        pass
     return None
 
-def normalize_province_name(name):
-    return PROVINCE_MAPPING.get(name, name)
-
-def create_choropleth_map(df_map, value_col, title, color_label="Produksi (Ribu Ton)", is_aggregate=False):
+def create_choropleth_map(df_map, value_col, title, color_label, is_aggregate=False):
     geojson = load_indonesia_geojson()
     if geojson is None:
         return None
     
     map_df = df_map.copy()
-    map_df["Provinsi_Normalized"] = map_df["Provinsi"].apply(normalize_province_name)
+    map_df["Provinsi_Norm"] = map_df["Provinsi"].map(PROVINCE_MAPPING).fillna(map_df["Provinsi"])
     
-    if is_aggregate:
-        colorscale = [
-            [0, "#FDF5EC"], [0.25, "#E8C9A0"], [0.5, "#C28F6A"],
-            [0.75, "#8B5A3C"], [1, "#4A2C1A"]
-        ]
-    else:
-        colorscale = [
-            [0, "#F5F0E3"], [0.25, "#D4B896"], [0.5, "#8BA888"],
-            [0.75, "#2D5F3F"], [1, "#1A2B20"]
-        ]
+    colorscale = [[0, "#FDF5EC"], [0.25, "#E8C9A0"], [0.5, "#C28F6A"], [0.75, "#8B5A3C"], [1, "#4A2C1A"]] if is_aggregate \
+                 else [[0, "#F5F0E3"], [0.25, "#D4B896"], [0.5, "#8BA888"], [0.75, "#2D5F3F"], [1, "#1A2B20"]]
     
     fig = px.choropleth(
         map_df, geojson=geojson, featureidkey="properties.Propinsi",
-        locations="Provinsi_Normalized", color=value_col,
+        locations="Provinsi_Norm", color=value_col,
         color_continuous_scale=colorscale, scope="asia",
         labels={value_col: color_label}, title=title,
-        hover_name="Provinsi", hover_data={"Provinsi_Normalized": False, value_col: ":,.2f"}
+        hover_name="Provinsi", hover_data={"Provinsi_Norm": False, value_col: ":,.2f"}
     )
     
     fig.update_geos(
@@ -99,1213 +85,451 @@ def create_choropleth_map(df_map, value_col, title, color_label="Produksi (Ribu 
         showcoastlines=True, coastlinecolor="#8BA888",
         showland=True, landcolor="#F5F0E3",
         showocean=True, oceancolor="#E8F0E5",
-        showlakes=False, projection_type="mercator",
-        fitbounds="locations", lataxis_range=[-12, 8], lonaxis_range=[94, 142]
+        projection_type="mercator", fitbounds="locations",
+        lataxis_range=[-12, 8], lonaxis_range=[94, 142]
     )
-    
     fig.update_layout(
         paper_bgcolor="#FAF7F0", plot_bgcolor="#FFFFFF",
         font=dict(color="#1A2B20", family="Inter, sans-serif"),
-        margin={"r": 0, "t": 60, "l": 0, "b": 40}, height=600,
-        title=dict(font=dict(size=17, color="#2D5F3F", family="Fraunces, serif", weight=600), x=0.02, xanchor="left"),
-        coloraxis_colorbar=dict(
-            title=dict(text=color_label, font=dict(color="#3E5245")),
-            tickfont=dict(color="#3E5245"), len=0.8, x=1.02,
-            thickness=20, outlinecolor="#C9C0AB", outlinewidth=1
-        ),
-        hoverlabel=dict(bgcolor="#FFFFFF", bordercolor="#2D5F3F", font=dict(color="#1A2B20", family="Inter", size=13))
+        margin={"r": 0, "t": 60, "l": 0, "b": 40}, height=580,
+        title=dict(font=dict(size=16, color="#2D5F3F", family="Georgia, serif"), x=0.02),
+        coloraxis_colorbar=dict(title=color_label, len=0.8, thickness=18)
     )
     return fig
 
 # =========================================================
-# ULTRA PREMIUM BOTANICAL THEME
+# LIGHTWEIGHT BOTANICAL THEME (Optimized CSS)
 # =========================================================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --bg-paper: #FAF7F0;
-    --bg-paper-deep: #F3EEE2;
-    --bg-card: #FFFFFF;
-    --bg-sidebar: #F0EBE0;
-    --bg-sidebar-header: #1E3A2B;
-    --ink-primary: #1A2B20;
-    --ink-secondary: #3E5245;
-    --ink-muted: #6B7D70;
-    --ink-faint: #9AA89F;
-    --ink-on-dark: #FAF7F0;
-    --accent-heritage: #2D5F3F;
-    --accent-heritage-deep: #1E3A2B;
-    --accent-copper: #B87333;
-    --accent-copper-light: #D4A574;
-    --accent-sage: #8BA888;
-    --accent-sage-deep: #6B8E76;
-    --accent-sand: #D4B896;
-    --accent-clay: #C17B4E;
-    --accent-cream: #F5EFE0;
+    --bg: #FAF7F0;
+    --card: #FFFFFF;
+    --sidebar: #F0EBE0;
+    --ink: #1A2B20;
+    --ink2: #3E5245;
+    --ink3: #6B7D70;
+    --heritage: #2D5F3F;
+    --copper: #B87333;
+    --sage: #8BA888;
+    --sand: #D4B896;
     --border: #E5DFD0;
-    --border-strong: #C9C0AB;
-    --shadow-xs: 0 1px 2px rgba(26, 43, 32, 0.03);
-    --shadow-sm: 0 2px 8px rgba(26, 43, 32, 0.04);
-    --shadow-md: 0 8px 24px rgba(26, 43, 32, 0.06);
-    --shadow-lg: 0 16px 48px rgba(26, 43, 32, 0.08);
-    --shadow-xl: 0 24px 64px rgba(26, 43, 32, 0.12);
-    --shadow-glow-green: 0 0 40px rgba(139, 168, 136, 0.25);
-    --shadow-glow-copper: 0 0 40px rgba(184, 115, 51, 0.20);
-    --radius-sm: 8px;
-    --radius-md: 14px;
-    --radius-lg: 20px;
-    --radius-xl: 28px;
+    --sh: 0 2px 8px rgba(26,43,32,0.06);
+    --sh-md: 0 8px 20px rgba(26,43,32,0.08);
 }
 
-.stApp::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.6;
-}
+* { box-sizing: border-box; }
 
 .stApp {
-    background-color: var(--bg-paper);
-    background-image: 
-        radial-gradient(at 20% 10%, rgba(139, 168, 136, 0.08) 0px, transparent 50%),
-        radial-gradient(at 80% 90%, rgba(212, 184, 150, 0.08) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(184, 115, 51, 0.03) 0px, transparent 60%);
-    color: var(--ink-primary);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 15px;
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    font-size: 14.5px;
+    line-height: 1.6;
 }
 
-.block-container { 
-    max-width: 1550px; 
-    padding-top: 2.5rem; 
-    padding-bottom: 3rem;
-    position: relative;
-    z-index: 2;
+.block-container { max-width: 1500px; padding: 2rem 2.5rem 3rem; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+
+h1, h2, h3 { 
+    font-family: Georgia, 'Times New Roman', serif !important;
+    color: var(--ink) !important;
+    letter-spacing: -0.02em;
 }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { 
-    background: linear-gradient(180deg, var(--accent-sage), var(--accent-heritage));
-    border-radius: 10px; 
-    border: 2px solid var(--bg-paper); 
-}
-::-webkit-scrollbar-thumb:hover { 
-    background: linear-gradient(180deg, var(--accent-copper), var(--accent-clay));
-}
-
-h1, h2, h3, h4 { 
-    font-family: 'Fraunces', Georgia, serif !important; 
-    color: var(--ink-primary) !important; 
-    letter-spacing: -0.025em; 
-    font-weight: 700 !important;
-    font-variation-settings: "opsz" 144, "SOFT" 50;
-}
-h1 { font-size: 2.6rem !important; line-height: 1.1 !important; } 
-h2 { font-size: 1.9rem !important; line-height: 1.2 !important; } 
-h3 { font-size: 1.5rem !important; line-height: 1.3 !important; }
-h4 { font-size: 1.2rem !important; line-height: 1.4 !important; }
-
-p, span, div, label {
-    color: var(--ink-primary);
-    font-family: 'Inter', sans-serif;
-}
-
-strong, b {
-    color: var(--ink-primary);
-    font-weight: 700;
-    letter-spacing: -0.01em;
-}
-
-@keyframes fadeInUp { 
-    from { opacity: 0; transform: translateY(30px); } 
-    to { opacity: 1; transform: translateY(0); } 
-}
-@keyframes fadeInScale { 
-    from { opacity: 0; transform: scale(0.94); } 
-    to { opacity: 1; transform: scale(1); } 
-}
-@keyframes slideInLeft { 
-    from { opacity: 0; transform: translateX(-40px); } 
-    to { opacity: 1; transform: translateX(0); } 
-}
-@keyframes slideInRight { 
-    from { opacity: 0; transform: translateX(40px); } 
-    to { opacity: 1; transform: translateX(0); } 
-}
-@keyframes gentleSway { 
-    0%, 100% { transform: rotate(-3deg) translateY(0); } 
-    50% { transform: rotate(3deg) translateY(-5px); } 
-}
-@keyframes shimmer { 
-    0% { background-position: -200% center; } 
-    100% { background-position: 200% center; } 
-}
-@keyframes breathe { 
-    0%, 100% { transform: scale(1); opacity: 0.9; } 
-    50% { transform: scale(1.02); opacity: 1; } 
-}
-@keyframes gradientShift { 
-    0% { background-position: 0% 50%; } 
-    50% { background-position: 100% 50%; } 
-    100% { background-position: 0% 50%; } 
-}
-@keyframes pulse { 
-    0%, 100% { opacity: 1; transform: scale(1); } 
-    50% { opacity: 0.85; transform: scale(1.05); } 
-}
-@keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-15px) rotate(3deg); }
-}
-@keyframes borderFlow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
-}
-@keyframes leafFall {
-    0% { 
-        transform: translate(0, -20px) rotate(0deg);
-        opacity: 0;
-    }
-    10% { opacity: 0.5; }
-    90% { opacity: 0.3; }
-    100% { 
-        transform: translate(50px, 100vh) rotate(720deg);
-        opacity: 0;
-    }
-}
-@keyframes textReveal {
-    from { 
-        clip-path: inset(0 100% 0 0);
-        opacity: 0;
-    }
-    to { 
-        clip-path: inset(0 0 0 0);
-        opacity: 1;
-    }
-}
-@keyframes counterUp {
-    from { 
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to { 
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* HERO */
 .hero-strip {
-    background: 
-        radial-gradient(ellipse at 20% 20%, rgba(139, 168, 136, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 30%, rgba(212, 184, 150, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 80%, rgba(184, 115, 51, 0.15) 0%, transparent 60%),
-        linear-gradient(135deg, #1E3A2B 0%, #2D5F3F 40%, #3E7550 100%);
-    background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100%;
-    animation: gradientShift 20s ease infinite, fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1);
-    color: var(--ink-on-dark);
-    padding: 3.5rem 4rem;
-    border-radius: var(--radius-xl);
-    box-shadow: 
-        0 30px 60px rgba(30, 58, 43, 0.25),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 2px 0 rgba(255, 255, 255, 0.08) inset;
-    margin-bottom: 3rem;
-    position: relative;
-    overflow: hidden;
-    backdrop-filter: blur(20px);
-}
-
-.hero-strip::before { 
-    content: '🌿'; 
-    position: absolute; 
-    right: 4rem; 
-    top: 50%; 
-    transform: translateY(-50%); 
-    font-size: 16rem; 
-    opacity: 0.07; 
-    filter: blur(4px) saturate(0.5);
-    animation: gentleSway 8s ease-in-out infinite;
-}
-
-.hero-strip::after { 
-    content: ''; 
-    position: absolute; 
-    top: 0; left: 0; right: 0; 
-    height: 1px; 
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    background-size: 200% 100%;
-    animation: shimmer 4s linear infinite;
-}
-
-.hero-title { 
-    font-family: 'Fraunces', serif !important; 
-    font-size: 3.2rem !important; 
-    font-weight: 800 !important; 
-    color: #FFFFFF !important; 
-    margin-bottom: 1rem; 
-    position: relative; 
-    z-index: 2; 
-    letter-spacing: -0.035em;
-    line-height: 1.05 !important;
-    animation: textReveal 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
-    font-variation-settings: "opsz" 144, "SOFT" 0;
-}
-
-.hero-title::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 80px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--accent-copper), var(--accent-sand), transparent);
-    border-radius: 2px;
-    animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s backwards;
-}
-
-.hero-subtitle { 
-    color: rgba(250, 247, 240, 0.88); 
-    font-size: 1.1rem; 
-    line-height: 1.7; 
-    max-width: 70%; 
-    margin-bottom: 2rem; 
-    position: relative; 
-    z-index: 2; 
-    font-weight: 400;
-    letter-spacing: -0.005em;
-    animation: fadeInUp 0.8s ease-out 0.6s backwards;
-}
-
-.hero-badges { 
-    display: flex; 
-    gap: 0.75rem; 
-    flex-wrap: wrap; 
-    position: relative; 
-    z-index: 2; 
-    animation: fadeInUp 0.8s ease-out 0.8s backwards; 
-}
-
-.hero-badge { 
-    background: rgba(250, 247, 240, 0.08); 
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
-    border: 1px solid rgba(250, 247, 240, 0.15); 
-    color: #FFFFFF; 
-    padding: 0.55rem 1.3rem; 
-    border-radius: 999px; 
-    font-size: 0.85rem; 
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-    animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    background: linear-gradient(135deg, #1E3A2B 0%, #2D5F3F 60%, #3E7550 100%);
+    color: var(--card);
+    padding: 2.5rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(30,58,43,0.18);
+    margin-bottom: 2rem;
     position: relative;
     overflow: hidden;
 }
-
-.hero-badge::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-    transition: left 0.6s ease;
-}
-
-.hero-badge:hover::before { left: 100%; }
-.hero-badge:nth-child(1) { animation-delay: 0.9s; } 
-.hero-badge:nth-child(2) { animation-delay: 1.0s; } 
-.hero-badge:nth-child(3) { animation-delay: 1.1s; } 
-.hero-badge:nth-child(4) { animation-delay: 1.2s; }
-
-.hero-badge:hover { 
-    background: rgba(250, 247, 240, 0.18); 
-    transform: translateY(-4px); 
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    border-color: rgba(250, 247, 240, 0.3);
-}
-
-.hero-mini-stats { 
-    display: flex; 
-    gap: 3.5rem; 
-    margin-top: 2.5rem; 
-    padding-top: 2rem; 
-    border-top: 1px solid rgba(250, 247, 240, 0.12); 
-    position: relative; 
-    z-index: 2; 
-    flex-wrap: wrap; 
-    animation: fadeInUp 0.8s ease-out 1.2s backwards; 
-}
-
-.mini-stat {
-    position: relative;
-    padding-right: 3.5rem;
-}
-
-.mini-stat:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    right: 0; top: 50%;
-    transform: translateY(-50%);
-    width: 1px;
-    height: 32px;
-    background: rgba(250, 247, 240, 0.15);
-}
-
-.mini-stat-label { 
-    font-size: 0.68rem; 
-    color: rgba(250, 247, 240, 0.6); 
-    text-transform: uppercase; 
-    letter-spacing: 0.18em; 
-    font-weight: 600; 
-    margin-bottom: 0.5rem; 
-}
-
-.mini-stat-value { 
-    font-size: 1.8rem; 
-    font-weight: 700; 
-    color: #FFFFFF; 
-    font-family: 'Fraunces', serif; 
-    letter-spacing: -0.025em;
-    font-variation-settings: "opsz" 144;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
-}
-
-section[data-testid="stSidebar"] { 
-    background: linear-gradient(180deg, #F0EBE0 0%, #E8E0CF 100%) !important; 
-    padding: 0 !important; 
-    animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-}
-
-section[data-testid="stSidebar"]::before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 1px; height: 100%;
-    background: linear-gradient(180deg, transparent, var(--border-strong), transparent);
-    z-index: 10;
-}
-
-section[data-testid="stSidebar"] > div { padding-top: 0 !important; }
-
-.sidebar-brand { 
-    background: 
-        radial-gradient(ellipse at 30% 20%, rgba(139, 168, 136, 0.2) 0%, transparent 60%),
-        linear-gradient(135deg, var(--bg-sidebar-header) 0%, #2D5F3F 100%);
-    color: var(--ink-on-dark); 
-    padding: 2.5rem 1.8rem 2.2rem; 
-    margin: -1rem -1rem 1.8rem -1rem; 
-    position: relative; 
-    overflow: hidden; 
-    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.sidebar-brand::before {
-    content: '';
-    position: absolute;
-    top: -50%; right: -20%;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(212, 184, 150, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: float 10s ease-in-out infinite;
-}
-
-.sidebar-brand::after { 
-    content: ''; 
-    position: absolute; 
-    bottom: 0; left: 0; right: 0; 
-    height: 1px; 
-    background: linear-gradient(90deg, transparent, var(--accent-copper), var(--accent-sand), transparent);
-    background-size: 200% 100%;
-    animation: shimmer 5s linear infinite;
-}
-
-.sidebar-brand-icon { 
-    font-size: 2.8rem; 
-    margin-bottom: 0.8rem; 
-    display: block; 
-    animation: gentleSway 6s ease-in-out infinite;
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
-}
-
-.sidebar-brand-title { 
-    font-family: 'Fraunces', serif; 
-    font-size: 1.6rem; 
-    font-weight: 700; 
-    color: #FFFFFF; 
-    margin-bottom: 0.3rem; 
-    letter-spacing: -0.025em;
-    font-variation-settings: "opsz" 144;
-}
-
-.sidebar-brand-sub { 
-    font-size: 0.68rem; 
-    color: rgba(250, 247, 240, 0.6); 
-    text-transform: uppercase; 
-    letter-spacing: 0.25em; 
-    font-weight: 600;
-    position: relative;
-    padding-left: 20px;
-}
-
-.sidebar-brand-sub::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 50%;
-    transform: translateY(-50%);
-    width: 12px; height: 1px;
-    background: var(--accent-copper);
-}
-
-.sidebar-block { 
-    background: var(--bg-card); 
-    border: 1px solid var(--border); 
-    border-radius: var(--radius-lg); 
-    padding: 1.5rem; 
-    margin-bottom: 1.3rem; 
-    box-shadow: var(--shadow-sm); 
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-    position: relative;
-    overflow: hidden;
-}
-
-.sidebar-block::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
-}
-
-.sidebar-block:nth-child(2) { animation-delay: 0.1s; } 
-.sidebar-block:nth-child(3) { animation-delay: 0.2s; } 
-.sidebar-block:nth-child(4) { animation-delay: 0.3s; }
-
-.sidebar-block:hover { 
-    box-shadow: var(--shadow-md); 
-    border-color: var(--border-strong); 
-    transform: translateY(-3px);
-}
-
-.sidebar-title { 
-    font-size: 0.68rem; 
-    font-weight: 700; 
-    color: var(--accent-heritage); 
-    text-transform: uppercase; 
-    letter-spacing: 0.18em; 
-    margin-bottom: 1rem; 
-    display: flex; 
-    align-items: center; 
-    gap: 0.6rem; 
-    padding-bottom: 0.7rem; 
-    border-bottom: 1px solid var(--border);
-    font-family: 'Inter', sans-serif;
-}
-
-.sidebar-title::before { 
-    content: ''; 
-    width: 3px; 
-    height: 14px; 
-    background: linear-gradient(180deg, var(--accent-copper), var(--accent-sand));
-    border-radius: 2px; 
-    animation: pulse 3s ease-in-out infinite;
-    box-shadow: 0 0 8px rgba(184, 115, 51, 0.3);
-}
-
-section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] { 
-    gap: 4px !important; 
-    padding: 0.4rem !important; 
-    background: rgba(229, 223, 208, 0.5);
-    border-radius: var(--radius-md); 
-    backdrop-filter: blur(10px);
-}
-
-section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label { 
-    border-radius: var(--radius-sm) !important; 
-    padding: 0.75rem 1.1rem !important; 
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important; 
-    color: var(--ink-secondary) !important; 
-    font-weight: 500 !important; 
-    font-size: 0.88rem !important; 
-    border-left: 3px solid transparent !important; 
-    margin-bottom: 0 !important;
-    position: relative;
-    overflow: hidden;
-}
-
-section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 0;
-    background: linear-gradient(90deg, rgba(139, 168, 136, 0.1), transparent);
-    transition: width 0.4s ease;
-}
-
-section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover::before {
-    width: 100%;
-}
-
-section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover { 
-    color: var(--accent-heritage) !important; 
-    border-left-color: var(--accent-sage) !important; 
-    transform: translateX(4px) !important; 
-}
-
-section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child { display: none; }
-
-section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-checked="true"] { 
-    background: linear-gradient(135deg, var(--accent-heritage) 0%, #3E7550 100%) !important; 
-    color: #FFFFFF !important; 
-    font-weight: 600 !important; 
-    box-shadow: 
-        0 4px 16px rgba(45, 95, 63, 0.3),
-        0 2px 4px rgba(45, 95, 63, 0.2) !important; 
-    border-left-color: var(--accent-copper) !important;
-}
-
-.commodity-brief { 
-    background: linear-gradient(135deg, #F5EFE0 0%, #EDE4D0 100%);
-    border-left: 4px solid var(--accent-heritage); 
-    padding: 1.2rem 1.3rem; 
-    border-radius: 0 var(--radius-md) var(--radius-md) 0; 
-    margin-top: 0.9rem; 
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.commodity-brief::before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 80px; height: 80px;
-    background: radial-gradient(circle, rgba(139, 168, 136, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    transform: translate(30%, -30%);
-}
-
-.commodity-brief:hover { 
-    transform: translateX(6px); 
-    box-shadow: var(--shadow-md);
-}
-
-.sidebar-footer { 
-    text-align: center; 
-    padding: 2rem 1rem; 
-    margin-top: 1.5rem; 
-    border-top: 1px solid var(--border); 
-    position: relative; 
-    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.6s backwards; 
-}
-
-.sidebar-footer-icon { 
-    font-size: 2.2rem; 
-    margin-bottom: 0.5rem; 
-    opacity: 0.6; 
-    animation: gentleSway 7s ease-in-out infinite;
-    display: inline-block;
-}
-
-.sidebar-footer-text { 
-    font-size: 0.65rem; 
-    color: var(--ink-muted); 
-    letter-spacing: 0.25em; 
-    text-transform: uppercase; 
-    font-weight: 700;
-}
-
-section[data-testid="stSidebar"] .stSelectbox > div,
-section[data-testid="stSidebar"] .stSlider > div {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0.3rem 0.6rem;
-    transition: all 0.3s ease;
-}
-
-section[data-testid="stSidebar"] label {
-    color: var(--ink-secondary) !important;
-    font-weight: 600 !important;
-    font-size: 0.8rem !important;
-    margin-bottom: 0.4rem !important;
-    letter-spacing: 0.01em;
-}
-
-.intel-kpi { 
-    background: linear-gradient(145deg, rgba(255,255,255,1) 0%, rgba(250,247,240,0.7) 100%);
-    border: 1px solid var(--border); 
-    border-radius: var(--radius-lg); 
-    padding: 1.7rem 1.6rem; 
-    box-shadow: var(--shadow-sm); 
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
-    height: 100%; 
-    position: relative; 
-    overflow: hidden; 
-    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-    backdrop-filter: blur(10px);
-}
-
-.intel-kpi:nth-child(1) { animation-delay: 0.1s; } 
-.intel-kpi:nth-child(2) { animation-delay: 0.2s; } 
-.intel-kpi:nth-child(3) { animation-delay: 0.3s; } 
-.intel-kpi:nth-child(4) { animation-delay: 0.4s; }
-
-.intel-kpi::before { 
-    content: ''; 
-    position: absolute; 
-    top: 0; left: 0; 
-    width: 100%; 
-    height: 3px; 
-    background: linear-gradient(90deg, var(--accent-sage), var(--accent-copper));
-    transform: scaleX(0); 
-    transform-origin: left; 
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.intel-kpi::after {
-    content: '';
-    position: absolute;
-    top: -50%; right: -30%;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(139, 168, 136, 0.08) 0%, transparent 70%);
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-.intel-kpi:hover { 
-    transform: translateY(-10px) scale(1.02); 
-    box-shadow: 
-        var(--shadow-lg),
-        0 0 0 1px var(--border-strong);
-    border-color: var(--accent-sage);
-}
-
-.intel-kpi:hover::before { transform: scaleX(1); }
-.intel-kpi:hover::after { opacity: 1; }
-
-.kpi-layer1 { 
-    font-size: 0.7rem; 
-    font-weight: 700; 
-    color: var(--ink-muted); 
-    text-transform: uppercase; 
-    letter-spacing: 0.12em; 
-    margin-bottom: 0.8rem; 
-    display: flex; 
-    align-items: center; 
-    gap: 0.5rem;
-    font-family: 'Inter', sans-serif;
-}
-
-.kpi-layer2 { 
-    font-size: 2.3rem; 
-    font-weight: 700; 
-    color: var(--ink-primary); 
-    line-height: 1.05; 
-    margin-bottom: 0.5rem; 
-    font-family: 'Fraunces', serif; 
-    letter-spacing: -0.03em;
-    font-variation-settings: "opsz" 144, "SOFT" 50;
-    transition: all 0.4s ease;
-    animation: counterUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
-}
-
-.intel-kpi:hover .kpi-layer2 { 
-    color: var(--accent-heritage); 
-    transform: scale(1.04);
-    text-shadow: 0 2px 20px rgba(45, 95, 63, 0.15);
-}
-
-.kpi-layer3 { 
-    font-size: 0.85rem; 
-    color: var(--ink-secondary); 
-    line-height: 1.55; 
-    font-weight: 500;
-    letter-spacing: -0.005em;
-}
-
-.section-title { 
-    font-family: 'Fraunces', serif !important; 
-    font-size: 1.75rem !important; 
-    font-weight: 700 !important; 
-    color: var(--accent-heritage) !important; 
-    border-bottom: none;
-    padding-bottom: 0.9rem; 
-    margin-top: 3.5rem; 
-    margin-bottom: 1.8rem; 
-    display: inline-block; 
-    letter-spacing: -0.025em;
-    animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1); 
-    position: relative;
-    font-variation-settings: "opsz" 144;
-}
-
-.section-title::after { 
-    content: ''; 
-    position: absolute; 
-    bottom: 0;
-    left: 0; 
-    width: 100%; 
-    height: 3px; 
-    background: linear-gradient(90deg, var(--accent-heritage), var(--accent-copper), var(--accent-sand), transparent);
-    background-size: 200% 100%;
-    animation: borderFlow 4s linear infinite;
-    border-radius: 2px;
-}
-
-.section-subtitle { 
-    font-size: 0.95rem; 
-    color: var(--ink-secondary); 
-    margin-bottom: 2rem; 
-    font-style: italic; 
-    padding-left: 1.2rem; 
-    border-left: 3px solid var(--accent-sand);
-    font-weight: 400;
-    letter-spacing: -0.005em;
-    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
-    font-family: 'Fraunces', serif;
-}
-
-.insight-card { 
-    background: linear-gradient(135deg, #EFF5EE 0%, #E5EFE4 100%);
-    border-left: 4px solid var(--accent-heritage); 
-    padding: 1.5rem 1.8rem; 
-    border-radius: 4px var(--radius-lg) var(--radius-lg) 4px; 
-    color: var(--ink-primary); 
-    margin: 1.3rem 0; 
-    line-height: 1.75; 
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-    font-size: 0.95rem; 
-    box-shadow: var(--shadow-sm); 
-    animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-    position: relative;
-    overflow: hidden;
-}
-
-.insight-card::before {
-    content: '"';
-    position: absolute;
-    top: -20px; left: 15px;
-    font-size: 6rem;
-    font-family: 'Fraunces', serif;
-    color: var(--accent-sage);
-    opacity: 0.1;
-    line-height: 1;
-}
-
-.insight-card:hover { 
-    transform: translateX(10px); 
-    box-shadow: var(--shadow-md); 
-    border-left-width: 6px;
-}
-
-.watchlist-card { 
-    background: linear-gradient(135deg, #FDF5EC 0%, #FAECD9 100%);
-    border-left: 4px solid var(--accent-copper); 
-    padding: 1.5rem 1.8rem; 
-    border-radius: 4px var(--radius-lg) var(--radius-lg) 4px; 
-    color: var(--ink-primary); 
-    margin: 1.3rem 0; 
-    line-height: 1.75; 
-    font-size: 0.95rem; 
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-    box-shadow: var(--shadow-sm); 
-    animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-    position: relative;
-}
-
-.watchlist-card::before {
-    content: '';
-    position: absolute;
-    top: 50%; right: -30px;
-    width: 100px; height: 100px;
-    background: radial-gradient(circle, rgba(184, 115, 51, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    transform: translateY(-50%);
-}
-
-.watchlist-card:hover { 
-    transform: translateX(10px); 
-    box-shadow: var(--shadow-md); 
-    border-left-width: 6px;
-}
-
-.rec-card { 
-    background: var(--bg-card); 
-    border: 1px solid var(--border); 
-    border-left: 4px solid var(--accent-sand); 
-    padding: 1.4rem 1.7rem; 
-    border-radius: 4px var(--radius-md) var(--radius-md) 4px; 
-    color: var(--ink-primary); 
-    margin: 0.9rem 0; 
-    line-height: 1.7; 
-    font-size: 0.93rem; 
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-    box-shadow: var(--shadow-xs); 
-    animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-
-.rec-card:hover { 
-    transform: translateX(10px); 
-    box-shadow: var(--shadow-md); 
-    border-left-width: 6px;
-    border-color: var(--accent-sand);
-}
-
-.priority-card { 
-    background: linear-gradient(145deg, #FFFFFF 0%, #FAF7F0 100%);
-    border: 1px solid var(--border); 
-    padding: 2rem 1.7rem; 
-    border-radius: var(--radius-lg); 
-    color: var(--ink-primary); 
-    margin: 0.7rem 0; 
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
-    text-align: center; 
-    box-shadow: var(--shadow-sm); 
-    animation: fadeInScale 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-    position: relative;
-    overflow: hidden;
-}
-
-.priority-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-heritage), var(--accent-copper), var(--accent-sand));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.priority-card:hover::before { transform: scaleX(1); }
-
-.priority-card:nth-child(1) { animation-delay: 0.1s; } 
-.priority-card:nth-child(2) { animation-delay: 0.2s; } 
-.priority-card:nth-child(3) { animation-delay: 0.3s; }
-
-.priority-card:hover { 
-    transform: translateY(-10px); 
-    box-shadow: var(--shadow-lg); 
-    border-color: var(--accent-heritage);
-}
-
-.stTabs [data-baseweb="tab-list"] { 
-    gap: 8px; 
-    background: linear-gradient(180deg, rgba(229, 223, 208, 0.5) 0%, rgba(229, 223, 208, 0.3) 100%);
-    padding: 0.5rem; 
-    border-radius: var(--radius-md); 
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid rgba(229, 223, 208, 0.5);
-    backdrop-filter: blur(10px);
-}
-
-.stTabs [data-baseweb="tab"] { 
-    background-color: transparent !important; 
-    border-radius: var(--radius-sm) !important; 
-    color: var(--ink-secondary) !important; 
-    font-weight: 600 !important; 
-    padding: 0.75rem 1.5rem !important; 
-    border: none !important; 
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important; 
-    font-size: 0.88rem !important;
-    letter-spacing: 0.01em;
-}
-
-.stTabs [data-baseweb="tab"]:hover { 
-    background-color: rgba(139, 168, 136, 0.12) !important; 
-    color: var(--accent-heritage) !important; 
-    transform: translateY(-2px) !important; 
-}
-
-.stTabs [aria-selected="true"] { 
-    background: linear-gradient(135deg, #FFFFFF 0%, #FAF7F0 100%) !important; 
-    color: var(--accent-heritage) !important; 
-    border: 1px solid var(--border) !important; 
-    box-shadow: 
-        var(--shadow-sm),
-        0 2px 0 rgba(45, 95, 63, 0.08) !important; 
-    font-weight: 700 !important;
-}
-
-.stButton > button, .stDownloadButton > button { 
-    border-radius: var(--radius-md) !important; 
-    font-weight: 600 !important; 
-    padding: 0.7rem 1.7rem !important; 
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important; 
-    font-size: 0.9rem !important; 
-    letter-spacing: 0.015em; 
-    position: relative; 
-    overflow: hidden;
-    font-family: 'Inter', sans-serif;
-}
-
-.stButton > button { 
-    background: linear-gradient(135deg, var(--accent-heritage) 0%, #3E7550 100%) !important; 
-    color: #FFFFFF !important; 
-    border: none !important; 
-    box-shadow: 
-        0 4px 12px rgba(45, 95, 63, 0.25),
-        0 2px 4px rgba(45, 95, 63, 0.15) !important;
-}
-
-.stButton > button::before { 
-    content: ''; 
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
-    width: 0; 
-    height: 0; 
-    border-radius: 50%; 
-    background: rgba(255, 255, 255, 0.2); 
-    transform: translate(-50%, -50%); 
-    transition: width 0.6s ease, height 0.6s ease;
-}
-
-.stButton > button:hover::before { 
-    width: 400px; 
-    height: 400px; 
-}
-
-.stButton > button:hover { 
-    background: linear-gradient(135deg, var(--accent-heritage-deep) 0%, var(--accent-heritage) 100%) !important; 
-    transform: translateY(-4px) !important; 
-    box-shadow: 
-        0 12px 28px rgba(45, 95, 63, 0.35),
-        0 4px 8px rgba(45, 95, 63, 0.2) !important;
-}
-
-.stDownloadButton > button { 
-    background-color: var(--bg-card) !important; 
-    color: var(--accent-heritage) !important; 
-    border: 1.5px solid var(--accent-heritage) !important;
-    font-weight: 600 !important;
-}
-
-.stDownloadButton > button:hover { 
-    background: linear-gradient(135deg, #F0F5EE 0%, #E8F0E5 100%) !important; 
-    transform: translateY(-4px) !important; 
-    box-shadow: 0 12px 28px rgba(45, 95, 63, 0.15) !important;
-    border-color: var(--accent-heritage-deep) !important;
-}
-
-.stSelectbox label, .stSlider label, .stRadio label, .stMultiSelect label, .stNumberInput label { 
-    color: var(--ink-secondary) !important; 
-    font-weight: 600 !important; 
-    font-size: 0.85rem !important; 
-    letter-spacing: 0.01em; 
-    transition: color 0.3s ease;
-}
-
-div[data-testid="stMetric"] { 
-    background: linear-gradient(145deg, #FFFFFF 0%, #FAF7F0 100%);
-    padding: 1.2rem 1.4rem; 
-    border-radius: var(--radius-md); 
-    border: 1px solid var(--border); 
-    box-shadow: var(--shadow-sm); 
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-    animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-    position: relative;
-    overflow: hidden;
-}
-
-div[data-testid="stMetric"]::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 2px;
-    background: linear-gradient(90deg, var(--accent-heritage), var(--accent-copper));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-div[data-testid="stMetric"]:hover::before { opacity: 1; }
-
-div[data-testid="stMetric"]:hover { 
-    transform: translateY(-6px); 
-    box-shadow: var(--shadow-md); 
-    border-color: var(--accent-sage);
-}
-
-div[data-testid="stMetric"] label { 
-    color: var(--ink-muted) !important; 
-    font-family: 'Inter', sans-serif !important; 
-    font-weight: 600;
-    font-size: 0.8rem !important;
-    letter-spacing: 0.02em;
-}
-
-div[data-testid="stMetric"] div[data-testid="stMetricValue"] { 
-    color: var(--ink-primary) !important; 
-    font-family: 'Fraunces', serif !important; 
-    font-weight: 700 !important; 
-    font-size: 1.65rem;
-    letter-spacing: -0.025em;
-    transition: all 0.3s ease;
-}
-
-div[data-testid="stMetric"]:hover div[data-testid="stMetricValue"] { 
-    color: var(--accent-heritage) !important; 
-    transform: scale(1.04);
-}
-
-header[data-testid="stHeader"] { 
-    background: rgba(250, 247, 240, 0.85) !important; 
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--border);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset;
-}
-
-.stDataFrame { 
-    border-radius: var(--radius-md) !important; 
-    border: 1px solid var(--border) !important; 
-    overflow: hidden; 
-    box-shadow: var(--shadow-sm); 
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
-    transition: all 0.4s ease;
-}
-
-.stDataFrame:hover { 
-    box-shadow: var(--shadow-md); 
-    border-color: var(--accent-sage);
-}
-
-.stWarning { 
-    border-radius: var(--radius-md) !important; 
-    border-left: 4px solid var(--accent-copper) !important; 
-    background: #FDF5EC !important; 
-    color: var(--ink-primary) !important; 
-    padding: 1.1rem 1.3rem !important; 
-    font-size: 0.9rem; 
-    animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: var(--shadow-sm);
-}
-
-.organic-divider { 
-    height: 1px; 
-    background: linear-gradient(90deg, transparent, var(--border-strong), var(--accent-sand), var(--border-strong), transparent); 
-    margin: 3.5rem 0; 
-    animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-}
-
-.organic-divider::before {
+.hero-strip::before {
     content: '🌿';
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.2rem;
-    background: var(--bg-paper);
-    padding: 0 1rem;
-    opacity: 0.5;
+    right: 3rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 14rem;
+    opacity: 0.06;
+}
+.hero-title {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    color: #fff !important;
+    margin-bottom: 0.8rem;
+    letter-spacing: -0.03em;
+}
+.hero-subtitle {
+    color: rgba(250,247,240,0.88);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 70%;
+    margin-bottom: 1.5rem;
+}
+.hero-badges { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.hero-badge {
+    background: rgba(250,247,240,0.1);
+    border: 1px solid rgba(250,247,240,0.2);
+    color: #fff;
+    padding: 0.45rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+.hero-mini-stats {
+    display: flex;
+    gap: 2.5rem;
+    margin-top: 1.8rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(250,247,240,0.15);
+    flex-wrap: wrap;
+}
+.mini-stat-label {
+    font-size: 0.68rem;
+    color: rgba(250,247,240,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+.mini-stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: Georgia, serif;
 }
 
-.stCodeBlock { 
-    border-radius: var(--radius-md) !important; 
-    border: 1px solid var(--border-strong) !important; 
-    background: var(--ink-primary) !important; 
-    animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    font-family: 'JetBrains Mono', monospace;
+/* SIDEBAR */
+section[data-testid="stSidebar"] {
+    background: var(--sidebar) !important;
+}
+.sidebar-brand {
+    background: linear-gradient(135deg, #1E3A2B, #2D5F3F);
+    color: #fff;
+    padding: 1.8rem 1.5rem;
+    margin: -1rem -1rem 1.2rem;
+}
+.sidebar-brand-icon { font-size: 2.2rem; display: block; margin-bottom: 0.4rem; }
+.sidebar-brand-title {
+    font-family: Georgia, serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+.sidebar-brand-sub {
+    font-size: 0.7rem;
+    color: rgba(250,247,240,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+}
+.sidebar-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--sh);
+}
+.sidebar-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--heritage);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
+    border-radius: 8px !important;
+    padding: 0.6rem 0.9rem !important;
+    color: var(--ink2) !important;
+    font-weight: 500 !important;
+    font-size: 0.88rem !important;
+    border-left: 3px solid transparent !important;
+    margin-bottom: 2px !important;
+    transition: all 0.2s ease;
+}
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover {
+    background: rgba(139,168,136,0.1) !important;
+    color: var(--heritage) !important;
+}
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child { display: none; }
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-checked="true"] {
+    background: var(--heritage) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    box-shadow: 0 3px 10px rgba(45,95,63,0.2) !important;
+}
+.commodity-brief {
+    background: #F5EFE0;
+    border-left: 3px solid var(--heritage);
+    padding: 0.9rem 1rem;
+    border-radius: 0 10px 10px 0;
+    margin-top: 0.7rem;
 }
 
-.aggregate-badge { 
-    display: inline-block; 
-    background: linear-gradient(135deg, var(--accent-copper) 0%, var(--accent-copper-light) 100%);
-    color: #FFFFFF; 
-    padding: 0.4rem 1.1rem; 
-    border-radius: 999px; 
-    font-size: 0.72rem; 
-    font-weight: 700; 
-    text-transform: uppercase; 
-    letter-spacing: 0.1em; 
-    margin-left: 0.9rem; 
-    box-shadow: 
-        0 4px 12px rgba(184, 115, 51, 0.3),
-        0 0 0 1px rgba(255,255,255,0.1) inset;
-    animation: pulse 2.5s ease-in-out infinite;
+/* KPI */
+.intel-kpi {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.4rem 1.3rem;
+    box-shadow: var(--sh);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    height: 100%;
+}
+.intel-kpi:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sh-md);
+}
+.kpi-layer1 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.kpi-layer2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+    margin-bottom: 0.35rem;
+    font-family: Georgia, serif;
+    letter-spacing: -0.02em;
+}
+.kpi-layer3 {
+    font-size: 0.82rem;
+    color: var(--ink2);
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+/* SECTION TITLES */
+.section-title {
+    font-family: Georgia, serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--heritage) !important;
+    padding-bottom: 0.6rem;
+    margin-top: 2.2rem;
+    margin-bottom: 1.2rem;
+    display: inline-block;
+    position: relative;
+}
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 60px; height: 3px;
+    background: var(--copper);
+    border-radius: 2px;
+}
+.section-subtitle {
+    font-size: 0.92rem;
+    color: var(--ink2);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+    padding-left: 1rem;
+    border-left: 3px solid var(--sand);
+}
+
+/* CARDS */
+.insight-card, .watchlist-card, .rec-card {
+    padding: 1.2rem 1.4rem;
+    border-radius: 12px;
+    margin: 1rem 0;
+    line-height: 1.7;
+    font-size: 0.92rem;
+    box-shadow: var(--sh);
+}
+.insight-card {
+    background: #EFF5EE;
+    border-left: 4px solid var(--heritage);
+}
+.watchlist-card {
+    background: #FDF5EC;
+    border-left: 4px solid var(--copper);
+}
+.rec-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--sand);
+}
+.priority-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 1.5rem 1.3rem;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: var(--sh);
+    transition: transform 0.25s ease;
+}
+.priority-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sh-md);
+}
+
+/* TABS */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 6px;
+    background: rgba(229,223,208,0.4);
+    padding: 0.4rem;
+    border-radius: 12px;
+}
+.stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    border-radius: 8px !important;
+    color: var(--ink2) !important;
+    font-weight: 600 !important;
+    padding: 0.65rem 1.3rem !important;
+    border: none !important;
+    font-size: 0.86rem !important;
+}
+.stTabs [data-baseweb="tab"]:hover {
+    background: rgba(139,168,136,0.12) !important;
+    color: var(--heritage) !important;
+}
+.stTabs [aria-selected="true"] {
+    background: var(--card) !important;
+    color: var(--heritage) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--sh) !important;
+    font-weight: 700 !important;
+}
+
+/* BUTTONS */
+.stButton > button, .stDownloadButton > button {
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.4rem !important;
+    font-size: 0.88rem !important;
+    transition: all 0.2s ease !important;
+}
+.stButton > button {
+    background: var(--heritage) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 2px 6px rgba(45,95,63,0.18) !important;
+}
+.stButton > button:hover {
+    background: #1E3A2B !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 14px rgba(45,95,63,0.25) !important;
+}
+.stDownloadButton > button {
+    background: var(--card) !important;
+    color: var(--heritage) !important;
+    border: 1.5px solid var(--heritage) !important;
+}
+.stDownloadButton > button:hover {
+    background: #F0F5EE !important;
+    transform: translateY(-2px) !important;
+}
+
+/* FORM LABELS */
+.stSelectbox label, .stSlider label, .stRadio label, .stMultiSelect label, .stNumberInput label {
+    color: var(--ink2) !important;
+    font-weight: 600 !important;
+    font-size: 0.84rem !important;
+}
+
+/* METRICS */
+div[data-testid="stMetric"] {
+    background: var(--card);
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--sh);
+}
+div[data-testid="stMetric"] label {
+    color: var(--ink3) !important;
+    font-weight: 600;
+    font-size: 0.8rem !important;
+}
+div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+    color: var(--ink) !important;
+    font-family: Georgia, serif !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem;
+}
+
+/* HEADER */
+header[data-testid="stHeader"] {
+    background: rgba(250,247,240,0.9) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+}
+
+/* DATAFRAME */
+.stDataFrame {
+    border-radius: 12px !important;
+    border: 1px solid var(--border) !important;
+    overflow: hidden;
+}
+
+/* WARNING */
+.stWarning {
+    border-radius: 10px !important;
+    border-left: 4px solid var(--copper) !important;
+    background: #FDF5EC !important;
+    color: var(--ink) !important;
+    padding: 0.9rem 1.1rem !important;
+    font-size: 0.88rem;
+}
+
+/* DIVIDER */
+.organic-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), var(--sand), var(--border), transparent);
+    margin: 2.5rem 0;
+}
+
+/* BADGE */
+.aggregate-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--copper), #D4A574);
+    color: #fff;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-left: 0.8rem;
     vertical-align: middle;
 }
 
+/* PLOTLY */
 .js-plotly-plot .plotly {
-    border-radius: var(--radius-lg);
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    background: var(--bg-card);
+    box-shadow: var(--sh);
     border: 1px solid var(--border);
 }
 
-.js-plotly-plot .plotly:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
-    border-color: var(--accent-sage);
-}
-
-.floating-botanicals {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
-    z-index: 1;
-    overflow: hidden;
-}
-
-.botanical {
-    position: absolute;
-    opacity: 0.08;
-    font-size: 2rem;
-    animation: leafFall linear infinite;
-}
-
-.botanical:nth-child(1) { left: 5%; animation-duration: 25s; animation-delay: 0s; }
-.botanical:nth-child(2) { left: 25%; animation-duration: 30s; animation-delay: 5s; }
-.botanical:nth-child(3) { left: 50%; animation-duration: 28s; animation-delay: 10s; }
-.botanical:nth-child(4) { left: 75%; animation-duration: 32s; animation-delay: 3s; }
-.botanical:nth-child(5) { left: 95%; animation-duration: 26s; animation-delay: 7s; }
-
-::selection {
-    background: var(--accent-sage);
-    color: white;
-}
-
-*:focus-visible {
-    outline: 2px solid var(--accent-heritage);
-    outline-offset: 2px;
-}
-
 @media (max-width: 1024px) {
-    .hero-title { font-size: 2.4rem !important; }
-    .hero-strip { padding: 2.5rem 2rem; }
-    .hero-mini-stats { gap: 2rem; }
-    .mini-stat-value { font-size: 1.5rem; }
-}
-
-@media (max-width: 768px) {
-    .hero-title { font-size: 1.9rem !important; }
-    .hero-subtitle { max-width: 100%; font-size: 0.95rem; }
+    .hero-title { font-size: 2rem !important; }
+    .hero-strip { padding: 2rem 1.5rem; }
     .hero-mini-stats { gap: 1.5rem; }
-    .kpi-layer2 { font-size: 1.8rem; }
+    .mini-stat-value { font-size: 1.3rem; }
 }
 </style>
-
-<div class="floating-botanicals">
-    <div class="botanical">🍃</div>
-    <div class="botanical">🌿</div>
-    <div class="botanical">🍂</div>
-    <div class="botanical">🌱</div>
-    <div class="botanical">☘️</div>
-</div>
 """, unsafe_allow_html=True)
 
 # =========================================================
@@ -1358,9 +582,6 @@ def load_data():
 df = load_data()
 numeric_cols = [c for c in df.columns if c != "Provinsi"]
 
-# =========================================================
-# COMMODITY IDENTITY MAP
-# =========================================================
 COMMODITY_IDENTITY = {
     "Kelapa Sawit": {"icon": "🌴", "color": "#3E5F4D", "color_light": "#6B9278", "sector": "Perkebunan Besar", "desc": "Primadona ekspor. Mendominasi Sumatera & Kalimantan."},
     "Kelapa": {"icon": "🥥", "color": "#5A7B8A", "color_light": "#89AAB8", "sector": "Perkebunan Rakyat", "desc": "Tanaman pesisir Nusantara. Potensi hilirisasi minyak & sabut."},
@@ -1398,13 +619,13 @@ def create_intel_kpi(label, value, subtext, icon, color):
 def apply_plantation_layout(fig, height=480):
     fig.update_layout(
         template="plotly_white", paper_bgcolor="#FAF7F0", plot_bgcolor="#FFFFFF",
-        font=dict(color="#1A2B20", family="Inter, sans-serif", size=13),
+        font=dict(color="#1A2B20", family="Inter, sans-serif", size=12),
         height=height, margin=dict(l=40, r=30, t=60, b=50),
-        xaxis=dict(gridcolor="#E5DFD0", zerolinecolor="#E5DFD0", tickfont=dict(size=11, color="#3E5245", family="Inter")),
-        yaxis=dict(gridcolor="#E5DFD0", zerolinecolor="#E5DFD0", tickfont=dict(size=11, color="#3E5245", family="Inter")),
-        title=dict(font=dict(size=17, color="#2D5F3F", family="Fraunces, serif", weight=600), x=0.02, xanchor="left"),
-        hoverlabel=dict(bgcolor="#FFFFFF", bordercolor="#2D5F3F", font=dict(color="#1A2B20", family="Inter", size=13)),
-        legend=dict(font=dict(color="#3E5245", size=12))
+        xaxis=dict(gridcolor="#E5DFD0", zerolinecolor="#E5DFD0", tickfont=dict(size=10, color="#3E5245")),
+        yaxis=dict(gridcolor="#E5DFD0", zerolinecolor="#E5DFD0", tickfont=dict(size=10, color="#3E5245")),
+        title=dict(font=dict(size=15, color="#2D5F3F", family="Georgia, serif"), x=0.02),
+        hoverlabel=dict(bgcolor="#FFFFFF", bordercolor="#2D5F3F", font=dict(color="#1A2B20", size=12)),
+        legend=dict(font=dict(color="#3E5245", size=11))
     )
     return fig
 
@@ -1447,27 +668,19 @@ with st.sidebar:
         st.markdown(f'''<div class="sidebar-block">
             <div class="sidebar-title">🌱 Commodity Brief</div>
             <div class="commodity-brief" style="border-left-color: {comm_info["color_light"]};">
-                <div style="font-size:1.4rem; margin-bottom:0.4rem; color:#1A2B20; font-weight:700; font-family:'Fraunces',serif;">{comm_info["icon"]} {selected_commodity}</div>
-                <div style="font-size:0.7rem; color:#6B7D70; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:0.5rem; font-weight:700;">{comm_info["sector"]}</div>
-                <div style="font-size:0.88rem; color:#3E5245; line-height:1.6;">{comm_info["desc"]}</div>
+                <div style="font-size:1.2rem; margin-bottom:0.3rem; font-weight:700;">{comm_info["icon"]} {selected_commodity}</div>
+                <div style="font-size:0.68rem; color:#6B7D70; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem; font-weight:700;">{comm_info["sector"]}</div>
+                <div style="font-size:0.85rem; color:#3E5245; line-height:1.5;">{comm_info["desc"]}</div>
             </div>
         </div>''', unsafe_allow_html=True)
     else:
         st.markdown('''<div class="sidebar-block">
-            <div class="sidebar-title">🌾 Mode Agregat Aktif</div>
+            <div class="sidebar-title">🌾 Mode Agregat</div>
             <div class="commodity-brief" style="border-left-color: #B87333;">
-                <div style="font-size:1.2rem; margin-bottom:0.4rem; color:#1A2B20; font-weight:700; font-family:'Fraunces',serif;">📊 Total Output</div>
-                <div style="font-size:0.7rem; color:#6B7D70; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:0.5rem; font-weight:700;">Semua Komoditas</div>
-                <div style="font-size:0.88rem; color:#3E5245; line-height:1.6;">Menampilkan gabungan total produksi 7 komoditas perkebunan utama Indonesia.</div>
+                <div style="font-size:1.1rem; margin-bottom:0.3rem; font-weight:700;">📊 Total Output</div>
+                <div style="font-size:0.85rem; color:#3E5245; line-height:1.5;">Gabungan total produksi 7 komoditas perkebunan utama.</div>
             </div>
         </div>''', unsafe_allow_html=True)
-    
-    st.markdown('''
-    <div class="sidebar-footer">
-        <div class="sidebar-footer-icon">🌴</div>
-        <div class="sidebar-footer-text">Tropical Heritage</div>
-    </div>
-    ''', unsafe_allow_html=True)
 
 active_df = df.copy()
 if selected_province != "Semua Provinsi":
@@ -1495,10 +708,10 @@ if menu == "🏠 Ringkasan Nasional":
             <span class="hero-badge">📈 Proyeksi Panen</span>
         </div>
         <div class="hero-mini-stats">
-            <div class="mini-stat"><div class="mini-stat-label">Provinsi</div><div class="mini-stat-value">{active_provs}</div></div>
-            <div class="mini-stat"><div class="mini-stat-label">Komoditas</div><div class="mini-stat-value">7</div></div>
-            <div class="mini-stat"><div class="mini-stat-label">Tahun Data</div><div class="mini-stat-value">2025</div></div>
-            <div class="mini-stat"><div class="mini-stat-label">Total Output</div><div class="mini-stat-value">{format_num(total_prod)} Ton</div></div>
+            <div><div class="mini-stat-label">Provinsi</div><div class="mini-stat-value">{active_provs}</div></div>
+            <div><div class="mini-stat-label">Komoditas</div><div class="mini-stat-value">7</div></div>
+            <div><div class="mini-stat-label">Tahun Data</div><div class="mini-stat-value">2025</div></div>
+            <div><div class="mini-stat-label">Total Output</div><div class="mini-stat-value">{format_num(total_prod)} Ton</div></div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1528,7 +741,7 @@ if menu == "🏠 Ringkasan Nasional":
     with c3: st.markdown(create_intel_kpi("Terdiversifikasi", diverse_prov[:14], f"{diverse_count} komoditas", "🌱", "#2D5F3F"), unsafe_allow_html=True)
     with c4: st.markdown(create_intel_kpi("Konsentrasi Top-5", f"{top5_share:.1f}%", "Pangsa 5 provinsi", "🎯", "#8BA888"), unsafe_allow_html=True)
 
-    st.markdown(f'<div class="section-title">🌾 Sentra & Kontribusi Produksi Nasional{"<span class=aggregate-badge>Mode Agregat</span>" if is_all_commodities else ""}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-title">🌾 Sentra & Kontribusi Produksi{"<span class=aggregate-badge>Agregat</span>" if is_all_commodities else ""}</div>', unsafe_allow_html=True)
     
     nat_tab1, nat_tab2 = st.tabs(["📊 Grafik Sentra", "🗺️ Peta Geospasial"])
     
@@ -1540,22 +753,21 @@ if menu == "🏠 Ringkasan Nasional":
             fig1 = px.bar(top_df[::-1], x=selected_commodity, y="Provinsi", orientation='h', text=selected_commodity,
                           title=f"Sentra Produksi: {commodity_display_name}", color_discrete_sequence=[bar_color])
             fig1.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-            st.plotly_chart(apply_plantation_layout(fig1, 520), use_container_width=True, key="nat_bar_01")
+            st.plotly_chart(apply_plantation_layout(fig1, 500), use_container_width=True, key="nat_bar_01")
         with col_r:
             prov_totals = active_df.copy()
             prov_totals["Total_Output"] = prov_totals[numeric_cols].sum(axis=1)
             top_prov_df = prov_totals.nlargest(top_n, "Total_Output")[["Provinsi", "Total_Output"]].sort_values("Total_Output", ascending=True)
             fig2 = px.bar(top_prov_df, x="Total_Output", y="Provinsi", orientation='h', text="Total_Output",
-                          title="Kontribusi Output Perkebunan per Provinsi", color_discrete_sequence=["#B87333"])
+                          title="Kontribusi Output per Provinsi", color_discrete_sequence=["#B87333"])
             fig2.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-            st.plotly_chart(apply_plantation_layout(fig2, 520), use_container_width=True, key="nat_bar_02")
+            st.plotly_chart(apply_plantation_layout(fig2, 500), use_container_width=True, key="nat_bar_02")
     
     with nat_tab2:
         st.markdown("""
         <div class="insight-card" style="margin-top: 0.5rem;">
             🗺️ <b>Peta Geospasial:</b> Visualisasi spasial menunjukkan <b>koridor produksi</b> perkebunan Indonesia. 
-            Hover pada peta untuk melihat detail produksi tiap provinsi. 
-            Warna lebih gelap = produksi lebih tinggi.
+            Hover untuk detail provinsi. Warna lebih gelap = produksi lebih tinggi.
         </div>
         """, unsafe_allow_html=True)
         
@@ -1568,7 +780,7 @@ if menu == "🏠 Ringkasan Nasional":
         if map_metric == "Produksi Komoditas Terpilih":
             map_df = active_df[["Provinsi", selected_commodity]].copy()
             map_df = map_df[map_df[selected_commodity] > 0]
-            map_title = f"Sebaran Produksi {commodity_display_name} di Indonesia"
+            map_title = f"Sebaran Produksi {commodity_display_name}"
             map_value_col = selected_commodity
             map_label = f"{commodity_display_name} (Ribu Ton)"
             is_agg_map = is_all_commodities
@@ -1576,7 +788,7 @@ if menu == "🏠 Ringkasan Nasional":
             map_df = active_df.copy()
             map_df["Total_Output_Map"] = map_df[numeric_cols].sum(axis=1)
             map_df = map_df[map_df["Total_Output_Map"] > 0]
-            map_title = "Total Output Perkebunan di Indonesia"
+            map_title = "Total Output Perkebunan Indonesia"
             map_value_col = "Total_Output_Map"
             map_label = "Total Output (Ribu Ton)"
             is_agg_map = True
@@ -1597,27 +809,27 @@ if menu == "🏠 Ringkasan Nasional":
                     median_val = map_df[map_value_col].median()
                     st.markdown(create_intel_kpi("Median Produksi", format_ton(median_val), "Tendensi sentral", "⚖️", "#8BA888"), unsafe_allow_html=True)
         else:
-            st.warning("⚠️ Tidak ada data produksi untuk ditampilkan pada peta.")
+            st.warning("⚠️ Tidak ada data produksi untuk ditampilkan.")
     
     st.markdown('<div class="organic-divider"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">🗺️ Peta Struktur Komoditas Nasional</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🗺️ Struktur Komoditas Nasional</div>', unsafe_allow_html=True)
     col_t1, col_t2 = st.columns(2)
     with col_t1:
         comp_df = active_df[numeric_cols].sum().reset_index()
         comp_df.columns = ["Komoditas", "Produksi"]
-        fig_pie = px.pie(comp_df, values="Produksi", names="Komoditas", hole=0.65,
+        fig_pie = px.pie(comp_df, values="Produksi", names="Komoditas", hole=0.6,
                          color="Komoditas", color_discrete_map={c: get_comm_attr(c, "color_light") for c in comp_df["Komoditas"]},
                          title="Komposisi Output Nasional")
-        fig_pie.update_traces(textinfo='percent+label', textfont_size=12, textfont_color='#1A2B20')
-        st.plotly_chart(apply_plantation_layout(fig_pie, 450), use_container_width=True, key="nat_pie_01")
+        fig_pie.update_traces(textinfo='percent+label', textfont_size=11)
+        st.plotly_chart(apply_plantation_layout(fig_pie, 430), use_container_width=True, key="nat_pie_01")
     with col_t2:
         tm_df = active_df.copy()
         tm_df["Total"] = tm_df[numeric_cols].sum(axis=1)
         tm_df = tm_df[tm_df["Total"] > 0].nlargest(15, "Total")
         fig_tm = px.treemap(tm_df, path=["Provinsi"], values="Total", color="Total", color_continuous_scale=[[0, "#E5DFD0"], [0.5, "#8BA888"], [1, "#2D5F3F"]],
-                            title="15 Wilayah Teratas (Treemap)")
-        fig_tm.update_traces(textfont_color="#FFFFFF", textfont_size=13)
-        st.plotly_chart(apply_plantation_layout(fig_tm, 450), use_container_width=True, key="nat_tree_01")
+                            title="15 Wilayah Teratas")
+        fig_tm.update_traces(textfont_color="#FFFFFF", textfont_size=12)
+        st.plotly_chart(apply_plantation_layout(fig_tm, 430), use_container_width=True, key="nat_tree_01")
 
     st.markdown('<div class="section-title">⚠️ Watchlist Strategis</div>', unsafe_allow_html=True)
     st.markdown(f"""
@@ -1626,7 +838,7 @@ if menu == "🏠 Ringkasan Nasional":
         • <b>Konsentrasi Spasial:</b> Top 5 provinsi menguasai <b>{top5_share:.1f}%</b> — mitigasi risiko iklim & pasar.<br>
         • <b>Dominasi {dom_comm}:</b> Penopang devisa, namun rentan fluktuasi harga global.<br>
         • <b>Model Diversifikasi:</b> <b>{diverse_prov}</b> menunjukkan portofolio seimbang.<br>
-        • <b>Kesenjangan:</b> Teh & Tebu sebaran sangat sempit, butuh klasterisasi spesifik lokasi.
+        • <b>Kesenjangan:</b> Teh & Tebu sebaran sempit, butuh klasterisasi spesifik lokasi.
     </div>
     """, unsafe_allow_html=True)
 
@@ -1638,19 +850,18 @@ elif menu == "🌴 Profil Komoditas":
         st.markdown("""
         <div class="watchlist-card">
             <b>ℹ️ Mode Agregat Aktif:</b> Halaman ini menampilkan profil per komoditas tunggal. 
-            Silakan pilih komoditas spesifik di sidebar untuk analisis mendalam, atau gunakan filter di bawah ini.
+            Silakan pilih komoditas spesifik di sidebar.
         </div>
         """, unsafe_allow_html=True)
     
-    target = st.selectbox("Pilih Komoditas untuk Analisis Mendalam", numeric_cols, key="prof_comm_sel")
+    target = st.selectbox("Pilih Komoditas", numeric_cols, key="prof_comm_sel")
     info = COMMODITY_IDENTITY[target]
 
     st.markdown(f"""
-    <div style="background: linear-gradient(145deg, #FFFFFF 0%, #FAF7F0 100%); border: 1px solid #E5DFD0; border-radius: 28px; padding: 3rem; margin-bottom: 2.5rem; box-shadow: 0 8px 32px rgba(26, 43, 32, 0.06); position: relative; overflow: hidden; animation: fadeInScale 0.7s cubic-bezier(0.16, 1, 0.3, 1);">
-        <div style="position:absolute; top:-30px; right:-20px; font-size:12rem; opacity:0.04; transform:rotate(15deg); animation: gentleSway 8s ease-in-out infinite;">{info['icon']}</div>
-        <div style="position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, {info['color']}, {info['color_light']}, transparent);"></div>
-        <div style="font-family:'Fraunces',serif; font-size:2.4rem; font-weight:700; color: #2D5F3F; margin-bottom: 1rem; letter-spacing: -0.03em; font-variation-settings: 'opsz' 144;">{info['icon']} Profil Komoditas: {target}</div>
-        <div style="font-size:1.05rem; color:#3E5245; line-height:1.75; font-weight:500;"><b style="color:#1A2B20;">Sektor:</b> {info['sector']}<br><b style="color:#1A2B20;">Potret:</b> {info['desc']}</div>
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 2rem; margin-bottom: 1.8rem; box-shadow: var(--sh); position: relative; overflow: hidden;">
+        <div style="position:absolute; top:-20px; right:-20px; font-size:10rem; opacity:0.04;">{info['icon']}</div>
+        <div style="font-family:Georgia,serif; font-size:2rem; font-weight:700; color: #2D5F3F; margin-bottom: 0.7rem;">{info['icon']} Profil Komoditas: {target}</div>
+        <div style="font-size:0.95rem; color:#3E5245; line-height:1.7;"><b>Sektor:</b> {info['sector']}<br><b>Potret:</b> {info['desc']}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1668,36 +879,32 @@ elif menu == "🌴 Profil Komoditas":
     with c3: st.markdown(create_intel_kpi("Median Produksi", format_ton(med), "Tendensi sentral", "⚖️", "#8BA888"), unsafe_allow_html=True)
     with c4: st.markdown(create_intel_kpi("Konsentrasi Top-5", f"{share5:.1f}%", "Pangsa 5 provinsi", "🎯", "#6B9278"), unsafe_allow_html=True)
 
-    tab1, tab2, tab3 = st.tabs(["🏆 Hirarki Sentra", "📊 Potret Distribusi", "🗺️ Peta Kontribusi"])
+    tab1, tab2, tab3 = st.tabs(["🏆 Hirarki Sentra", "📊 Distribusi", "🗺️ Peta Kontribusi"])
     comm_color = get_comm_attr(target, "color_light")
     with tab1:
         fig = px.bar(c_df.head(top_n)[::-1], x=target, y="Provinsi", orientation='h', text=target,
-                     title=f"Hirarki Sentra Produksi: {target}", color_discrete_sequence=[comm_color])
+                     title=f"Hirarki Sentra: {target}", color_discrete_sequence=[comm_color])
         fig.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-        st.plotly_chart(apply_plantation_layout(fig, 600), use_container_width=True, key=f"comm_bar_{target}")
+        st.plotly_chart(apply_plantation_layout(fig, 560), use_container_width=True, key=f"comm_bar_{target}")
     with tab2:
         c1, c2 = st.columns(2)
         with c1:
             fig_h = px.histogram(c_df, x=target, nbins=15, title="Distribusi Volume", color_discrete_sequence=[comm_color])
-            st.plotly_chart(apply_plantation_layout(fig_h, 480), use_container_width=True, key=f"comm_hist_{target}")
+            st.plotly_chart(apply_plantation_layout(fig_h, 440), use_container_width=True, key=f"comm_hist_{target}")
         with c2:
-            fig_b = px.box(c_df, y=target, points="all", title="Persebaran & Sentra Ekstrem", color_discrete_sequence=[comm_color])
-            st.plotly_chart(apply_plantation_layout(fig_b, 480), use_container_width=True, key=f"comm_box_{target}")
+            fig_b = px.box(c_df, y=target, points="all", title="Persebaran & Outlier", color_discrete_sequence=[comm_color])
+            st.plotly_chart(apply_plantation_layout(fig_b, 440), use_container_width=True, key=f"comm_box_{target}")
     with tab3:
         fig_t = px.treemap(c_df.head(15), path=["Provinsi"], values=target, color=target,
-                           color_continuous_scale=[[0, "#E5DFD0"], [0.5, info["color_light"]], [1, info["color"]]], title="Treemap Kontribusi Wilayah")
-        fig_t.update_traces(textfont_color="#FFFFFF", textfont_size=13)
-        st.plotly_chart(apply_plantation_layout(fig_t, 500), use_container_width=True, key=f"comm_tree_{target}")
-        fig_p = px.pie(c_df.head(10), values=target, names="Provinsi", hole=0.65, title="Komposisi 10 Wilayah Teratas",
-                       color_discrete_sequence=SOFT_PALETTE)
-        fig_p.update_traces(textinfo='percent+label')
-        st.plotly_chart(apply_plantation_layout(fig_p, 450), use_container_width=True, key=f"comm_pie_{target}")
+                           color_continuous_scale=[[0, "#E5DFD0"], [0.5, info["color_light"]], [1, info["color"]]], title="Treemap Kontribusi")
+        fig_t.update_traces(textfont_color="#FFFFFF", textfont_size=12)
+        st.plotly_chart(apply_plantation_layout(fig_t, 460), use_container_width=True, key=f"comm_tree_{target}")
 
     conc_note = "terkonsentrasi kuat" if share5 > 60 else "relatif terdistribusi"
     st.markdown(f"""
     <div class="insight-card" style="border-left-color: {info['color_light']};">
-        {info['icon']} <b>Intelijen {target}:</b> Produksi bersifat <b>{conc_note}</b> ({share5:.1f}% dikuasai Top-5).
-        <b>{top_p}</b> berperan sebagai anchor. Potensi hilirisasi perlu difokuskan di wilayah penyangga.
+        {info['icon']} <b>Intelijen {target}:</b> Produksi <b>{conc_note}</b> ({share5:.1f}% dikuasai Top-5).
+        <b>{top_p}</b> sebagai anchor. Hilirisasi fokus di wilayah penyangga.
     </div>
     """, unsafe_allow_html=True)
 
@@ -1716,11 +923,9 @@ elif menu == "🗺️ Profil Provinsi":
     nat_share = (tot_p / df[numeric_cols].sum().sum() * 100) if df[numeric_cols].sum().sum() > 0 else 0
 
     st.markdown(f"""
-    <div style="background: linear-gradient(145deg, #FFFFFF 0%, #FAF7F0 100%); border: 1px solid #E5DFD0; border-radius: 28px; padding: 3rem; margin-bottom: 2.5rem; box-shadow: 0 8px 32px rgba(26, 43, 32, 0.06); position: relative; overflow: hidden; animation: fadeInScale 0.7s cubic-bezier(0.16, 1, 0.3, 1);">
-        <div style="position:absolute; top:-30px; right:-10px; font-size:12rem; opacity:0.04; color: #2D5F3F; animation: gentleSway 8s ease-in-out infinite;">🗺️</div>
-        <div style="position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, #2D5F3F, #B87333, transparent);"></div>
-        <div style="font-family:'Fraunces',serif; font-size:2.4rem; font-weight:700; color: #2D5F3F; margin-bottom: 1rem; letter-spacing: -0.03em;">🗺️ Profil Perkebunan: {target_prov}</div>
-        <div style="font-size:1.05rem; color:#3E5245; line-height:1.75; font-weight:500;">Total output <b style="color:#1A2B20;">{format_ton(tot_p)} ribu ton</b> ({nat_share:.2f}% nasional). Komoditas andalan: <b style="color:#1A2B20;">{dom_c}</b> ({dom_share:.1f}%).</div>
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 2rem; margin-bottom: 1.8rem; box-shadow: var(--sh);">
+        <div style="font-family:Georgia,serif; font-size:2rem; font-weight:700; color: #2D5F3F; margin-bottom: 0.7rem;">🗺️ Profil: {target_prov}</div>
+        <div style="font-size:0.95rem; color:#3E5245; line-height:1.7;">Total output <b>{format_ton(tot_p)} ribu ton</b> ({nat_share:.2f}% nasional). Andalan: <b>{dom_c}</b> ({dom_share:.1f}%).</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1730,22 +935,22 @@ elif menu == "🗺️ Profil Provinsi":
     with c3: st.markdown(create_intel_kpi("Sektor Aktif", str(active_c), f"dari {len(numeric_cols)}", "🌱", "#8BA888"), unsafe_allow_html=True)
     with c4: st.markdown(create_intel_kpi("Tingkat Dominasi", f"{dom_share:.0f}%", "Konsentrasi utama", "🎯", "#B87333"), unsafe_allow_html=True)
 
-    st.markdown('<div class="section-title">🌳 Struktur & Portofolio Komoditas</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🌳 Struktur & Portofolio</div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         p_df = pd.DataFrame({"Komoditas": list(p_data.keys()), "Produksi": list(p_data.values())}).sort_values("Produksi", ascending=False)
         fig = px.bar(p_df, x="Komoditas", y="Produksi", text="Produksi", color="Komoditas",
                      color_discrete_map={c: get_comm_attr(c, "color_light") for c in p_df["Komoditas"]}, title="Portofolio Komoditas")
         fig.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-        st.plotly_chart(apply_plantation_layout(fig, 460), use_container_width=True, key=f"prov_bar_{target_prov}")
+        st.plotly_chart(apply_plantation_layout(fig, 430), use_container_width=True, key=f"prov_bar_{target_prov}")
     with col2:
-        fig2 = px.pie(p_df[p_df["Produksi"]>0], values="Produksi", names="Komoditas", hole=0.65, title="Komposisi Output Daerah",
+        fig2 = px.pie(p_df[p_df["Produksi"]>0], values="Produksi", names="Komoditas", hole=0.6, title="Komposisi Output",
                       color_discrete_sequence=SOFT_PALETTE)
         fig2.update_traces(textinfo='percent+label')
-        st.plotly_chart(apply_plantation_layout(fig2, 460), use_container_width=True, key=f"prov_pie_{target_prov}")
+        st.plotly_chart(apply_plantation_layout(fig2, 430), use_container_width=True, key=f"prov_pie_{target_prov}")
 
     st.markdown('<div class="organic-divider"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">🎯 Radar Portofolio vs Nasional</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🎯 Radar vs Nasional</div>', unsafe_allow_html=True)
     col_r1, col_r2 = st.columns([1, 1])
     with col_r1:
         nat_avg = {c: df[c].mean() for c in numeric_cols}
@@ -1757,31 +962,31 @@ elif menu == "🗺️ Profil Provinsi":
         nat_norm = [(v / nat_max * 100) if nat_max > 0 else 0 for v in nat_values]
         fig_r = go.Figure()
         fig_r.add_trace(go.Scatterpolar(r=p_norm + [p_norm[0]], theta=numeric_cols + [numeric_cols[0]],
-                                        fill='toself', name=target_prov, line_color="#2D5F3F", fillcolor="rgba(45, 95, 63, 0.3)"))
+                                        fill='toself', name=target_prov, line_color="#2D5F3F", fillcolor="rgba(45, 95, 63, 0.25)"))
         fig_r.add_trace(go.Scatterpolar(r=nat_norm + [nat_norm[0]], theta=numeric_cols + [numeric_cols[0]],
-                                        fill='toself', name="Rata-rata Nasional", line_color="#B87333", fillcolor="rgba(184, 115, 51, 0.15)"))
+                                        fill='toself', name="Nasional", line_color="#B87333", fillcolor="rgba(184, 115, 51, 0.12)"))
         fig_r.update_layout(polar=dict(bgcolor="#FFFFFF",
                                        radialaxis=dict(visible=True, showticklabels=False, gridcolor="#E5DFD0"),
-                                       angularaxis=dict(gridcolor="#E5DFD0", tickfont=dict(color="#3E5245", family="Inter"))),
+                                       angularaxis=dict(gridcolor="#E5DFD0", tickfont=dict(color="#3E5245"))),
                             showlegend=True, title="Radar (Normalisasi)")
-        st.plotly_chart(apply_plantation_layout(fig_r, 500), use_container_width=True, key=f"prov_radar_{target_prov}")
+        st.plotly_chart(apply_plantation_layout(fig_r, 470), use_container_width=True, key=f"prov_radar_{target_prov}")
     with col_r2:
         bench_df = pd.DataFrame({"Komoditas": numeric_cols, "Provinsi": p_values, "Nasional": list(nat_avg.values())})
         bench_df["Deviasi"] = bench_df["Provinsi"] - bench_df["Nasional"]
         colors = ["#6B9278" if v >= 0 else "#B39471" for v in bench_df["Deviasi"]]
         fig3 = go.Figure(go.Bar(y=bench_df["Komoditas"], x=bench_df["Deviasi"], orientation='h', marker_color=colors))
         fig3.update_layout(title="Deviasi vs Rata-rata Nasional", xaxis_title="Deviasi (Ribu Ton)")
-        st.plotly_chart(apply_plantation_layout(fig3, 500), use_container_width=True, key=f"prov_bench_{target_prov}")
+        st.plotly_chart(apply_plantation_layout(fig3, 470), use_container_width=True, key=f"prov_bench_{target_prov}")
 
-    dep_note = "⚠️ Sangat bergantung pada satu komoditas." if dom_share > 70 else "✅ Portofolio relatif seimbang."
-    st.markdown(f'<div class="insight-card">🗺️ <b>{target_prov}</b>: <b>{active_c}</b> komoditas aktif. {dep_note} Strategi: perkuat klaster unggulan & hilirisasi lokal.</div>', unsafe_allow_html=True)
+    dep_note = "⚠️ Bergantung pada satu komoditas." if dom_share > 70 else "✅ Portofolio seimbang."
+    st.markdown(f'<div class="insight-card">🗺️ <b>{target_prov}</b>: <b>{active_c}</b> komoditas aktif. {dep_note}</div>', unsafe_allow_html=True)
 
 # =========================================================
 # PAGE 4: EKSPLORASI VISUAL
 # =========================================================
 elif menu == "🔬 Eksplorasi Visual":
-    st.markdown(f'<div class="section-title">🔬 Eksplorasi Visual & EDA{"<span class=aggregate-badge>Mode Agregat</span>" if is_all_commodities else ""}</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-subtitle">5 perspektif visual: Overview, Distribusi, Hubungan, Korelasi, Deep Dive</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-title">🔬 Eksplorasi Visual & EDA{"<span class=aggregate-badge>Agregat</span>" if is_all_commodities else ""}</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">5 perspektif: Overview, Distribusi, Hubungan, Korelasi, Deep Dive</div>', unsafe_allow_html=True)
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["📌 Overview", "📊 Distribusi", "🔗 Hubungan", "🌡️ Korelasi", "📍 Deep Dive"])
     with tab1:
@@ -1792,33 +997,33 @@ elif menu == "🔬 Eksplorasi Visual":
             fig = px.bar(top_df[::-1], x=selected_commodity, y="Provinsi", orientation='h', text=selected_commodity,
                          title=f"Top Sentra {commodity_display_name}", color_discrete_sequence=[bar_color])
             fig.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-            st.plotly_chart(apply_plantation_layout(fig, 500), use_container_width=True, key="eda_overview_1")
+            st.plotly_chart(apply_plantation_layout(fig, 470), use_container_width=True, key="eda_overview_1")
         with c2:
             temp = active_df.copy(); temp["Total"] = temp[numeric_cols].sum(axis=1)
             top_total = temp.nlargest(top_n, "Total").sort_values("Total", ascending=True)
-            fig2 = px.bar(top_total, x="Total", y="Provinsi", orientation='h', text="Total", title="Top Provinsi Total Produksi", color_discrete_sequence=["#B87333"])
+            fig2 = px.bar(top_total, x="Total", y="Provinsi", orientation='h', text="Total", title="Top Provinsi Total", color_discrete_sequence=["#B87333"])
             fig2.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-            st.plotly_chart(apply_plantation_layout(fig2, 500), use_container_width=True, key="eda_overview_2")
+            st.plotly_chart(apply_plantation_layout(fig2, 470), use_container_width=True, key="eda_overview_2")
     with tab2:
         c1, c2 = st.columns(2)
         with c1:
             bar_color = "#B87333" if is_all_commodities else get_comm_attr(selected_commodity,"color_light")
             fig = px.histogram(active_df, x=selected_commodity, nbins=15, title=f"Distribusi {commodity_display_name}",
                                color_discrete_sequence=[bar_color])
-            st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="eda_dist_1")
+            st.plotly_chart(apply_plantation_layout(fig, 440), use_container_width=True, key="eda_dist_1")
         with c2:
             melted = active_df.melt(id_vars="Provinsi", value_vars=numeric_cols, var_name="Komoditas", value_name="Produksi")
             fig2 = px.box(melted, x="Komoditas", y="Produksi", color="Komoditas", title="Persebaran Antar Komoditas",
                           color_discrete_map={c: get_comm_attr(c, "color_light") for c in numeric_cols})
             fig2.update_xaxes(tickangle=35); fig2.update_layout(showlegend=False)
-            st.plotly_chart(apply_plantation_layout(fig2, 480), use_container_width=True, key="eda_dist_2")
+            st.plotly_chart(apply_plantation_layout(fig2, 440), use_container_width=True, key="eda_dist_2")
     with tab3:
         c1, c2 = st.columns(2)
         x_v = c1.selectbox("Komoditas X", numeric_cols, index=0, key="eda_rel_x")
         y_v = c2.selectbox("Komoditas Y", numeric_cols, index=1, key="eda_rel_y")
         if x_v != y_v:
             fig = px.scatter(active_df, x=x_v, y=y_v, hover_name="Provinsi", title=f"{x_v} vs {y_v}", color_discrete_sequence=["#2D5F3F"])
-            st.plotly_chart(apply_plantation_layout(fig, 550), use_container_width=True, key="eda_rel_scatter")
+            st.plotly_chart(apply_plantation_layout(fig, 500), use_container_width=True, key="eda_rel_scatter")
             corr = active_df[[x_v, y_v]].corr().iloc[0,1]
             strength = "kuat" if abs(corr)>0.6 else "sedang" if abs(corr)>0.3 else "lemah"
             st.markdown(f'<div class="insight-card">🔗 <b>Korelasi:</b> {corr:.3f} ({strength})</div>', unsafe_allow_html=True)
@@ -1828,12 +1033,10 @@ elif menu == "🔬 Eksplorasi Visual":
         fig = px.imshow(corr_m, text_auto=".2f", aspect="auto", zmin=-1, zmax=1,
                         color_continuous_scale=[[0,"#A67B66"],[0.5,"#FAF7F0"],[1,"#2D5F3F"]],
                         title="Matriks Korelasi Agro-Ekologis")
-        fig.update_traces(textfont=dict(color="#1A2B20", size=12, family="Inter"), xgap=3, ygap=3)
+        fig.update_traces(textfont=dict(color="#1A2B20", size=11), xgap=3, ygap=3)
         fig.update_xaxes(side="bottom", tickangle=30); fig.update_yaxes(autorange="reversed")
-        fig.update_layout(paper_bgcolor="#FAF7F0", plot_bgcolor="#FFFFFF",
-                          font=dict(color="#1A2B20"), margin=dict(l=40,r=30,t=60,b=40))
-        fig.update_coloraxes(colorbar=dict(title=dict(text="Korelasi", font=dict(color="#3E5245")),
-                                            tickfont=dict(color="#3E5245"), len=0.75))
+        fig.update_layout(paper_bgcolor="#FAF7F0", plot_bgcolor="#FFFFFF", font=dict(color="#1A2B20"), margin=dict(l=40,r=30,t=60,b=40))
+        fig.update_coloraxes(colorbar=dict(title="Korelasi", len=0.75))
         st.plotly_chart(fig, use_container_width=True, key="eda_corr")
     with tab5:
         deep_prov = st.selectbox("Pilih Provinsi", active_df["Provinsi"].tolist(), key="eda_deep")
@@ -1846,7 +1049,7 @@ elif menu == "🔬 Eksplorasi Visual":
                 fig = px.bar(profile, x="Komoditas", y="Produksi", text="Produksi", color="Komoditas",
                              color_discrete_map={c: get_comm_attr(c, "color_light") for c in numeric_cols}, title=f"Profil {deep_prov}")
                 fig.update_traces(texttemplate='%{text:,.0f}', textposition='outside'); fig.update_layout(showlegend=False)
-                st.plotly_chart(apply_plantation_layout(fig, 500), use_container_width=True, key=f"eda_deep_bar_{deep_prov}")
+                st.plotly_chart(apply_plantation_layout(fig, 460), use_container_width=True, key=f"eda_deep_bar_{deep_prov}")
             with c2:
                 total_p = profile["Produksi"].sum()
                 dom_comm = profile.iloc[0]["Komoditas"]
@@ -1869,7 +1072,7 @@ elif menu == "📊 Analisis Produksi":
         fig.add_trace(go.Bar(name=p1, x=comp["Komoditas"], y=comp[p1], marker_color="#6B9278"))
         fig.add_trace(go.Bar(name=p2, x=comp["Komoditas"], y=comp[p2], marker_color="#B87333"))
         fig.update_layout(barmode='group', title=f"{p1} vs {p2}")
-        st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="duel_chart")
+        st.plotly_chart(apply_plantation_layout(fig, 450), use_container_width=True, key="duel_chart")
         w1, w2 = (comp[p1] >comp[p2]).sum(), (comp[p2] >comp[p1]).sum()
         st.markdown(f'<div class="insight-card">⚔️ {p1} unggul <b>{w1}</b> komoditas | {p2} unggul <b>{w2}</b> komoditas.</div>', unsafe_allow_html=True)
     with tab2:
@@ -1878,7 +1081,7 @@ elif menu == "📊 Analisis Produksi":
         y_v = c2.selectbox("Y", numeric_cols, index=1, key="rel_y")
         if x_v != y_v:
             fig = px.scatter(active_df, x=x_v, y=y_v, hover_name="Provinsi", title=f"{x_v} vs {y_v}", color_discrete_sequence=["#2D5F3F"])
-            st.plotly_chart(apply_plantation_layout(fig, 500), use_container_width=True, key="rel_scatter")
+            st.plotly_chart(apply_plantation_layout(fig, 470), use_container_width=True, key="rel_scatter")
             corr = active_df[[x_v, y_v]].corr().iloc[0,1]
             st.markdown(f'<div class="insight-card">🔗 Korelasi: <b>{corr:.3f}</b></div>', unsafe_allow_html=True)
         else: st.warning("Pilih dua komoditas berbeda.")
@@ -1890,22 +1093,21 @@ elif menu == "📊 Analisis Produksi":
         fig = go.Figure(go.Bar(x=bdf["Komoditas"], y=bdf["Rasio"], marker_color=[get_comm_attr(c, "color_light") for c in bdf["Komoditas"]]))
         fig.add_hline(y=1, line_dash="dash", line_color="#B87333")
         fig.update_layout(title=f"{bp} vs Nasional", yaxis_title="Rasio")
-        st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="bench_chart")
+        st.plotly_chart(apply_plantation_layout(fig, 450), use_container_width=True, key="bench_chart")
 
 # =========================================================
 # PAGE 6: SEBARAN WILAYAH
 # =========================================================
 elif menu == "🌍 Sebaran Wilayah":
-    st.markdown(f'<div class="section-title">🌍 Sebaran Wilayah Produksi{"<span class=aggregate-badge>Mode Agregat</span>" if is_all_commodities else ""}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="section-subtitle">Visualisasi spasial distribusi {commodity_display_name} di seluruh Indonesia</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-title">🌍 Sebaran Wilayah Produksi{"<span class=aggregate-badge>Agregat</span>" if is_all_commodities else ""}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-subtitle">Visualisasi spasial {commodity_display_name} di Indonesia</div>', unsafe_allow_html=True)
     
-    geo_tab1, geo_tab2, geo_tab3 = st.tabs(["🗺️ Peta Choropleth", "📊 Ranking Intensitas", "🏷️ Klasifikasi Wilayah"])
+    geo_tab1, geo_tab2, geo_tab3 = st.tabs(["🗺️ Peta Choropleth", "📊 Ranking", "🏷️ Klasifikasi"])
     
     with geo_tab1:
         st.markdown(f"""
         <div class="insight-card" style="margin-top: 0.5rem;">
-            🗺️ <b>Peta Spasial {commodity_display_name}:</b> Menunjukkan distribusi geografis sentra produksi. 
-            Pola spasial mengindikasikan <b>koridor produksi</b> dan <b>klaster regional</b> yang dapat dioptimalkan untuk logistik dan hilirisasi.
+            🗺️ <b>Peta Spasial {commodity_display_name}:</b> Menunjukkan koridor produksi dan klaster regional untuk optimasi logistik dan hilirisasi.
         </div>
         """, unsafe_allow_html=True)
         
@@ -1915,7 +1117,7 @@ elif menu == "🌍 Sebaran Wilayah":
         if not geo_df.empty:
             fig_geo = create_choropleth_map(
                 geo_df, selected_commodity,
-                f"Distribusi Spasial {commodity_display_name} di Indonesia",
+                f"Distribusi {commodity_display_name}",
                 f"{commodity_display_name} (Ribu Ton)",
                 is_aggregate=is_all_commodities
             )
@@ -1932,7 +1134,7 @@ elif menu == "🌍 Sebaran Wilayah":
                             "🏆" if i == 1 else "📍", "#B87333" if i == 1 else "#6B9278"
                         ), unsafe_allow_html=True)
         else:
-            st.warning(f"⚠️ Tidak ada data produksi {commodity_display_name} untuk ditampilkan pada peta.")
+            st.warning(f"⚠️ Tidak ada data {commodity_display_name}.")
     
     with geo_tab2:
         geo_df = active_df[["Provinsi", selected_commodity]].copy().sort_values(selected_commodity, ascending=False)
@@ -1943,18 +1145,18 @@ elif menu == "🌍 Sebaran Wilayah":
             else:
                 color_scale = [get_comm_attr(selected_commodity, "color"), get_comm_attr(selected_commodity, "color_light")]
             fig1 = px.bar(geo_df.head(top_n), x="Provinsi", y=selected_commodity, color=selected_commodity, text=selected_commodity,
-                          color_continuous_scale=color_scale, title=f"Ranking Intensitas Sentra: {commodity_display_name}")
+                          color_continuous_scale=color_scale, title=f"Ranking Sentra: {commodity_display_name}")
             fig1.update_traces(texttemplate='%{text:.2f}', textposition='outside')
             fig1.update_xaxes(tickangle=45)
-            st.plotly_chart(apply_plantation_layout(fig1, 500), use_container_width=True, key="geo_rank")
+            st.plotly_chart(apply_plantation_layout(fig1, 470), use_container_width=True, key="geo_rank")
         with col_r:
             bub = geo_df.head(15).copy()
             bub["Rank"] = range(1, len(bub)+1)
             bar_color = "#B87333" if is_all_commodities else get_comm_attr(selected_commodity, "color_light")
             fig2 = px.scatter(bub, x="Rank", y=selected_commodity, size=selected_commodity, hover_name="Provinsi", text="Provinsi",
-                              title="Bubble Prioritas Wilayah", color_discrete_sequence=[bar_color])
+                              title="Bubble Prioritas", color_discrete_sequence=[bar_color])
             fig2.update_traces(textposition="top center")
-            st.plotly_chart(apply_plantation_layout(fig2, 500), use_container_width=True, key="geo_bub")
+            st.plotly_chart(apply_plantation_layout(fig2, 470), use_container_width=True, key="geo_bub")
     
     with geo_tab3:
         geo_df = active_df[["Provinsi", selected_commodity]].copy().sort_values(selected_commodity, ascending=False)
@@ -1964,41 +1166,30 @@ elif menu == "🌍 Sebaran Wilayah":
             geo_df["Kategori"] = pd.cut(geo_df["Share"], bins=[-1,1,5,15,100], labels=["Minor", "Penyangga", "Regional", "Nasional"])
             kc = geo_df["Kategori"].value_counts()
             
-            st.markdown("### 🏷️ Klasifikasi Wilayah Berdasarkan Pangsa Produksi")
-            st.markdown("""
-            <div class="watchlist-card">
-                <b>Metodologi Klasifikasi:</b><br>
-                • <b>Nasional (>15%):</b> Anchor produksi nasional<br>
-                • <b>Regional (5-15%):</b> Pilar produksi regional<br>
-                • <b>Penyangga (1-5%):</b> Stabilisator<br>
-                • <b>Minor (<1%):</b> Niche market
-            </div>
-            """, unsafe_allow_html=True)
-            
+            st.markdown("### 🏷️ Klasifikasi Berdasarkan Pangsa Produksi")
             k1, k2, k3, k4 = st.columns(4)
-            k1.markdown(create_intel_kpi("Sentra Nasional", str(kc.get("Nasional",0)), "Anchor production", "🏆", "#B87333"), unsafe_allow_html=True)
-            k2.markdown(create_intel_kpi("Sentra Regional", str(kc.get("Regional",0)), "Pillar produksi", "🌾", "#6B9278"), unsafe_allow_html=True)
+            k1.markdown(create_intel_kpi("Sentra Nasional", str(kc.get("Nasional",0)), "Anchor", "🏆", "#B87333"), unsafe_allow_html=True)
+            k2.markdown(create_intel_kpi("Sentra Regional", str(kc.get("Regional",0)), "Pilar", "🌾", "#6B9278"), unsafe_allow_html=True)
             k3.markdown(create_intel_kpi("Penyangga", str(kc.get("Penyangga",0)), "Stabilisator", "🌱", "#8BA888"), unsafe_allow_html=True)
             k4.markdown(create_intel_kpi("Minor", str(kc.get("Minor",0)), "Niche", "🍃", "#B39471"), unsafe_allow_html=True)
             
-            st.markdown("### 📋 Detail Klasifikasi per Provinsi")
             display_df = geo_df[["Provinsi", selected_commodity, "Share", "Kategori"]].copy()
-            display_df.columns = ["Provinsi", f"{commodity_display_name} (Ribu Ton)", "Pangsa (%)", "Kategori"]
-            display_df[f"{commodity_display_name} (Ribu Ton)"] = display_df[f"{commodity_display_name} (Ribu Ton)"].apply(lambda x: format_ton(x))
+            display_df.columns = ["Provinsi", f"{commodity_display_name}", "Pangsa (%)", "Kategori"]
+            display_df[f"{commodity_display_name}"] = display_df[f"{commodity_display_name}"].apply(format_ton)
             display_df["Pangsa (%)"] = display_df["Pangsa (%)"].apply(lambda x: f"{x:.2f}%")
             st.dataframe(display_df, use_container_width=True, hide_index=True)
         else:
-            st.warning("⚠️ Tidak ada data untuk diklasifikasikan.")
+            st.warning("⚠️ Tidak ada data.")
 
 # =========================================================
 # PAGE 7: PROYEKSI & MODEL
 # =========================================================
 elif menu == "📈 Proyeksi & Model":
     st.markdown('<div class="section-title">📈 Proyeksi & Model Produksi</div>', unsafe_allow_html=True)
-    st.markdown('<div class="watchlist-card">📌 <b>Catatan:</b> Model untuk eksplorasi pola awal, bukan prediksi final tanpa validasi time-series.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="watchlist-card">📌 <b>Catatan:</b> Model eksplorasi pola awal, bukan prediksi final tanpa validasi time-series.</div>', unsafe_allow_html=True)
 
     if active_df.shape[0] < 5:
-        st.warning("⚠️ Data terlalu sedikit untuk analisis model yang stabil.")
+        st.warning("⚠️ Data terlalu sedikit.")
     else:
         tab_lr, tab_fc, tab_rf, tab_dt = st.tabs(["📐 Regresi Linear", "📅 Forecasting 2026", "🌲 Random Forest", "🌳 Decision Tree"])
         with tab_lr:
@@ -2016,22 +1207,22 @@ elif menu == "📈 Proyeksi & Model":
                     k2.metric("RMSE", f"{math.sqrt(mean_squared_error(y, pred)):.2f}")
                     k3.metric("R²", f"{r2_score(y, pred):.4f}")
                     fig = go.Figure()
-                    fig.add_trace(go.Scatter(x=mdf[x_var], y=mdf[y_var], mode="markers", name="Aktual", marker=dict(color="#2D5F3F", size=9, symbol="circle")))
+                    fig.add_trace(go.Scatter(x=mdf[x_var], y=mdf[y_var], mode="markers", name="Aktual", marker=dict(color="#2D5F3F", size=9)))
                     sort_idx = np.argsort(mdf[x_var].values)
                     fig.add_trace(go.Scatter(x=mdf[x_var].values[sort_idx], y=pred[sort_idx], mode="lines", name="Regresi", line=dict(color="#B87333", width=3)))
-                    fig.update_layout(title=f"Pola Hubungan: {x_var} → {y_var}", xaxis_title=x_var, yaxis_title=y_var)
-                    st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="proj_reg")
+                    fig.update_layout(title=f"Pola: {x_var} → {y_var}", xaxis_title=x_var, yaxis_title=y_var)
+                    st.plotly_chart(apply_plantation_layout(fig, 450), use_container_width=True, key="proj_reg")
                     st.markdown("#### 🎮 Playground Prediksi")
-                    x_input = st.number_input(f"Masukkan volume {x_var} (Ribu Ton):", min_value=0.0, value=float(np.median(mdf[x_var])))
+                    x_input = st.number_input(f"Volume {x_var} (Ribu Ton):", min_value=0.0, value=float(np.median(mdf[x_var])))
                     pred_val = lr.predict([[x_input]])[0]
-                    st.markdown(f'<div class="insight-card">🌾 Prediksi <b>{y_var}</b> jika <b>{x_var} = {x_input:.2f}</b> ribu ton adalah <b>{pred_val:.2f}</b> ribu ton.</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="insight-card">🌾 Prediksi <b>{y_var}</b> jika <b>{x_var} = {x_input:.2f}</b> → <b>{pred_val:.2f}</b> ribu ton.</div>', unsafe_allow_html=True)
                 else:
-                    st.warning("Data tidak cukup untuk membangun model regresi (minimal 5 observasi).")
+                    st.warning("Data tidak cukup (min 5 observasi).")
             else:
-                st.warning("Pilih dua komoditas yang berbeda untuk analisis.")
+                st.warning("Pilih dua komoditas berbeda.")
         with tab_fc:
             st.markdown("### 📅 Simulasi Panen 2026")
-            st.markdown('<div class="watchlist-card">⚠️ Dataset cross-sectional (2025). Forecasting via simulasi growth rate.</div>', unsafe_allow_html=True)
+            st.markdown('<div class="watchlist-card">⚠️ Dataset cross-sectional (2025). Forecasting via growth rate.</div>', unsafe_allow_html=True)
             fc_comm = st.selectbox("Komoditas Target", numeric_cols, key="fc_comm")
             gr = st.slider("Growth Rate (%)", 1, 20, 7, key="fc_gr") / 100
             fc = active_df[["Provinsi", fc_comm]].copy()
@@ -2040,8 +1231,8 @@ elif menu == "📈 Proyeksi & Model":
             fig_fc = go.Figure()
             fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[fc_comm], name="Panen 2025", marker_color="#B39471"))
             fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Proyeksi_2026"], name="Proyeksi 2026", marker_color="#6B9278"))
-            fig_fc.update_layout(barmode="group", title=f"Forecasting {fc_comm}: 2025 vs 2026", xaxis_title="Provinsi", yaxis_title="Volume (Ribu Ton)")
-            st.plotly_chart(apply_plantation_layout(fig_fc, 500), use_container_width=True, key="fc_chart_bar")
+            fig_fc.update_layout(barmode="group", title=f"Forecast {fc_comm}: 2025 vs 2026")
+            st.plotly_chart(apply_plantation_layout(fig_fc, 470), use_container_width=True, key="fc_chart_bar")
             c1, c2 = st.columns(2)
             c1.metric("Total 2025", format_num(fc[fc_comm].sum()))
             c2.metric("Total 2026", format_num(fc["Proyeksi_2026"].sum()), f"+{gr*100:.0f}%")
@@ -2064,12 +1255,12 @@ elif menu == "📈 Proyeksi & Model":
                 with c1:
                     imp = pd.Series(rf.feature_importances_, index=feats).sort_values(ascending=True)
                     fig_imp = px.bar(x=imp.values, y=imp.index, orientation='h', title="Feature Importance", color_discrete_sequence=["#6B9278"])
-                    st.plotly_chart(apply_plantation_layout(fig_imp, 450), use_container_width=True, key="rf_imp")
+                    st.plotly_chart(apply_plantation_layout(fig_imp, 420), use_container_width=True, key="rf_imp")
                 with c2:
                     comp_df = pd.DataFrame({"Aktual": y_te, "Prediksi": y_pred})
-                    fig_sc = px.scatter(comp_df, x="Aktual", y="Prediksi", title="Aktual vs Prediksi (Test Set)", color_discrete_sequence=["#B87333"])
-                    st.plotly_chart(apply_plantation_layout(fig_sc, 450), use_container_width=True, key="rf_scatter")
-                st.markdown(f'<div class="insight-card">🌱 <b>{imp.idxmax()}</b> menjadi driver utama untuk <b>{tgt}</b> (score: {imp.max():.3f}).</div>', unsafe_allow_html=True)
+                    fig_sc = px.scatter(comp_df, x="Aktual", y="Prediksi", title="Aktual vs Prediksi", color_discrete_sequence=["#B87333"])
+                    st.plotly_chart(apply_plantation_layout(fig_sc, 420), use_container_width=True, key="rf_scatter")
+                st.markdown(f'<div class="insight-card">🌱 Driver utama <b>{tgt}</b>: <b>{imp.idxmax()}</b> (score: {imp.max():.3f}).</div>', unsafe_allow_html=True)
             else: st.warning("Data terlalu sedikit.")
         with tab_dt:
             st.markdown("### 🌳 Decision Tree Regression")
@@ -2086,28 +1277,25 @@ elif menu == "📈 Proyeksi & Model":
                 k2.metric("RMSE", f"{math.sqrt(mean_squared_error(y_te, y_pred)):.2f}")
                 k3.metric("R²", f"{r2_score(y_te, y_pred):.4f}")
                 imp_dt = pd.Series(dt.feature_importances_, index=feats_dt).sort_values(ascending=True)
-                fig_imp_dt = px.bar(x=imp_dt.values, y=imp_dt.index, orientation='h',
-                                    title="Feature Importance (Pembagi Utama)", color_discrete_sequence=["#8BA888"])
-                st.plotly_chart(apply_plantation_layout(fig_imp_dt, 400), use_container_width=True, key="dt_imp")
-                st.markdown("#### 🌳 Logika Percabangan Pohon Keputusan")
+                fig_imp_dt = px.bar(x=imp_dt.values, y=imp_dt.index, orientation='h', title="Feature Importance", color_discrete_sequence=["#8BA888"])
+                st.plotly_chart(apply_plantation_layout(fig_imp_dt, 380), use_container_width=True, key="dt_imp")
+                st.markdown("#### 🌳 Logika Percabangan Pohon")
                 st.markdown("""
                 <div class="insight-card">
-                Alih-alih menggunakan gambar statis yang berat,
-                dashboard ini menampilkan <b>rules (aturan logika)</b> langsung dari model.
-                Ini menunjukkan secara transparan bagaimana model membagi wilayah berdasarkan threshold komoditas lain.
+                Menampilkan <b>rules</b> langsung dari model. Menunjukkan transparan bagaimana model membagi wilayah berdasarkan threshold komoditas lain.
                 </div>
                 """, unsafe_allow_html=True)
                 tree_rules = export_text(dt, feature_names=list(feats_dt))
                 st.code(tree_rules, language="text")
             else:
-                st.warning("Data terlalu sedikit untuk membangun Decision Tree.")
+                st.warning("Data terlalu sedikit.")
 
 # =========================================================
 # PAGE 8: INSIGHT & STRATEGI
 # =========================================================
 elif menu == "🧠 Insight & Strategi":
     st.markdown('<div class="section-title">🧠 Insight & Strategi Perkebunan</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-subtitle">Executive briefing: temuan strategis, rekomendasi kebijakan, dan prioritas pengembangan</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-subtitle">Executive briefing: temuan strategis, rekomendasi kebijakan, prioritas pengembangan</div>', unsafe_allow_html=True)
 
     tot_nat = active_df[numeric_cols].sum().sum()
     comm_sums = active_df[numeric_cols].sum().sort_values(ascending=False)
@@ -2118,11 +1306,11 @@ elif menu == "🧠 Insight & Strategi":
 
     st.markdown("### 📜 Insight Strategis Nasional")
     insights = [
-        f"🌴 <b>{dom_c}</b> sebagai tulang punggung sektor perkebunan nasional ({format_ton(comm_sums.iloc[0])} ribu ton).",
+        f"🌴 <b>{dom_c}</b> sebagai tulang punggung sektor ({format_ton(comm_sums.iloc[0])} ribu ton).",
         f"🗺️ <b>Konsentrasi Spasial:</b> Top 5 provinsi menguasai <b>{top5_share:.1f}%</b> output nasional.",
         f"🌱 <b>{div_p}</b> sebagai model ketahanan struktural dengan portofolio terdiversifikasi.",
-        f"🔗 <b>Spesialisasi Geografis:</b> Korelasi lemah antar komoditas menunjukkan mosaik keunggulan komparatif regional.",
-        f"📉 <b>Kesenjangan:</b> Teh & Tebu memiliki sebaran sangat sempit, butuh strategi klasterisasi spesifik lokasi."
+        f"🔗 <b>Spesialisasi Geografis:</b> Korelasi lemah antar komoditas menunjukkan mosaik keunggulan komparatif.",
+        f"📉 <b>Kesenjangan:</b> Teh & Tebu sebaran sempit, butuh klasterisasi spesifik lokasi."
     ]
     for i, ins in enumerate(insights, 1):
         st.markdown(f'<div class="insight-card"><b>#{i}</b> {ins}</div>', unsafe_allow_html=True)
@@ -2130,9 +1318,9 @@ elif menu == "🧠 Insight & Strategi":
     st.markdown('<div class="organic-divider"></div>', unsafe_allow_html=True)
     st.markdown("### 🚀 Rekomendasi Kebijakan & Bisnis")
     recs = [
-        "💼 <b>Hilirisasi Berbasis Klaster:</b> Bangun pabrik pengolahan di sentra produksi untuk nilai tambah ekspor.",
+        "💼 <b>Hilirisasi Berbasis Klaster:</b> Bangun pabrik pengolahan di sentra produksi.",
         "🛡️ <b>Mitigasi Konsentrasi:</b> Kembangkan sentra alternatif untuk distribusi risiko.",
-        "🌳 <b>Program Replanting:</b> Peremajaan tanaman tua (>25 tahun) dengan bibit unggul → produktivitas +40-60%.",
+        "🌳 <b>Program Replanting:</b> Peremajaan tanaman tua (>25 tahun) → produktivitas +40-60%.",
         "🗺️ <b>Branding Geografis:</b> Registrasi Indikasi Geografis (Kopi Gayo, Kakao Sulawesi, Teh Jabar).",
         "📊 <b>Sistem Time-Series:</b> Transisi ke monitoring berkala untuk forecasting akurat."
     ]
@@ -2141,9 +1329,9 @@ elif menu == "🧠 Insight & Strategi":
 
     st.markdown("### 🎯 Prioritas Pengembangan Strategis")
     p1, p2, p3 = st.columns(3)
-    with p1: st.markdown('<div class="priority-card"><b style="font-family:Fraunces,serif; font-size:1.3rem; color:#2D5F3F; letter-spacing:-0.02em;">🏭 Hilirisasi & Nilai Tambah</b><br><span style="color:#3E5245; font-size:0.92rem;">Pengolahan CPO, karet olahan, kopi specialty.</span></div>', unsafe_allow_html=True)
-    with p2: st.markdown('<div class="priority-card"><b style="font-family:Fraunces,serif; font-size:1.3rem; color:#2D5F3F; letter-spacing:-0.02em;">🌱 Diversifikasi & Ketahanan</b><br><span style="color:#3E5245; font-size:0.92rem;">Tanaman sela & agroforestri berkelanjutan.</span></div>', unsafe_allow_html=True)
-    with p3: st.markdown('<div class="priority-card"><b style="font-family:Fraunces,serif; font-size:1.3rem; color:#2D5F3F; letter-spacing:-0.02em;">📈 Digitalisasi & Data</b><br><span style="color:#3E5245; font-size:0.92rem;">Precision agriculture & dashboard real-time.</span></div>', unsafe_allow_html=True)
+    with p1: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">🏭 Hilirisasi</b><br><span style="color:#3E5245; font-size:0.88rem;">Pengolahan CPO, karet olahan, kopi specialty.</span></div>', unsafe_allow_html=True)
+    with p2: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">🌱 Diversifikasi</b><br><span style="color:#3E5245; font-size:0.88rem;">Tanaman sela & agroforestri berkelanjutan.</span></div>', unsafe_allow_html=True)
+    with p3: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">📈 Digitalisasi</b><br><span style="color:#3E5245; font-size:0.88rem;">Precision agriculture & dashboard real-time.</span></div>', unsafe_allow_html=True)
 
 # =========================================================
 # PAGE 9: DATA & EKSPOR
@@ -2155,7 +1343,7 @@ elif menu == "📦 Data & Ekspor":
     c2.metric("🌾 Komoditas", len(numeric_cols))
     c3.metric("✅ Missing", int(active_df.isnull().sum().sum()))
     c4.metric("🔄 Duplikat", int(active_df.duplicated().sum()))
-    tab1, tab2, tab3 = st.tabs(["📋 Dataset Mentah", "📊 Statistik Deskriptif", "🧹 Kualitas Data"])
+    tab1, tab2, tab3 = st.tabs(["📋 Dataset", "📊 Statistik", "🧹 Kualitas"])
     with tab1: st.dataframe(active_df, use_container_width=True)
     with tab2:
         desc = active_df[numeric_cols].describe().T; desc["Range"] = desc["max"] - desc["min"]
@@ -2165,7 +1353,7 @@ elif menu == "📦 Data & Ekspor":
         st.markdown(f"- ✅ Missing values: {int(active_df.isnull().sum().sum())}")
         st.markdown(f"- ✅ Baris duplikat: {int(active_df.duplicated().sum())}")
         st.markdown(f"- ⚠️ Wilayah tanpa produksi: {int(zero_rows)}")
-        st.markdown('<div class="watchlist-card">📌 Outlier (Riau-sawit, Jatim-tebu) merepresentasikan <b>sentra produksi riil</b> BPS.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="watchlist-card">📌 Outlier (Riau-sawit, Jatim-tebu) = <b>sentra produksi riil</b> BPS.</div>', unsafe_allow_html=True)
     st.markdown("---")
     col1, col2 = st.columns(2)
     with col1: st.download_button("⬇️ Ekspor Dataset", active_df.to_csv(index=False).encode("utf-8"), "data_perkebunan.csv", "text/csv", use_container_width=True)
@@ -2184,13 +1372,12 @@ elif menu == "📦 Data & Ekspor":
 # FOOTER
 # =========================================================
 st.markdown("""
-<div style="text-align:center; padding:3.5rem 2rem; margin-top:4rem; background: linear-gradient(145deg, #FFFFFF 0%, #FAF7F0 100%); border-radius: 28px; border: 1px solid #E5DFD0; box-shadow: 0 -8px 40px rgba(26, 43, 32, 0.05); animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1); position: relative; overflow: hidden;">
-    <div style="position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, transparent, #2D5F3F, #B87333, transparent); background-size: 200% 100%; animation: borderFlow 5s linear infinite;"></div>
-    <div style="font-size:3rem; margin-bottom:0.8rem; opacity:0.75; animation: gentleSway 6s ease-in-out infinite; display:inline-block;">🌿</div>
-    <h3 style="font-family:'Fraunces',serif; font-size:1.8rem; font-weight:700; color: #2D5F3F; margin-bottom:0.7rem; letter-spacing:-0.03em; font-variation-settings: 'opsz' 144;">Plantation Intelligence Dashboard</h3>
-    <p style="color:#3E5245; font-size:0.95rem; margin-bottom:0.5rem; font-weight:500;">UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
-    <p style="color:#6B7D70; font-size:0.88rem; margin-top:0.8rem; max-width:600px; margin-left:auto; margin-right:auto; line-height:1.6;">Streamlit + Plotly + Scikit-Learn untuk perencanaan strategis sektor perkebunan Indonesia</p>
-    <div style="width:80px; height:2px; background: linear-gradient(90deg, transparent, #B87333, transparent); margin: 1.8rem auto; border-radius:2px;"></div>
-    <p style="color:#9AA89F; font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; font-weight:700;">© 2026 | Sumber: BPS — Produksi Tanaman Perkebunan Menurut Provinsi, 2025</p>
+<div style="text-align:center; padding:2.5rem 2rem; margin-top:3rem; background: var(--card); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--sh);">
+    <div style="font-size:2.5rem; margin-bottom:0.6rem;">🌿</div>
+    <h3 style="font-family:Georgia,serif; font-size:1.5rem; font-weight:700; color: #2D5F3F; margin-bottom:0.5rem;">Plantation Intelligence Dashboard</h3>
+    <p style="color:#3E5245; font-size:0.9rem; margin-bottom:0.4rem; font-weight:500;">UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
+    <p style="color:#6B7D70; font-size:0.85rem; margin-top:0.6rem;">Streamlit + Plotly + Scikit-Learn untuk perencanaan strategis sektor perkebunan Indonesia</p>
+    <div style="width:60px; height:2px; background: linear-gradient(90deg, #2D5F3F, #B87333); margin: 1.2rem auto;"></div>
+    <p style="color:#9AA89F; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:700;">© 2026 | Sumber: BPS — Produksi Tanaman Perkebunan, 2025</p>
 </div>
 """, unsafe_allow_html=True)
