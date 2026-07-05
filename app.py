@@ -5,6 +5,8 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
+import requests
+import json
 from sklearn.tree import export_text
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -25,37 +27,157 @@ st.set_page_config(
 )
 
 # =========================================================
-# 🎨 TROPICAL HERITAGE THEME + ORGANIC ANIMATIONS
+# 🗺️ GEOJSON LOADER & PROVINCE MAPPING
+# =========================================================
+# Mapping untuk handle mismatch nama provinsi antara BPS & GeoJSON
+PROVINCE_MAPPING = {
+    "DKI JAKARTA": "Jakarta Raya",
+    "DI YOGYAKARTA": "Yogyakarta",
+    "KEP. BANGKA BELITUNG": "Kepulauan Bangka Belitung",
+    "KEP. RIAU": "Kepulauan Riau",
+    "NUSA TENGGARA BARAT": "Nusa Tenggara Barat",
+    "NUSA TENGGARA TIMUR": "Nusa Tenggara Timur",
+    "SULAWESI TENGGARA": "Sulawesi Tenggara",
+    "KALIMANTAN BARAT": "Kalimantan Barat",
+    "KALIMANTAN TENGAH": "Kalimantan Tengah",
+    "KALIMANTAN SELATAN": "Kalimantan Selatan",
+    "KALIMANTAN TIMUR": "Kalimantan Timur",
+    "KALIMANTAN UTARA": "Kalimantan Utara",
+    "SUMATERA UTARA": "Sumatera Utara",
+    "SUMATERA BARAT": "Sumatera Barat",
+    "SUMATERA SELATAN": "Sumatera Selatan",
+    "PAPUA BARAT DAYA": "Papua Barat",  # fallback
+    "PAPUA PEGUNUNGAN": "Papua",  # fallback
+    "PAPUA SELATAN": "Papua",  # fallback
+    "PAPUA TENGAH": "Papua",  # fallback
+}
+
+@st.cache_data(show_spinner="Memuat peta Indonesia...")
+def load_indonesia_geojson():
+    """Load GeoJSON Indonesia dari GitHub dengan fallback handling."""
+    urls = [
+        "https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/indonesia-province.json",
+        "https://raw.githubusercontent.com/semogasukses/indonesia-geojson/master/indonesia-prov.json"
+    ]
+    for url in urls:
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                return response.json()
+        except:
+            continue
+    return None
+
+def normalize_province_name(name):
+    """Normalisasi nama provinsi untuk matching dengan GeoJSON."""
+    return PROVINCE_MAPPING.get(name, name)
+
+def create_choropleth_map(df_map, value_col, title, color_label="Produksi (Ribu Ton)"):
+    """
+    Membuat peta choropleth Indonesia dengan handling robust.
+    """
+    geojson = load_indonesia_geojson()
+    if geojson is None:
+        st.warning("⚠️ Tidak dapat memuat peta. Menampilkan visualisasi alternatif.")
+        return None
+    
+    # Siapkan data dengan nama provinsi yang dinormalisasi
+    map_df = df_map.copy()
+    map_df["Provinsi_Normalized"] = map_df["Provinsi"].apply(normalize_province_name)
+    
+    # Siapkan color scale earthy (sesuai tema)
+    colorscale = [
+        [0, "#F5F0E3"],      # Sand cream (rendah)
+        [0.25, "#D4B896"],   # Warm sand
+        [0.5, "#8BA888"],    # Sage green
+        [0.75, "#2D5F3F"],   # Heritage green
+        [1, "#1A2B20"]       # Deep forest (tinggi)
+    ]
+    
+    fig = px.choropleth(
+        map_df,
+        geojson=geojson,
+        featureidkey="properties.Propinsi",  # key di GeoJSON
+        locations="Provinsi_Normalized",
+        color=value_col,
+        color_continuous_scale=colorscale,
+        scope="asia",
+        labels={value_col: color_label},
+        title=title,
+        hover_name="Provinsi",
+        hover_data={
+            "Provinsi_Normalized": False,
+            value_col: ":,.2f"
+        }
+    )
+    
+    # Custom layout untuk peta yang elegan
+    fig.update_geos(
+        showcountries=True,
+        countrycolor="#C9C0AB",
+        showcoastlines=True,
+        coastlinecolor="#8BA888",
+        showland=True,
+        landcolor="#F5F0E3",
+        showocean=True,
+        oceancolor="#E8F0E5",
+        showlakes=False,
+        projection_type="mercator",
+        fitbounds="locations",
+        lataxis_range=[-12, 8],
+        lonaxis_range=[94, 142]
+    )
+    
+    fig.update_layout(
+        paper_bgcolor="#FAF7F0",
+        plot_bgcolor="#FFFFFF",
+        font=dict(color="#1A2B20", family="Inter, sans-serif"),
+        margin={"r": 0, "t": 60, "l": 0, "b": 40},
+        height=600,
+        title=dict(
+            font=dict(size=17, color="#2D5F3F", family="Fraunces, serif", weight=600),
+            x=0.02, xanchor="left"
+        ),
+        coloraxis_colorbar=dict(
+            title=dict(text=color_label, font=dict(color="#3E5245")),
+            tickfont=dict(color="#3E5245"),
+            len=0.8,
+            x=1.02,
+            thickness=20,
+            outlinecolor="#C9C0AB",
+            outlinewidth=1
+        ),
+        hoverlabel=dict(
+            bgcolor="#FFFFFF",
+            bordercolor="#2D5F3F",
+            font=dict(color="#1A2B20", family="Inter", size=13)
+        )
+    )
+    
+    return fig
+
+# =========================================================
+# 🎨 TROPICAL HERITAGE THEME + ANIMATIONS
 # =========================================================
 st.markdown("""
 <style>
-/* ============================================
-   0. IMPORTS & VARIABLES
-   ============================================ */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-    /* Paper & Card backgrounds */
     --bg-paper: #FAF7F0;
     --bg-card: #FFFFFF;
     --bg-sidebar: #F0EBE0;
     --bg-sidebar-header: #2D4A3A;
-    
-    /* Ink colors — HIGH CONTRAST for readability */
     --ink-primary: #1A2B20;
     --ink-secondary: #3E5245;
     --ink-muted: #6B7D70;
     --ink-faint: #9AA89F;
     --ink-on-dark: #FAF7F0;
-    
-    /* Accents */
     --accent-heritage: #2D5F3F;
     --accent-copper: #B87333;
     --accent-sage: #8BA888;
     --accent-sand: #D4B896;
     --accent-clay: #C17B4E;
-    
-    /* Borders & Shadows */
     --border: #E5DFD0;
     --border-strong: #C9C0AB;
     --shadow-sm: 0 1px 3px rgba(26, 43, 32, 0.05);
@@ -63,9 +185,6 @@ st.markdown("""
     --shadow-lg: 0 12px 32px rgba(26, 43, 32, 0.10);
 }
 
-/* ============================================
-   1. GLOBAL BASE
-   ============================================ */
 .stApp {
     background-color: var(--bg-paper);
     color: var(--ink-primary);
@@ -80,7 +199,6 @@ st.markdown("""
     padding-bottom: 3rem;
 }
 
-/* Elegant scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg-paper); }
 ::-webkit-scrollbar-thumb {
@@ -88,11 +206,7 @@ st.markdown("""
     border-radius: 10px;
     border: 2px solid var(--bg-paper);
 }
-::-webkit-scrollbar-thumb:hover { background: var(--accent-sage); }
 
-/* ============================================
-   2. TYPOGRAPHY — HIGH READABILITY
-   ============================================ */
 h1, h2, h3 {
     font-family: 'Fraunces', Georgia, serif !important;
     color: var(--ink-primary) !important;
@@ -100,120 +214,51 @@ h1, h2, h3 {
     font-weight: 700 !important;
 }
 
-h1 { font-size: 2.4rem !important; line-height: 1.2 !important; }
-h2 { font-size: 1.8rem !important; line-height: 1.3 !important; }
-h3 { font-size: 1.4rem !important; line-height: 1.4 !important; }
+h1 { font-size: 2.4rem !important; }
+h2 { font-size: 1.8rem !important; }
+h3 { font-size: 1.4rem !important; }
 
-p, span, div, label {
-    color: var(--ink-primary);
-    font-family: 'Inter', sans-serif;
-}
-
-strong, b {
-    color: var(--ink-primary);
-    font-weight: 700;
-}
-
-/* ============================================
-   3. KEYFRAME ANIMATIONS
-   ============================================ */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes floatLeaf {
-    0%, 100% {
-        transform: translateY(0) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-20px) rotate(5deg);
-    }
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes gentleSway {
-    0%, 100% {
-        transform: rotate(-2deg);
-    }
-    50% {
-        transform: rotate(2deg);
-    }
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
 }
 
 @keyframes shimmer {
-    0% {
-        background-position: -200% center;
-    }
-    100% {
-        background-position: 200% center;
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.85;
-        transform: scale(1.05);
-    }
-}
-
-@keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
 }
 
 @keyframes breathe {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.9;
-    }
-    50% {
-        transform: scale(1.02);
-        opacity: 1;
-    }
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.02); opacity: 1; }
 }
 
-/* ============================================
-   4. HERO STRIP + ANIMATIONS
-   ============================================ */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.05); }
+}
+
 .hero-strip {
     background: linear-gradient(135deg, #2D4A3A 0%, #3E5F4D 50%, #4A6F58 100%);
     background-size: 200% 200%;
@@ -347,9 +392,6 @@ strong, b {
     animation: breathe 4s ease-in-out infinite;
 }
 
-/* ============================================
-   5. SIDEBAR — PREMIUM HERITAGE DESIGN + ANIMATIONS
-   ============================================ */
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #F0EBE0 0%, #E8E0CF 100%) !important;
     padding: 0 !important;
@@ -360,7 +402,6 @@ section[data-testid="stSidebar"] > div {
     padding-top: 0 !important;
 }
 
-/* Brand header */
 .sidebar-brand {
     background: linear-gradient(135deg, var(--bg-sidebar-header) 0%, #3E5F4D 100%);
     color: var(--ink-on-dark);
@@ -405,7 +446,6 @@ section[data-testid="stSidebar"] > div {
     font-weight: 600;
 }
 
-/* Sidebar blocks */
 .sidebar-block {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -450,7 +490,6 @@ section[data-testid="stSidebar"] > div {
     animation: pulse 3s ease-in-out infinite;
 }
 
-/* Sidebar navigation pills */
 section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] {
     gap: 4px !important;
     padding: 0.3rem !important;
@@ -489,7 +528,6 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     animation: pulse 0.4s ease-out;
 }
 
-/* Commodity brief card */
 .commodity-brief {
     background: linear-gradient(135deg, #F5F0E3 0%, #EFE7D3 100%);
     border-left: 4px solid var(--accent-heritage);
@@ -504,7 +542,6 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     box-shadow: var(--shadow-md);
 }
 
-/* Sidebar decorative footer */
 .sidebar-footer {
     text-align: center;
     padding: 1.5rem 1rem;
@@ -529,32 +566,6 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     font-weight: 700;
 }
 
-/* Sidebar form controls */
-section[data-testid="stSidebar"] .stSelectbox > div,
-section[data-testid="stSidebar"] .stSlider > div {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.3rem 0.6rem;
-    transition: all 0.3s ease;
-}
-
-section[data-testid="stSidebar"] .stSelectbox > div:hover,
-section[data-testid="stSidebar"] .stSlider > div:hover {
-    border-color: var(--accent-sage);
-    box-shadow: 0 2px 8px rgba(139, 168, 136, 0.15);
-}
-
-section[data-testid="stSidebar"] label {
-    color: var(--ink-secondary) !important;
-    font-weight: 600 !important;
-    font-size: 0.82rem !important;
-    margin-bottom: 0.4rem !important;
-}
-
-/* ============================================
-   6. KPI CARDS + ANIMATIONS
-   ============================================ */
 .intel-kpi {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -630,9 +641,6 @@ section[data-testid="stSidebar"] label {
     font-weight: 500;
 }
 
-/* ============================================
-   7. SECTION TITLES + ANIMATIONS
-   ============================================ */
 .section-title {
     font-family: 'Fraunces', serif !important;
     font-size: 1.6rem !important;
@@ -672,9 +680,6 @@ section[data-testid="stSidebar"] label {
     animation: fadeInUp 0.6s ease-out 0.2s backwards;
 }
 
-/* ============================================
-   8. CARDS (Insight, Watchlist, Rec, Priority) + ANIMATIONS
-   ============================================ */
 .insight-card {
     background: linear-gradient(135deg, #F0F5EE 0%, #E8F0E5 100%);
     border-left: 4px solid var(--accent-heritage);
@@ -759,9 +764,6 @@ section[data-testid="stSidebar"] label {
     border-color: var(--accent-heritage);
 }
 
-/* ============================================
-   9. TABS + ANIMATIONS
-   ============================================ */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px;
     background: rgba(229, 223, 208, 0.4);
@@ -796,9 +798,6 @@ section[data-testid="stSidebar"] label {
     animation: pulse 0.4s ease-out;
 }
 
-/* ============================================
-   10. BUTTONS & CONTROLS + ANIMATIONS
-   ============================================ */
 .stButton > button, .stDownloadButton > button {
     border-radius: 12px !important;
     font-weight: 600 !important;
@@ -853,7 +852,6 @@ section[data-testid="stSidebar"] label {
     box-shadow: 0 8px 20px rgba(45, 95, 63, 0.15) !important;
 }
 
-/* Main area form labels */
 .stSelectbox label, .stSlider label, .stRadio label,
 .stMultiSelect label, .stNumberInput label {
     color: var(--ink-secondary) !important;
@@ -867,9 +865,6 @@ section[data-testid="stSidebar"] label {
     color: var(--accent-heritage) !important;
 }
 
-/* ============================================
-   11. METRICS & DATAFRAMES + ANIMATIONS
-   ============================================ */
 div[data-testid="stMetric"] {
     background: var(--bg-card);
     padding: 1.1rem 1.3rem;
@@ -925,9 +920,6 @@ header[data-testid="stHeader"] {
     border-color: var(--accent-sage);
 }
 
-/* ============================================
-   12. WARNINGS + ANIMATIONS
-   ============================================ */
 .stWarning {
     border-radius: 12px !important;
     border-left: 4px solid var(--accent-copper) !important;
@@ -938,9 +930,6 @@ header[data-testid="stHeader"] {
     animation: slideInLeft 0.5s ease-out;
 }
 
-/* ============================================
-   13. ORGANIC DIVIDER + ANIMATIONS
-   ============================================ */
 .organic-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--border-strong), var(--accent-sand), var(--border-strong), transparent);
@@ -948,9 +937,6 @@ header[data-testid="stHeader"] {
     animation: fadeInUp 0.6s ease-out;
 }
 
-/* ============================================
-   14. CODE BLOCKS + ANIMATIONS
-   ============================================ */
 .stCodeBlock {
     border-radius: 12px !important;
     border: 1px solid var(--border-strong) !important;
@@ -958,88 +944,19 @@ header[data-testid="stHeader"] {
     animation: fadeInScale 0.6s ease-out;
 }
 
-/* ============================================
-   15. FLOATING LEAVES BACKGROUND ANIMATION
-   ============================================ */
-.floating-leaves {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
+/* Map container enhancements */
+.js-plotly-plot .plotly {
+    border-radius: 16px;
     overflow: hidden;
-}
-
-.leaf {
-    position: absolute;
-    font-size: 2rem;
-    opacity: 0.15;
-    animation: floatLeaf 8s ease-in-out infinite;
-}
-
-.leaf:nth-child(1) { left: 10%; animation-delay: 0s; top: 20%; }
-.leaf:nth-child(2) { left: 30%; animation-delay: 2s; top: 60%; }
-.leaf:nth-child(3) { left: 50%; animation-delay: 4s; top: 30%; }
-.leaf:nth-child(4) { left: 70%; animation-delay: 1s; top: 70%; }
-.leaf:nth-child(5) { left: 90%; animation-delay: 3s; top: 40%; }
-
-/* ============================================
-   16. CHART CONTAINER ANIMATIONS
-   ============================================ */
-.js-plotly-plot {
-    animation: fadeInScale 0.6s ease-out;
+    box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
 }
 
-.js-plotly-plot:hover {
-    transform: scale(1.01);
-}
-
-/* ============================================
-   17. EMOJI ICON HOVER ANIMATIONS
-   ============================================ */
-.hero-strip::before,
-.sidebar-brand-icon,
-.sidebar-footer-icon {
-    transition: all 0.3s ease;
-}
-
-.hero-strip:hover::before {
-    animation: gentleSway 3s ease-in-out infinite;
-    opacity: 0.12;
-}
-
-/* ============================================
-   18. LOADING SKELETON ANIMATION
-   ============================================ */
-@keyframes skeleton {
-    0% {
-        background-position: -200px 0;
-    }
-    100% {
-        background-position: calc(200px + 100%) 0;
-    }
-}
-
-.stSkeleton {
-    background: linear-gradient(90deg, var(--bg-card) 0%, var(--border) 50%, var(--bg-card) 100%);
-    background-size: 200px 100%;
-    animation: skeleton 1.5s ease-in-out infinite;
+.js-plotly-plot .plotly:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 </style>
-""", unsafe_allow_html=True)
-
-# Add floating leaves background
-st.markdown("""
-<div class="floating-leaves">
-    <div class="leaf">🍃</div>
-    <div class="leaf">🌿</div>
-    <div class="leaf">🍂</div>
-    <div class="leaf">🌱</div>
-    <div class="leaf">☘️</div>
-</div>
 """, unsafe_allow_html=True)
 
 # =========================================================
@@ -1093,7 +1010,7 @@ df = load_data()
 numeric_cols = [c for c in df.columns if c != "Provinsi"]
 
 # =========================================================
-# COMMODITY IDENTITY MAP — EARTHY REFINED PALETTE
+# COMMODITY IDENTITY MAP
 # =========================================================
 COMMODITY_IDENTITY = {
     "Kelapa Sawit": {"icon": "🌴", "color": "#3E5F4D", "color_light": "#6B9278", "sector": "Perkebunan Besar", "desc": "Primadona ekspor. Mendominasi Sumatera & Kalimantan."},
@@ -1161,10 +1078,9 @@ def apply_plantation_layout(fig, height=480):
     return fig
 
 # =========================================================
-# SIDEBAR — PREMIUM HERITAGE
+# SIDEBAR
 # =========================================================
 with st.sidebar:
-    # Brand header
     st.markdown('''
     <div class="sidebar-brand">
         <span class="sidebar-brand-icon">🌿</span>
@@ -1173,7 +1089,6 @@ with st.sidebar:
     </div>
     ''', unsafe_allow_html=True)
     
-    # Navigation block
     st.markdown('<div class="sidebar-block"><div class="sidebar-title">🧭 Navigasi</div>', unsafe_allow_html=True)
     menu = st.radio("Menu",
         ["🏠 Ringkasan Nasional", "🌴 Profil Komoditas", "🗺️ Profil Provinsi",
@@ -1182,7 +1097,6 @@ with st.sidebar:
         label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Filter block
     st.markdown('<div class="sidebar-block"><div class="sidebar-title">🎛️ Filter Data</div>', unsafe_allow_html=True)
     selected_commodity = st.selectbox("Komoditas Fokus", numeric_cols, index=0, key="side_comm")
     selected_province = st.selectbox("Wilayah Provinsi", ["Semua Provinsi"] + df["Provinsi"].tolist(), index=0, key="side_prov")
@@ -1190,7 +1104,6 @@ with st.sidebar:
     show_zeros = st.checkbox("Tampilkan wilayah tanpa produksi", value=True, key="side_zero")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Commodity brief
     comm_info = COMMODITY_IDENTITY[selected_commodity]
     st.markdown(f'''<div class="sidebar-block">
         <div class="sidebar-title">🌱 Commodity Brief</div>
@@ -1201,7 +1114,6 @@ with st.sidebar:
         </div>
     </div>''', unsafe_allow_html=True)
     
-    # Footer
     st.markdown('''
     <div class="sidebar-footer">
         <div class="sidebar-footer-icon">🌴</div>
@@ -1216,7 +1128,7 @@ if not show_zeros:
     active_df = active_df[(active_df[numeric_cols].sum(axis=1) > 0)].copy()
 
 # =========================================================
-# PAGE 1: RINGKASAN NASIONAL
+# PAGE 1: RINGKASAN NASIONAL (DENGAN PETA CHOROPLETH)
 # =========================================================
 if menu == "🏠 Ringkasan Nasional":
     total_prod = active_df[numeric_cols].sum().sum()
@@ -1264,23 +1176,97 @@ if menu == "🏠 Ringkasan Nasional":
     with c3: st.markdown(create_intel_kpi("Terdiversifikasi", diverse_prov[:14], f"{diverse_count} komoditas", "🌱", "#2D5F3F"), unsafe_allow_html=True)
     with c4: st.markdown(create_intel_kpi("Konsentrasi Top-5", f"{top5_share:.1f}%", "Pangsa 5 provinsi", "🎯", "#8BA888"), unsafe_allow_html=True)
 
+    # ============= NEW: TABS WITH CHOROPLETH MAP =============
     st.markdown('<div class="section-title">🌾 Sentra & Kontribusi Produksi Nasional</div>', unsafe_allow_html=True)
-    col_l, col_r = st.columns(2)
-    with col_l:
-        top_df = active_df[["Provinsi", selected_commodity]].sort_values(selected_commodity, ascending=False).head(top_n)
-        fig1 = px.bar(top_df[::-1], x=selected_commodity, y="Provinsi", orientation='h', text=selected_commodity,
-                      title=f"Sentra Produksi: {selected_commodity}", color_discrete_sequence=[get_comm_attr(selected_commodity, "color_light")])
-        fig1.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-        st.plotly_chart(apply_plantation_layout(fig1, 520), use_container_width=True, key="nat_bar_01")
-    with col_r:
-        prov_totals = active_df.copy()
-        prov_totals["Total_Output"] = prov_totals[numeric_cols].sum(axis=1)
-        top_prov_df = prov_totals.nlargest(top_n, "Total_Output")[["Provinsi", "Total_Output"]].sort_values("Total_Output", ascending=True)
-        fig2 = px.bar(top_prov_df, x="Total_Output", y="Provinsi", orientation='h', text="Total_Output",
-                      title="Kontribusi Output Perkebunan per Provinsi", color_discrete_sequence=["#B87333"])
-        fig2.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
-        st.plotly_chart(apply_plantation_layout(fig2, 520), use_container_width=True, key="nat_bar_02")
-
+    
+    nat_tab1, nat_tab2 = st.tabs(["📊 Grafik Sentra", "🗺️ Peta Geospasial"])
+    
+    with nat_tab1:
+        col_l, col_r = st.columns(2)
+        with col_l:
+            top_df = active_df[["Provinsi", selected_commodity]].sort_values(selected_commodity, ascending=False).head(top_n)
+            fig1 = px.bar(top_df[::-1], x=selected_commodity, y="Provinsi", orientation='h', text=selected_commodity,
+                          title=f"Sentra Produksi: {selected_commodity}", color_discrete_sequence=[get_comm_attr(selected_commodity, "color_light")])
+            fig1.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
+            st.plotly_chart(apply_plantation_layout(fig1, 520), use_container_width=True, key="nat_bar_01")
+        with col_r:
+            prov_totals = active_df.copy()
+            prov_totals["Total_Output"] = prov_totals[numeric_cols].sum(axis=1)
+            top_prov_df = prov_totals.nlargest(top_n, "Total_Output")[["Provinsi", "Total_Output"]].sort_values("Total_Output", ascending=True)
+            fig2 = px.bar(top_prov_df, x="Total_Output", y="Provinsi", orientation='h', text="Total_Output",
+                          title="Kontribusi Output Perkebunan per Provinsi", color_discrete_sequence=["#B87333"])
+            fig2.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
+            st.plotly_chart(apply_plantation_layout(fig2, 520), use_container_width=True, key="nat_bar_02")
+    
+    with nat_tab2:
+        st.markdown("""
+        <div class="insight-card" style="margin-top: 0.5rem;">
+            🗺️ <b>Peta Geospasial:</b> Visualisasi spasial menunjukkan <b>koridor produksi</b> perkebunan Indonesia. 
+            Hover pada peta untuk melihat detail produksi tiap provinsi. 
+            Warna lebih gelap = produksi lebih tinggi.
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Toggle untuk pilih metrik peta
+        map_metric = st.radio(
+            "Pilih Metrik Peta:",
+            ["Produksi Komoditas Terpilih", "Total Output Semua Komoditas"],
+            horizontal=True,
+            key="map_metric_selector"
+        )
+        
+        if map_metric == "Produksi Komoditas Terpilih":
+            map_df = active_df[["Provinsi", selected_commodity]].copy()
+            map_df = map_df[map_df[selected_commodity] > 0]
+            map_title = f"Sebaran Produksi {selected_commodity} di Indonesia"
+            map_value_col = selected_commodity
+            map_label = f"{selected_commodity} (Ribu Ton)"
+        else:
+            map_df = active_df.copy()
+            map_df["Total_Output"] = map_df[numeric_cols].sum(axis=1)
+            map_df = map_df[map_df["Total_Output"] > 0]
+            map_title = "Total Output Perkebunan di Indonesia"
+            map_value_col = "Total_Output"
+            map_label = "Total Output (Ribu Ton)"
+        
+        if not map_df.empty:
+            fig_map = create_choropleth_map(map_df, map_value_col, map_title, map_label)
+            if fig_map:
+                st.plotly_chart(fig_map, use_container_width=True, key="nat_choropleth_main")
+                
+                # Statistics below map
+                col_m1, col_m2, col_m3 = st.columns(3)
+                with col_m1:
+                    st.markdown(create_intel_kpi(
+                        "Provinsi Terpetakan",
+                        str(len(map_df)),
+                        "Dengan produksi > 0",
+                        "📍",
+                        "#6B9278"
+                    ), unsafe_allow_html=True)
+                with col_m2:
+                    max_prov = map_df.loc[map_df[map_value_col].idxmax(), "Provinsi"]
+                    max_val = map_df[map_value_col].max()
+                    st.markdown(create_intel_kpi(
+                        "Hotspot Tertinggi",
+                        max_prov[:14],
+                        f"{format_ton(max_val)} ribu ton",
+                        "🔥",
+                        "#B87333"
+                    ), unsafe_allow_html=True)
+                with col_m3:
+                    median_val = map_df[map_value_col].median()
+                    st.markdown(create_intel_kpi(
+                        "Median Produksi",
+                        format_ton(median_val),
+                        "Tendensi sentral",
+                        "⚖️",
+                        "#8BA888"
+                    ), unsafe_allow_html=True)
+        else:
+            st.warning("⚠️ Tidak ada data produksi untuk ditampilkan pada peta.")
+    
+    # Lanjut dengan section lain
     st.markdown('<div class="organic-divider"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-title">🗺️ Peta Struktur Komoditas Nasional</div>', unsafe_allow_html=True)
     col_t1, col_t2 = st.columns(2)
@@ -1313,7 +1299,106 @@ if menu == "🏠 Ringkasan Nasional":
     """, unsafe_allow_html=True)
 
 # =========================================================
-# PAGE 2: PROFIL KOMODITAS
+# PAGE 6: SEBARAN WILAYAH (DENGAN PETA CHOROPLETH)
+# =========================================================
+elif menu == "🌍 Sebaran Wilayah":
+    st.markdown('<div class="section-title">🌍 Sebaran Wilayah Produksi</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-subtitle">Visualisasi spasial distribusi {selected_commodity} di seluruh Indonesia</div>', unsafe_allow_html=True)
+    
+    # ============= NEW: TABS WITH MAP AS MAIN VISUAL =============
+    geo_tab1, geo_tab2, geo_tab3 = st.tabs(["🗺️ Peta Choropleth", "📊 Ranking Intensitas", "🏷️ Klasifikasi Wilayah"])
+    
+    with geo_tab1:
+        st.markdown("""
+        <div class="insight-card" style="margin-top: 0.5rem;">
+            🗺️ <b>Peta Spasial {selected_commodity}:</b> Menunjukkan distribusi geografis sentra produksi. 
+            Pola spasial mengindikasikan <b>koridor produksi</b> dan <b>klaster regional</b> yang dapat dioptimalkan untuk logistik dan hilirisasi.
+        </div>
+        """.format(selected_commodity=selected_commodity), unsafe_allow_html=True)
+        
+        geo_df = active_df[["Provinsi", selected_commodity]].copy()
+        geo_df = geo_df[geo_df[selected_commodity] > 0]
+        
+        if not geo_df.empty:
+            fig_geo = create_choropleth_map(
+                geo_df,
+                selected_commodity,
+                f"Distribusi Spasial {selected_commodity} di Indonesia",
+                f"{selected_commodity} (Ribu Ton)"
+            )
+            if fig_geo:
+                st.plotly_chart(fig_geo, use_container_width=True, key="sebaran_choropleth")
+                
+                # Top 5 provinces as highlight cards
+                st.markdown("#### 🏆 Top 5 Hotspot Provinsi")
+                top_5 = geo_df.nlargest(5, selected_commodity)
+                t1, t2, t3, t4, t5 = st.columns(5)
+                for i, (idx, row) in enumerate(top_5.iterrows(), 1):
+                    with [t1, t2, t3, t4, t5][i-1]:
+                        st.markdown(create_intel_kpi(
+                            f"#{i} {row['Provinsi'][:10]}",
+                            format_ton(row[selected_commodity]),
+                            "Ribu Ton",
+                            "🏆" if i == 1 else "📍",
+                            "#B87333" if i == 1 else "#6B9278"
+                        ), unsafe_allow_html=True)
+        else:
+            st.warning(f"⚠️ Tidak ada data produksi {selected_commodity} untuk ditampilkan pada peta.")
+    
+    with geo_tab2:
+        geo_df = active_df[["Provinsi", selected_commodity]].copy().sort_values(selected_commodity, ascending=False)
+        col_l, col_r = st.columns([1.2, 1])
+        with col_l:
+            fig1 = px.bar(geo_df.head(top_n), x="Provinsi", y=selected_commodity, color=selected_commodity, text=selected_commodity,
+                          color_continuous_scale=[[0, "#E5DFD0"], [1, get_comm_attr(selected_commodity, "color_light")]],
+                          title="Ranking Intensitas Sentra")
+            fig1.update_traces(texttemplate='%{text:.2f}', textposition='outside')
+            fig1.update_xaxes(tickangle=45)
+            st.plotly_chart(apply_plantation_layout(fig1, 500), use_container_width=True, key="geo_rank")
+        with col_r:
+            bub = geo_df.head(15).copy()
+            bub["Rank"] = range(1, len(bub)+1)
+            fig2 = px.scatter(bub, x="Rank", y=selected_commodity, size=selected_commodity, hover_name="Provinsi", text="Provinsi",
+                              title="Bubble Prioritas Wilayah", color_discrete_sequence=[get_comm_attr(selected_commodity, "color_light")])
+            fig2.update_traces(textposition="top center")
+            st.plotly_chart(apply_plantation_layout(fig2, 500), use_container_width=True, key="geo_bub")
+    
+    with geo_tab3:
+        total_g = geo_df[selected_commodity].sum()
+        if total_g > 0:
+            geo_df["Share"] = (geo_df[selected_commodity]/total_g)*100
+            geo_df["Kategori"] = pd.cut(geo_df["Share"], bins=[-1,1,5,15,100], labels=["Minor", "Penyangga", "Regional", "Nasional"])
+            kc = geo_df["Kategori"].value_counts()
+            
+            st.markdown("### 🏷️ Klasifikasi Wilayah Berdasarkan Pangsa Produksi")
+            st.markdown("""
+            <div class="watchlist-card">
+                <b>Metodologi Klasifikasi:</b><br>
+                • <b>Nasional (>15%):</b> Anchor produksi nasional<br>
+                • <b>Regional (5-15%):</b> Pilar produksi regional<br>
+                • <b>Penyangga (1-5%):</b> Stabilisator<br>
+                • <b>Minor (<1%):</b> Niche market
+            </div>
+            """, unsafe_allow_html=True)
+            
+            k1, k2, k3, k4 = st.columns(4)
+            k1.markdown(create_intel_kpi("Sentra Nasional", str(kc.get("Nasional",0)), "Anchor production", "🏆", "#B87333"), unsafe_allow_html=True)
+            k2.markdown(create_intel_kpi("Sentra Regional", str(kc.get("Regional",0)), "Pillar produksi", "🌾", "#6B9278"), unsafe_allow_html=True)
+            k3.markdown(create_intel_kpi("Penyangga", str(kc.get("Penyangga",0)), "Stabilisator", "🌱", "#8BA888"), unsafe_allow_html=True)
+            k4.markdown(create_intel_kpi("Minor", str(kc.get("Minor",0)), "Niche", "🍃", "#B39471"), unsafe_allow_html=True)
+            
+            # Detailed table
+            st.markdown("### 📋 Detail Klasifikasi per Provinsi")
+            display_df = geo_df[["Provinsi", selected_commodity, "Share", "Kategori"]].copy()
+            display_df.columns = ["Provinsi", f"{selected_commodity} (Ribu Ton)", "Pangsa (%)", "Kategori"]
+            display_df[f"{selected_commodity} (Ribu Ton)"] = display_df[f"{selected_commodity} (Ribu Ton)"].apply(lambda x: format_ton(x))
+            display_df["Pangsa (%)"] = display_df["Pangsa (%)"].apply(lambda x: f"{x:.2f}%")
+            st.dataframe(display_df, use_container_width=True, hide_index=True)
+        else:
+            st.warning("⚠️ Tidak ada data untuk diklasifikasikan.")
+
+# =========================================================
+# PAGE 2-5, 7-9: (Sama seperti kode sebelumnya, tidak berubah)
 # =========================================================
 elif menu == "🌴 Profil Komoditas":
     target = st.selectbox("Pilih Komoditas", numeric_cols, key="prof_comm_sel")
@@ -1374,9 +1459,6 @@ elif menu == "🌴 Profil Komoditas":
     </div>
     """, unsafe_allow_html=True)
 
-# =========================================================
-# PAGE 3: PROFIL PROVINSI
-# =========================================================
 elif menu == "🗺️ Profil Provinsi":
     target_prov = st.selectbox("Pilih Provinsi", df["Provinsi"].tolist(), key="prof_prov_sel")
     p_row = df[df["Provinsi"] == target_prov].iloc[0]
@@ -1448,9 +1530,6 @@ elif menu == "🗺️ Profil Provinsi":
     dep_note = "⚠️ Sangat bergantung pada satu komoditas." if dom_share > 70 else "✅ Portofolio relatif seimbang."
     st.markdown(f'<div class="insight-card">🗺️ <b>{target_prov}</b>: <b>{active_c}</b> komoditas aktif. {dep_note} Strategi: perkuat klaster unggulan & hilirisasi lokal.</div>', unsafe_allow_html=True)
 
-# =========================================================
-# PAGE 4: EKSPLORASI VISUAL
-# =========================================================
 elif menu == "🔬 Eksplorasi Visual":
     st.markdown('<div class="section-title">🔬 Eksplorasi Visual & EDA</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-subtitle">5 perspektif visual: Overview, Distribusi, Hubungan, Korelasi, Deep Dive</div>', unsafe_allow_html=True)
@@ -1523,9 +1602,6 @@ elif menu == "🔬 Eksplorasi Visual":
                 st.markdown(create_intel_kpi("Total Produksi", format_num(total_p), "Ribu Ton", "📦", "#6B9278"), unsafe_allow_html=True)
                 st.markdown(create_intel_kpi("Komoditas Dominan", dom_comm, format_ton(profile.iloc[0]['Produksi']), get_comm_attr(dom_comm,'icon'), get_comm_attr(dom_comm,'color_light')), unsafe_allow_html=True)
 
-# =========================================================
-# PAGE 5: ANALISIS PRODUKSI
-# =========================================================
 elif menu == "📊 Analisis Produksi":
     st.markdown('<div class="section-title">📊 Analisis Produksi & Perbandingan</div>', unsafe_allow_html=True)
     tab1, tab2, tab3 = st.tabs(["⚔️ Duel Wilayah", "🔗 Relasi Komoditas", "🎯 Benchmarking"])
@@ -1562,40 +1638,6 @@ elif menu == "📊 Analisis Produksi":
         fig.update_layout(title=f"{bp} vs Nasional", yaxis_title="Rasio")
         st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="bench_chart")
 
-# =========================================================
-# PAGE 6: SEBARAN WILAYAH
-# =========================================================
-elif menu == "🌍 Sebaran Wilayah":
-    st.markdown('<div class="section-title">🌍 Sebaran Wilayah Produksi</div>', unsafe_allow_html=True)
-    geo_df = active_df[["Provinsi", selected_commodity]].copy().sort_values(selected_commodity, ascending=False)
-    col_l, col_r = st.columns([1.2, 1])
-    with col_l:
-        fig1 = px.bar(geo_df.head(top_n), x="Provinsi", y=selected_commodity, color=selected_commodity, text=selected_commodity,
-                      color_continuous_scale=[[0, "#E5DFD0"], [1, get_comm_attr(selected_commodity, "color_light")]],
-                      title="Ranking Intensitas Sentra")
-        fig1.update_traces(texttemplate='%{text:.2f}', textposition='outside'); fig1.update_xaxes(tickangle=45)
-        st.plotly_chart(apply_plantation_layout(fig1, 500), use_container_width=True, key="geo_rank")
-    with col_r:
-        bub = geo_df.head(15).copy(); bub["Rank"] = range(1, len(bub)+1)
-        fig2 = px.scatter(bub, x="Rank", y=selected_commodity, size=selected_commodity, hover_name="Provinsi", text="Provinsi",
-                          title="Bubble Prioritas Wilayah", color_discrete_sequence=[get_comm_attr(selected_commodity, "color_light")])
-        fig2.update_traces(textposition="top center")
-        st.plotly_chart(apply_plantation_layout(fig2, 500), use_container_width=True, key="geo_bub")
-    total_g = geo_df[selected_commodity].sum()
-    if total_g > 0:
-        geo_df["Share"] = (geo_df[selected_commodity]/total_g)*100
-        geo_df["Kategori"] = pd.cut(geo_df["Share"], bins=[-1,1,5,15,100], labels=["Minor", "Penyangga", "Regional", "Nasional"])
-        kc = geo_df["Kategori"].value_counts()
-        st.markdown('<div class="section-title">🏷️ Klasifikasi Wilayah</div>', unsafe_allow_html=True)
-        k1,k2,k3,k4 = st.columns(4)
-        k1.markdown(create_intel_kpi("Sentra Nasional", str(kc.get("Nasional",0)), "Anchor production", "🏆", "#B87333"), unsafe_allow_html=True)
-        k2.markdown(create_intel_kpi("Sentra Regional", str(kc.get("Regional",0)), "Pillar produksi", "🌾", "#6B9278"), unsafe_allow_html=True)
-        k3.markdown(create_intel_kpi("Penyangga", str(kc.get("Penyangga",0)), "Stabilisator", "🌱", "#8BA888"), unsafe_allow_html=True)
-        k4.markdown(create_intel_kpi("Minor", str(kc.get("Minor",0)), "Niche", "🍃", "#B39471"), unsafe_allow_html=True)
-
-# =========================================================
-# PAGE 7: PROYEKSI & MODEL
-# =========================================================
 elif menu == "📈 Proyeksi & Model":
     st.markdown('<div class="section-title">📈 Proyeksi & Model Produksi</div>', unsafe_allow_html=True)
     st.markdown('<div class="watchlist-card">📌 <b>Catatan:</b> Model untuk eksplorasi pola awal, bukan prediksi final tanpa validasi time-series.</div>', unsafe_allow_html=True)
@@ -1706,9 +1748,6 @@ elif menu == "📈 Proyeksi & Model":
             else:
                 st.warning("Data terlalu sedikit untuk membangun Decision Tree.")
 
-# =========================================================
-# PAGE 8: INSIGHT & STRATEGI
-# =========================================================
 elif menu == "🧠 Insight & Strategi":
     st.markdown('<div class="section-title">🧠 Insight & Strategi Perkebunan</div>', unsafe_allow_html=True)
     st.markdown('<div class="section-subtitle">Executive briefing: temuan strategis, rekomendasi kebijakan, dan prioritas pengembangan</div>', unsafe_allow_html=True)
@@ -1749,9 +1788,6 @@ elif menu == "🧠 Insight & Strategi":
     with p2: st.markdown('<div class="priority-card"><b style="font-family:Fraunces,serif; font-size:1.2rem; color:#2D5F3F;">🌱 Diversifikasi & Ketahanan</b><br><span style="color:#3E5245; font-size:0.92rem;">Tanaman sela & agroforestri berkelanjutan.</span></div>', unsafe_allow_html=True)
     with p3: st.markdown('<div class="priority-card"><b style="font-family:Fraunces,serif; font-size:1.2rem; color:#2D5F3F;">📈 Digitalisasi & Data</b><br><span style="color:#3E5245; font-size:0.92rem;">Precision agriculture & dashboard real-time.</span></div>', unsafe_allow_html=True)
 
-# =========================================================
-# PAGE 9: DATA & EKSPOR
-# =========================================================
 elif menu == "📦 Data & Ekspor":
     st.markdown('<div class="section-title">📦 Data & Ekspor Perkebunan</div>', unsafe_allow_html=True)
     c1,c2,c3,c4 = st.columns(4)
