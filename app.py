@@ -23,9 +23,9 @@ st.setpageconfig(
     initialsidebarstate="expanded"
 )
 
-=========================================================
+
 #🗺️ GEOJSON & PROVINCE MAPPING
-=========================================================
+
 PROVINCE_MAPPING = {
     "DKI JAKARTA": "Jakarta Raya",
     "DI YOGYAKARTA": "Yogyakarta",
