@@ -118,7 +118,7 @@ def createchoroplethmap(dfmap, valuecol, title, colorlabel="Produksi (Ribu Ton)"
     return fig
 
 =========================================================
-🎨 ULTRA PREMIUM BOTANICAL THEME
+#🎨 ULTRA PREMIUM BOTANICAL THEME
 =========================================================
 st.markdown("""
 
