@@ -1718,9 +1718,7 @@ if menu == "🏠 Ringkasan Nasional":
     
     """, unsafeallowhtml=True)
 
-=========================================================
-PAGE 2: PROFIL KOMODITAS
-=========================================================
+
 elif menu == "🌴 Profil Komoditas":
     if isallcommodities:
         st.markdown("""
@@ -1789,9 +1787,7 @@ elif menu == "🌴 Profil Komoditas":
     
     """, unsafeallowhtml=True)
 
-=========================================================
-PAGE 3: PROFIL PROVINSI
-=========================================================
+
 elif menu == "🗺️ Profil Provinsi":
     targetprov = st.selectbox("Pilih Provinsi", df["Provinsi"].tolist(), key="profprov_sel")
     prow = df[df["Provinsi"] == targetprov].iloc[0]
@@ -1864,9 +1860,7 @@ elif menu == "🗺️ Profil Provinsi":
     depnote = "⚠️ Sangat bergantung pada satu komoditas." if domshare > 70 else "✅ Portofolio relatif seimbang."
     st.markdown(f'🗺️ {targetprov}: {activec} komoditas aktif. {depnote} Strategi: perkuat klaster unggulan & hilirisasi lokal.', unsafeallow_html=True)
 
-=========================================================
-PAGE 4: EKSPLORASI VISUAL
-=========================================================
+
 elif menu == "🔬 Eksplorasi Visual":
     st.markdown(f'🔬 Eksplorasi Visual & EDA{"Mode Agregat" if isallcommodities else ""}', unsafeallowhtml=True)
     st.markdown('5 perspektif visual: Overview, Distribusi, Hubungan, Korelasi, Deep Dive', unsafeallowhtml=True)
@@ -1941,9 +1935,6 @@ elif menu == "🔬 Eksplorasi Visual":
                 st.markdown(createintelkpi("Total Produksi", formatnum(totalp), "Ribu Ton", "📦", "#6B9278"), unsafeallowhtml=True)
                 st.markdown(createintelkpi("Komoditas Dominan", domcomm, formatton(profile.iloc[0]['Produksi']), getcommattr(domcomm,'icon'), getcommattr(domcomm,'colorlight')), unsafeallow_html=True)
 
-=========================================================
-PAGE 5: ANALISIS PRODUKSI
-=========================================================
 elif menu == "📊 Analisis Produksi":
     st.markdown('📊 Analisis Produksi & Perbandingan', unsafeallowhtml=True)
     tab1, tab2, tab3 = st.tabs(["⚔️ Duel Wilayah", "🔗 Relasi Komoditas", "🎯 Benchmarking"])
@@ -1980,9 +1971,7 @@ elif menu == "📊 Analisis Produksi":
         fig.updatelayout(title=f"{bp} vs Nasional", yaxistitle="Rasio")
         st.plotlychart(applyplantationlayout(fig, 480), usecontainerwidth=True, key="benchchart")
 
-=========================================================
-PAGE 6: SEBARAN WILAYAH
-=========================================================
+
 elif menu == "🌍 Sebaran Wilayah":
     st.markdown(f'🌍 Sebaran Wilayah Produksi{"Mode Agregat" if isallcommodities else ""}', unsafeallowhtml=True)
     st.markdown(f'Visualisasi spasial distribusi {commoditydisplayname} di seluruh Indonesia', unsafeallowhtml=True)
@@ -2078,9 +2067,7 @@ elif menu == "🌍 Sebaran Wilayah":
         else:
             st.warning("⚠️ Tidak ada data untuk diklasifikasikan.")
 
-=========================================================
-PAGE 7: PROYEKSI & MODEL
-=========================================================
+
 elif menu == "📈 Proyeksi & Model":
     st.markdown('📈 Proyeksi & Model Produksi', unsafeallowhtml=True)
     st.markdown('📌 Catatan: Model untuk eksplorasi pola awal, bukan prediksi final tanpa validasi time-series.', unsafeallowhtml=True)
@@ -2180,9 +2167,7 @@ elif menu == "📈 Proyeksi & Model":
             else:
                 st.warning("Data terlalu sedikit untuk membangun Decision Tree.")
 
-=========================================================
-PAGE 8: INSIGHT & STRATEGI
-=========================================================
+
 elif menu == "🧠 Insight & Strategi":
     st.markdown('🧠 Insight & Strategi Perkebunan', unsafeallowhtml=True)
     st.markdown('Executive briefing: temuan strategis, rekomendasi kebijakan, dan prioritas pengembangan', unsafeallowhtml=True)
@@ -2223,9 +2208,7 @@ elif menu == "🧠 Insight & Strategi":
     with p2: st.markdown('🌱 Diversifikasi & KetahananTanaman sela & agroforestri berkelanjutan.', unsafeallowhtml=True)
     with p3: st.markdown('📈 Digitalisasi & DataPrecision agriculture & dashboard real-time.', unsafeallowhtml=True)
 
-=========================================================
-PAGE 9: DATA & EKSPOR
-=========================================================
+
 elif menu == "📦 Data & Ekspor":
     st.markdown('📦 Data & Ekspor Perkebunan', unsafeallowhtml=True)
     c1,c2,c3,c4 = st.columns(4)
@@ -2258,9 +2241,7 @@ elif menu == "📦 Data & Ekspor":
     st.dataframe(exportfc, usecontainer_width=True)
     st.downloadbutton(f"⬇️ Ekspor Proyeksi {expcomm} 2026", exportfc.tocsv(index=False).encode("utf-8"), f"proyeksi{expcomm}2026.csv", "text/csv", usecontainer_width=True)
 
-=========================================================
-FOOTER
-=========================================================
+
 st.markdown("""
 
     
