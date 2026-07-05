@@ -1567,9 +1567,7 @@ if not show_zeros:
 
 activedf["TotalOutput"] = activedf[numericcols].sum(axis=1)
 
-=========================================================
-PAGE 1: RINGKASAN NASIONAL
-=========================================================
+
 if menu == "🏠 Ringkasan Nasional":
     totalprod = activedf[numeric_cols].sum().sum()
     activeprovs = len(activedf)
