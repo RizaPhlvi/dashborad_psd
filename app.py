@@ -1500,9 +1500,9 @@ def applyplantationlayout(fig, height=480):
     )
     return fig
 
-=========================================================
-SIDEBAR
-=========================================================
+
+#SIDEBAR
+
 with st.sidebar:
     st.markdown('''
     
