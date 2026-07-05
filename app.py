@@ -1674,23 +1674,24 @@ elif menu == "📈 Proyeksi & Model":
                     st.warning("Data tidak cukup untuk membangun model regresi (minimal 5 observasi).")
             else:
                 st.warning("Pilih dua komoditas yang berbeda untuk analisis.")
-        with tab_fc:
-            st.markdown("### 📅 Simulasi Panen 2025")
-            st.markdown('<div class="watchlist-card">⚠️ Dataset cross-sectional. Forecasting via simulasi growth rate.</div>', unsafe_allow_html=True)
-            fc_comm = st.selectbox("Komoditas Target", numeric_cols, key="fc_comm")
-            gr = st.slider("Growth Rate (%)", 1, 20, 7, key="fc_gr") / 100
-            fc = active_df[["Provinsi", fc_comm]].copy()
-            fc["Proyeksi_2025"] = fc[fc_comm] * (1 + gr)
-            top_fc = fc.sort_values(fc_comm, ascending=False).head(top_n)
-            fig_fc = go.Figure()
-            fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[fc_comm], name="Panen 2024", marker_color="#B39471"))
-            fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Proyeksi_2025"], name="Proyeksi 2025", marker_color="#6B9278"))
-            fig_fc.update_layout(barmode="group", title=f"Forecasting {fc_comm}: 2024 vs 2025", xaxis_title="Provinsi", yaxis_title="Volume (Ribu Ton)")
-            st.plotly_chart(apply_plantation_layout(fig_fc, 500), use_container_width=True, key="fc_chart_bar")
-            c1, c2 = st.columns(2)
-            c1.metric("Total 2024", format_num(fc[fc_comm].sum()))
-            c2.metric("Total 2025", format_num(fc["Proyeksi_2025"].sum()), f"+{gr*100:.0f}%")
-            st.dataframe(top_fc, use_container_width=True)
+           # --- TAB 2: FORECASTING (GROUPED BAR) ---
+    with tab_fc:
+        st.markdown("### 📅 Simulasi Panen 2026")
+        st.markdown('<div class="watchlist-card">⚠️ Dataset cross-sectional (2025). Forecasting via simulasi growth rate.</div>', unsafe_allow_html=True)
+        fc_comm = st.selectbox("Komoditas Target", numeric_cols, key="fc_comm")
+        gr = st.slider("Growth Rate (%)", 1, 20, 7, key="fc_gr") / 100
+        fc = active_df[["Provinsi", fc_comm]].copy()
+        fc["Proyeksi_2026"] = fc[fc_comm] * (1 + gr)
+        top_fc = fc.sort_values(fc_comm, ascending=False).head(top_n)
+        fig_fc = go.Figure()
+        fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[fc_comm], name="Panen 2025", marker_color="#c7815e"))
+        fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Proyeksi_2026"], name="Proyeksi 2026", marker_color="#4ade80"))
+        fig_fc.update_layout(barmode="group", title=f"Forecasting {fc_comm}: 2025 vs 2026", xaxis_title="Provinsi", yaxis_title="Volume (Ribu Ton)")
+        st.plotly_chart(apply_plantation_layout(fig_fc, 500), use_container_width=True, key="fc_chart_bar")
+        c1, c2 = st.columns(2)
+        c1.metric("Total 2025", format_num(fc[fc_comm].sum()))
+        c2.metric("Total 2026", format_num(fc["Proyeksi_2026"].sum()), f"+{gr*100:.0f}%")
+        st.dataframe(top_fc, use_container_width=True)
         with tab_rf:
             st.markdown("### 🌲 Random Forest Regression")
             tgt = st.selectbox("Target Prediksi", numeric_cols, key="rf_tgt")
