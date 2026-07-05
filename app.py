@@ -15,9 +15,7 @@ from sklearn.modelselection import traintest_split
 import warnings
 warnings.filterwarnings('ignore')
 
-=========================================================
-PAGE CONFIG
-=========================================================
+
 st.setpageconfig(
     page_title="Plantation Intelligence Dashboard",
     page_icon="🌿",
