@@ -25,7 +25,7 @@ st.set_page_config(
 )
 
 # =========================================================
-# 🎨 TROPICAL HERITAGE THEME — MAXIMUM READABILITY
+# 🎨 TROPICAL HERITAGE THEME + ORGANIC ANIMATIONS
 # =========================================================
 st.markdown("""
 <style>
@@ -115,10 +115,109 @@ strong, b {
 }
 
 /* ============================================
-   3. HERO STRIP
+   3. KEYFRAME ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes floatLeaf {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+}
+
+@keyframes gentleSway {
+    0%, 100% {
+        transform: rotate(-2deg);
+    }
+    50% {
+        transform: rotate(2deg);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.85;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes breathe {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.02);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   4. HERO STRIP + ANIMATIONS
    ============================================ */
 .hero-strip {
     background: linear-gradient(135deg, #2D4A3A 0%, #3E5F4D 50%, #4A6F58 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 15s ease infinite, fadeInUp 0.8s ease-out;
     color: var(--ink-on-dark);
     padding: 3rem 3.5rem;
     border-radius: 28px;
@@ -137,6 +236,7 @@ strong, b {
     font-size: 14rem;
     opacity: 0.08;
     filter: blur(3px);
+    animation: gentleSway 6s ease-in-out infinite;
 }
 
 .hero-strip::after {
@@ -145,6 +245,8 @@ strong, b {
     top: 0; left: 0; right: 0;
     height: 3px;
     background: linear-gradient(90deg, transparent, var(--accent-copper), var(--accent-sand), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
 }
 
 .hero-title {
@@ -156,6 +258,7 @@ strong, b {
     position: relative;
     z-index: 2;
     letter-spacing: -0.03em;
+    animation: fadeInUp 0.8s ease-out 0.2s backwards;
 }
 
 .hero-accent {
@@ -166,6 +269,7 @@ strong, b {
     margin-bottom: 1.5rem;
     position: relative;
     z-index: 2;
+    animation: slideInLeft 0.6s ease-out 0.4s backwards;
 }
 
 .hero-subtitle {
@@ -177,6 +281,7 @@ strong, b {
     position: relative;
     z-index: 2;
     font-weight: 400;
+    animation: fadeInUp 0.8s ease-out 0.5s backwards;
 }
 
 .hero-badges {
@@ -185,6 +290,7 @@ strong, b {
     flex-wrap: wrap;
     position: relative;
     z-index: 2;
+    animation: fadeInUp 0.8s ease-out 0.7s backwards;
 }
 
 .hero-badge {
@@ -196,12 +302,19 @@ strong, b {
     border-radius: 999px;
     font-size: 0.88rem;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInScale 0.6s ease-out backwards;
 }
+
+.hero-badge:nth-child(1) { animation-delay: 0.8s; }
+.hero-badge:nth-child(2) { animation-delay: 0.9s; }
+.hero-badge:nth-child(3) { animation-delay: 1.0s; }
+.hero-badge:nth-child(4) { animation-delay: 1.1s; }
 
 .hero-badge:hover {
     background: rgba(250, 247, 240, 0.20);
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(250, 247, 240, 0.15);
 }
 
 .hero-mini-stats {
@@ -213,6 +326,7 @@ strong, b {
     position: relative;
     z-index: 2;
     flex-wrap: wrap;
+    animation: fadeInUp 0.8s ease-out 1s backwards;
 }
 
 .mini-stat-label {
@@ -230,14 +344,16 @@ strong, b {
     color: #FFFFFF;
     font-family: 'Fraunces', serif;
     letter-spacing: -0.02em;
+    animation: breathe 4s ease-in-out infinite;
 }
 
 /* ============================================
-   4. SIDEBAR — PREMIUM HERITAGE DESIGN
+   5. SIDEBAR — PREMIUM HERITAGE DESIGN + ANIMATIONS
    ============================================ */
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #F0EBE0 0%, #E8E0CF 100%) !important;
     padding: 0 !important;
+    animation: slideInLeft 0.6s ease-out;
 }
 
 section[data-testid="stSidebar"] > div {
@@ -252,6 +368,7 @@ section[data-testid="stSidebar"] > div {
     margin: -1rem -1rem 1.5rem -1rem;
     position: relative;
     overflow: hidden;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 .sidebar-brand::after {
@@ -260,12 +377,15 @@ section[data-testid="stSidebar"] > div {
     bottom: 0; left: 0; right: 0;
     height: 3px;
     background: linear-gradient(90deg, var(--accent-copper), var(--accent-sand));
+    background-size: 200% 100%;
+    animation: shimmer 4s linear infinite;
 }
 
 .sidebar-brand-icon {
     font-size: 2.2rem;
     margin-bottom: 0.5rem;
     display: block;
+    animation: gentleSway 5s ease-in-out infinite;
 }
 
 .sidebar-brand-title {
@@ -293,12 +413,18 @@ section[data-testid="stSidebar"] > div {
     padding: 1.3rem;
     margin-bottom: 1.2rem;
     box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease-out backwards;
 }
+
+.sidebar-block:nth-child(2) { animation-delay: 0.1s; }
+.sidebar-block:nth-child(3) { animation-delay: 0.2s; }
+.sidebar-block:nth-child(4) { animation-delay: 0.3s; }
 
 .sidebar-block:hover {
     box-shadow: var(--shadow-md);
     border-color: var(--border-strong);
+    transform: translateY(-2px);
 }
 
 .sidebar-title {
@@ -321,6 +447,7 @@ section[data-testid="stSidebar"] > div {
     height: 14px;
     background: var(--accent-copper);
     border-radius: 2px;
+    animation: pulse 3s ease-in-out infinite;
 }
 
 /* Sidebar navigation pills */
@@ -334,7 +461,7 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] {
 section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
     border-radius: 10px !important;
     padding: 0.7rem 1rem !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     color: var(--ink-secondary) !important;
     font-weight: 500 !important;
     font-size: 0.92rem !important;
@@ -346,6 +473,7 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover
     background-color: rgba(139, 168, 136, 0.12) !important;
     color: var(--accent-heritage) !important;
     border-left-color: var(--accent-sage) !important;
+    transform: translateX(3px) !important;
 }
 
 section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child {
@@ -358,6 +486,7 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     font-weight: 600 !important;
     box-shadow: 0 4px 12px rgba(45, 95, 63, 0.25) !important;
     border-left-color: var(--accent-copper) !important;
+    animation: pulse 0.4s ease-out;
 }
 
 /* Commodity brief card */
@@ -371,8 +500,8 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
 }
 
 .commodity-brief:hover {
-    transform: translateX(3px);
-    box-shadow: var(--shadow-sm);
+    transform: translateX(5px);
+    box-shadow: var(--shadow-md);
 }
 
 /* Sidebar decorative footer */
@@ -382,12 +511,14 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     margin-top: 1rem;
     border-top: 1px solid var(--border);
     position: relative;
+    animation: fadeInUp 0.6s ease-out 0.5s backwards;
 }
 
 .sidebar-footer-icon {
     font-size: 1.8rem;
     margin-bottom: 0.4rem;
     opacity: 0.5;
+    animation: gentleSway 7s ease-in-out infinite;
 }
 
 .sidebar-footer-text {
@@ -405,6 +536,13 @@ section[data-testid="stSidebar"] .stSlider > div {
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 0.3rem 0.6rem;
+    transition: all 0.3s ease;
+}
+
+section[data-testid="stSidebar"] .stSelectbox > div:hover,
+section[data-testid="stSidebar"] .stSlider > div:hover {
+    border-color: var(--accent-sage);
+    box-shadow: 0 2px 8px rgba(139, 168, 136, 0.15);
 }
 
 section[data-testid="stSidebar"] label {
@@ -415,7 +553,7 @@ section[data-testid="stSidebar"] label {
 }
 
 /* ============================================
-   5. KPI CARDS
+   6. KPI CARDS + ANIMATIONS
    ============================================ */
 .intel-kpi {
     background: var(--bg-card);
@@ -427,7 +565,13 @@ section[data-testid="stSidebar"] label {
     height: 100%;
     position: relative;
     overflow: hidden;
+    animation: fadeInUp 0.6s ease-out backwards;
 }
+
+.intel-kpi:nth-child(1) { animation-delay: 0.1s; }
+.intel-kpi:nth-child(2) { animation-delay: 0.2s; }
+.intel-kpi:nth-child(3) { animation-delay: 0.3s; }
+.intel-kpi:nth-child(4) { animation-delay: 0.4s; }
 
 .intel-kpi::before {
     content: '';
@@ -438,11 +582,11 @@ section[data-testid="stSidebar"] label {
     background: var(--accent-sage);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.4s ease;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .intel-kpi:hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-lg);
     border-color: var(--border-strong);
 }
@@ -471,6 +615,12 @@ section[data-testid="stSidebar"] label {
     margin-bottom: 0.4rem;
     font-family: 'Fraunces', serif;
     letter-spacing: -0.02em;
+    transition: all 0.3s ease;
+}
+
+.intel-kpi:hover .kpi-layer2 {
+    color: var(--accent-heritage);
+    transform: scale(1.05);
 }
 
 .kpi-layer3 {
@@ -481,7 +631,7 @@ section[data-testid="stSidebar"] label {
 }
 
 /* ============================================
-   6. SECTION TITLES
+   7. SECTION TITLES + ANIMATIONS
    ============================================ */
 .section-title {
     font-family: 'Fraunces', serif !important;
@@ -494,6 +644,21 @@ section[data-testid="stSidebar"] label {
     margin-bottom: 1.5rem;
     display: inline-block;
     letter-spacing: -0.01em;
+    animation: slideInLeft 0.6s ease-out;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-copper), var(--accent-sand));
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    opacity: 0.6;
 }
 
 .section-subtitle {
@@ -504,10 +669,11 @@ section[data-testid="stSidebar"] label {
     padding-left: 1rem;
     border-left: 3px solid var(--accent-sand);
     font-weight: 500;
+    animation: fadeInUp 0.6s ease-out 0.2s backwards;
 }
 
 /* ============================================
-   7. CARDS (Insight, Watchlist, Rec, Priority)
+   8. CARDS (Insight, Watchlist, Rec, Priority) + ANIMATIONS
    ============================================ */
 .insight-card {
     background: linear-gradient(135deg, #F0F5EE 0%, #E8F0E5 100%);
@@ -517,13 +683,14 @@ section[data-testid="stSidebar"] label {
     color: var(--ink-primary);
     margin: 1.2rem 0;
     line-height: 1.75;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 0.98rem;
     box-shadow: var(--shadow-sm);
+    animation: slideInLeft 0.5s ease-out backwards;
 }
 
 .insight-card:hover {
-    transform: translateX(4px);
+    transform: translateX(8px) scale(1.01);
     box-shadow: var(--shadow-md);
     border-left-width: 6px;
 }
@@ -537,12 +704,13 @@ section[data-testid="stSidebar"] label {
     margin: 1.2rem 0;
     line-height: 1.75;
     font-size: 0.98rem;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-sm);
+    animation: slideInLeft 0.5s ease-out backwards;
 }
 
 .watchlist-card:hover {
-    transform: translateX(4px);
+    transform: translateX(8px) scale(1.01);
     box-shadow: var(--shadow-md);
     border-left-width: 6px;
 }
@@ -557,12 +725,13 @@ section[data-testid="stSidebar"] label {
     margin: 0.8rem 0;
     line-height: 1.7;
     font-size: 0.96rem;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-sm);
+    animation: slideInLeft 0.5s ease-out backwards;
 }
 
 .rec-card:hover {
-    transform: translateX(4px);
+    transform: translateX(8px) scale(1.01);
     box-shadow: var(--shadow-md);
     border-left-width: 6px;
 }
@@ -574,25 +743,31 @@ section[data-testid="stSidebar"] label {
     border-radius: 18px;
     color: var(--ink-primary);
     margin: 0.6rem 0;
-    transition: all 0.4s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: center;
     box-shadow: var(--shadow-sm);
+    animation: fadeInScale 0.6s ease-out backwards;
 }
 
+.priority-card:nth-child(1) { animation-delay: 0.1s; }
+.priority-card:nth-child(2) { animation-delay: 0.2s; }
+.priority-card:nth-child(3) { animation-delay: 0.3s; }
+
 .priority-card:hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px) scale(1.03);
     box-shadow: var(--shadow-lg);
     border-color: var(--accent-heritage);
 }
 
 /* ============================================
-   8. TABS
+   9. TABS + ANIMATIONS
    ============================================ */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px;
     background: rgba(229, 223, 208, 0.4);
     padding: 0.5rem;
     border-radius: 14px;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 .stTabs [data-baseweb="tab"] {
@@ -602,13 +777,14 @@ section[data-testid="stSidebar"] label {
     font-weight: 600 !important;
     padding: 0.7rem 1.4rem !important;
     border: none !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     font-size: 0.92rem !important;
 }
 
 .stTabs [data-baseweb="tab"]:hover {
     background-color: rgba(139, 168, 136, 0.15) !important;
     color: var(--accent-heritage) !important;
+    transform: translateY(-2px) !important;
 }
 
 .stTabs [aria-selected="true"] {
@@ -617,18 +793,21 @@ section[data-testid="stSidebar"] label {
     border: 1px solid var(--border) !important;
     box-shadow: var(--shadow-sm) !important;
     font-weight: 700 !important;
+    animation: pulse 0.4s ease-out;
 }
 
 /* ============================================
-   9. BUTTONS & CONTROLS
+   10. BUTTONS & CONTROLS + ANIMATIONS
    ============================================ */
 .stButton > button, .stDownloadButton > button {
     border-radius: 12px !important;
     font-weight: 600 !important;
     padding: 0.6rem 1.5rem !important;
-    transition: all 0.3s ease !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     font-size: 0.92rem !important;
     letter-spacing: 0.01em;
+    position: relative;
+    overflow: hidden;
 }
 
 .stButton > button {
@@ -638,10 +817,28 @@ section[data-testid="stSidebar"] label {
     box-shadow: 0 2px 8px rgba(45, 95, 63, 0.2) !important;
 }
 
+.stButton > button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.stButton > button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
 .stButton > button:hover {
     background-color: #223F30 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 18px rgba(45, 95, 63, 0.3) !important;
+    transform: translateY(-3px) scale(1.03) !important;
+    box-shadow: 0 8px 20px rgba(45, 95, 63, 0.35) !important;
 }
 
 .stDownloadButton > button {
@@ -652,7 +849,8 @@ section[data-testid="stSidebar"] label {
 
 .stDownloadButton > button:hover {
     background-color: #F0F5EE !important;
-    transform: translateY(-2px) !important;
+    transform: translateY(-3px) scale(1.03) !important;
+    box-shadow: 0 8px 20px rgba(45, 95, 63, 0.15) !important;
 }
 
 /* Main area form labels */
@@ -662,10 +860,15 @@ section[data-testid="stSidebar"] label {
     font-weight: 600 !important;
     font-size: 0.88rem !important;
     letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+
+.stSelectbox label:hover, .stSlider label:hover, .stRadio label:hover {
+    color: var(--accent-heritage) !important;
 }
 
 /* ============================================
-   10. METRICS & DATAFRAMES
+   11. METRICS & DATAFRAMES + ANIMATIONS
    ============================================ */
 div[data-testid="stMetric"] {
     background: var(--bg-card);
@@ -673,6 +876,14 @@ div[data-testid="stMetric"] {
     border-radius: 14px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    animation: fadeInScale 0.5s ease-out backwards;
+}
+
+div[data-testid="stMetric"]:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-sage);
 }
 
 div[data-testid="stMetric"] label {
@@ -686,6 +897,12 @@ div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
     font-family: 'Fraunces', serif !important;
     font-weight: 700 !important;
     font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+div[data-testid="stMetric"]:hover div[data-testid="stMetricValue"] {
+    color: var(--accent-heritage) !important;
+    transform: scale(1.05);
 }
 
 header[data-testid="stHeader"] {
@@ -699,10 +916,17 @@ header[data-testid="stHeader"] {
     border: 1px solid var(--border) !important;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    animation: fadeInUp 0.6s ease-out;
+    transition: all 0.3s ease;
+}
+
+.stDataFrame:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-sage);
 }
 
 /* ============================================
-   11. WARNINGS
+   12. WARNINGS + ANIMATIONS
    ============================================ */
 .stWarning {
     border-radius: 12px !important;
@@ -711,26 +935,111 @@ header[data-testid="stHeader"] {
     color: var(--ink-primary) !important;
     padding: 1rem 1.2rem !important;
     font-size: 0.92rem;
+    animation: slideInLeft 0.5s ease-out;
 }
 
 /* ============================================
-   12. ORGANIC DIVIDER
+   13. ORGANIC DIVIDER + ANIMATIONS
    ============================================ */
 .organic-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--border-strong), var(--accent-sand), var(--border-strong), transparent);
     margin: 3rem 0;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 /* ============================================
-   13. CODE BLOCKS
+   14. CODE BLOCKS + ANIMATIONS
    ============================================ */
 .stCodeBlock {
     border-radius: 12px !important;
     border: 1px solid var(--border-strong) !important;
     background: #1A2B20 !important;
+    animation: fadeInScale 0.6s ease-out;
+}
+
+/* ============================================
+   15. FLOATING LEAVES BACKGROUND ANIMATION
+   ============================================ */
+.floating-leaves {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.leaf {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.15;
+    animation: floatLeaf 8s ease-in-out infinite;
+}
+
+.leaf:nth-child(1) { left: 10%; animation-delay: 0s; top: 20%; }
+.leaf:nth-child(2) { left: 30%; animation-delay: 2s; top: 60%; }
+.leaf:nth-child(3) { left: 50%; animation-delay: 4s; top: 30%; }
+.leaf:nth-child(4) { left: 70%; animation-delay: 1s; top: 70%; }
+.leaf:nth-child(5) { left: 90%; animation-delay: 3s; top: 40%; }
+
+/* ============================================
+   16. CHART CONTAINER ANIMATIONS
+   ============================================ */
+.js-plotly-plot {
+    animation: fadeInScale 0.6s ease-out;
+    transition: all 0.3s ease;
+}
+
+.js-plotly-plot:hover {
+    transform: scale(1.01);
+}
+
+/* ============================================
+   17. EMOJI ICON HOVER ANIMATIONS
+   ============================================ */
+.hero-strip::before,
+.sidebar-brand-icon,
+.sidebar-footer-icon {
+    transition: all 0.3s ease;
+}
+
+.hero-strip:hover::before {
+    animation: gentleSway 3s ease-in-out infinite;
+    opacity: 0.12;
+}
+
+/* ============================================
+   18. LOADING SKELETON ANIMATION
+   ============================================ */
+@keyframes skeleton {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+.stSkeleton {
+    background: linear-gradient(90deg, var(--bg-card) 0%, var(--border) 50%, var(--bg-card) 100%);
+    background-size: 200px 100%;
+    animation: skeleton 1.5s ease-in-out infinite;
 }
 </style>
+""", unsafe_allow_html=True)
+
+# Add floating leaves background
+st.markdown("""
+<div class="floating-leaves">
+    <div class="leaf">🍃</div>
+    <div class="leaf">🌿</div>
+    <div class="leaf">🍂</div>
+    <div class="leaf">🌱</div>
+    <div class="leaf">☘️</div>
+</div>
 """, unsafe_allow_html=True)
 
 # =========================================================
@@ -1011,8 +1320,8 @@ elif menu == "🌴 Profil Komoditas":
     info = COMMODITY_IDENTITY[target]
 
     st.markdown(f"""
-    <div style="background: #FFFFFF; border: 1px solid #E5DFD0; border-radius: 24px; padding: 2.8rem; margin-bottom: 2.2rem; box-shadow: 0 4px 24px rgba(26, 43, 32, 0.05); position: relative; overflow: hidden;">
-        <div style="position:absolute; top:-20px; right:-20px; font-size:10rem; opacity:0.05; transform:rotate(15deg);">{info['icon']}</div>
+    <div style="background: #FFFFFF; border: 1px solid #E5DFD0; border-radius: 24px; padding: 2.8rem; margin-bottom: 2.2rem; box-shadow: 0 4px 24px rgba(26, 43, 32, 0.05); position: relative; overflow: hidden; animation: fadeInScale 0.6s ease-out;">
+        <div style="position:absolute; top:-20px; right:-20px; font-size:10rem; opacity:0.05; transform:rotate(15deg); animation: gentleSway 8s ease-in-out infinite;">{info['icon']}</div>
         <div style="font-family:'Fraunces',serif; font-size:2.2rem; font-weight:700; color: #2D5F3F; margin-bottom: 0.8rem; letter-spacing: -0.02em;">{info['icon']} Profil Komoditas: {target}</div>
         <div style="font-size:1rem; color:#3E5245; line-height:1.75; font-weight:500;"><b style="color:#1A2B20;">Sektor:</b> {info['sector']}<br><b style="color:#1A2B20;">Potret:</b> {info['desc']}</div>
     </div>
@@ -1080,8 +1389,8 @@ elif menu == "🗺️ Profil Provinsi":
     nat_share = (tot_p / df[numeric_cols].sum().sum() * 100) if df[numeric_cols].sum().sum() > 0 else 0
 
     st.markdown(f"""
-    <div style="background: #FFFFFF; border: 1px solid #E5DFD0; border-radius: 24px; padding: 2.8rem; margin-bottom: 2.2rem; box-shadow: 0 4px 24px rgba(26, 43, 32, 0.05); position: relative; overflow: hidden;">
-        <div style="position:absolute; top:-30px; right:-10px; font-size:10rem; opacity:0.05; color: #2D5F3F;">🗺️</div>
+    <div style="background: #FFFFFF; border: 1px solid #E5DFD0; border-radius: 24px; padding: 2.8rem; margin-bottom: 2.2rem; box-shadow: 0 4px 24px rgba(26, 43, 32, 0.05); position: relative; overflow: hidden; animation: fadeInScale 0.6s ease-out;">
+        <div style="position:absolute; top:-30px; right:-10px; font-size:10rem; opacity:0.05; color: #2D5F3F; animation: gentleSway 8s ease-in-out infinite;">🗺️</div>
         <div style="font-family:'Fraunces',serif; font-size:2.2rem; font-weight:700; color: #2D5F3F; margin-bottom: 0.8rem;">🗺️ Profil Perkebunan: {target_prov}</div>
         <div style="font-size:1rem; color:#3E5245; line-height:1.75; font-weight:500;">Total output <b style="color:#1A2B20;">{format_ton(tot_p)} ribu ton</b> ({nat_share:.2f}% nasional). Komoditas andalan: <b style="color:#1A2B20;">{dom_c}</b> ({dom_share:.1f}%).</div>
     </div>
@@ -1478,8 +1787,8 @@ elif menu == "📦 Data & Ekspor":
 # FOOTER
 # =========================================================
 st.markdown("""
-<div style="text-align:center; padding:3rem 2rem; margin-top:3rem; background: #FFFFFF; border-radius: 24px; border: 1px solid #E5DFD0; box-shadow: 0 -4px 24px rgba(26, 43, 32, 0.04);">
-    <div style="font-size:2.5rem; margin-bottom:0.5rem; opacity:0.7;">🌿</div>
+<div style="text-align:center; padding:3rem 2rem; margin-top:3rem; background: #FFFFFF; border-radius: 24px; border: 1px solid #E5DFD0; box-shadow: 0 -4px 24px rgba(26, 43, 32, 0.04); animation: fadeInUp 0.8s ease-out;">
+    <div style="font-size:2.5rem; margin-bottom:0.5rem; opacity:0.7; animation: gentleSway 6s ease-in-out infinite;">🌿</div>
     <h3 style="font-family:'Fraunces',serif; font-size:1.6rem; font-weight:700; color: #2D5F3F; margin-bottom:0.6rem; letter-spacing:-0.02em;">Plantation Intelligence Dashboard</h3>
     <p style="color:#3E5245; font-size:0.95rem; margin-bottom:0.4rem; font-weight:500;">UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
     <p style="color:#6B7D70; font-size:0.88rem; margin-top:0.8rem;">Streamlit + Plotly + Scikit-Learn untuk perencanaan strategis sektor perkebunan Indonesia</p>
