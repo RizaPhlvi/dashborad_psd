@@ -25,76 +25,104 @@ st.set_page_config(
 )
 
 # =========================================================
-# 🎨 BOTANICAL ELEGANCE THEME CSS (SOFT & ELEGANT)
+# 🎨 TROPICAL HERITAGE THEME — MAXIMUM READABILITY
 # =========================================================
 st.markdown("""
 <style>
 /* ============================================
-   0. IMPORTS & ROOT VARIABLES
+   0. IMPORTS & VARIABLES
    ============================================ */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --bg-main: #F6F4EE;
-    --bg-sidebar: #EBE8DF;
+    /* Paper & Card backgrounds */
+    --bg-paper: #FAF7F0;
     --bg-card: #FFFFFF;
-    --bg-hero-start: #3E5245;
-    --bg-hero-end: #5E7A65;
-    --text-primary: #28362C;
-    --text-secondary: #556359;
-    --text-muted: #849187;
-    --text-on-dark: #F6F4EE;
-    --accent-sage: #6B8E76;
-    --accent-olive: #4A6B53;
-    --accent-clay: #C28F6A;
-    --accent-sand: #D4B895;
-    --border-soft: #E2DFD5;
-    --shadow-soft: 0 4px 24px rgba(40, 54, 44, 0.04);
-    --shadow-hover: 0 12px 32px rgba(40, 54, 44, 0.08);
+    --bg-sidebar: #F0EBE0;
+    --bg-sidebar-header: #2D4A3A;
+    
+    /* Ink colors — HIGH CONTRAST for readability */
+    --ink-primary: #1A2B20;
+    --ink-secondary: #3E5245;
+    --ink-muted: #6B7D70;
+    --ink-faint: #9AA89F;
+    --ink-on-dark: #FAF7F0;
+    
+    /* Accents */
+    --accent-heritage: #2D5F3F;
+    --accent-copper: #B87333;
+    --accent-sage: #8BA888;
+    --accent-sand: #D4B896;
+    --accent-clay: #C17B4E;
+    
+    /* Borders & Shadows */
+    --border: #E5DFD0;
+    --border-strong: #C9C0AB;
+    --shadow-sm: 0 1px 3px rgba(26, 43, 32, 0.05);
+    --shadow-md: 0 4px 12px rgba(26, 43, 32, 0.07);
+    --shadow-lg: 0 12px 32px rgba(26, 43, 32, 0.10);
 }
 
 /* ============================================
-   1. GLOBAL RESET & BASE
+   1. GLOBAL BASE
    ============================================ */
 .stApp {
-    background-color: var(--bg-main);
-    color: var(--text-primary);
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-paper);
+    color: var(--ink-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
 }
 
 .block-container {
     max-width: 1550px;
-    padding-top: 2rem;
+    padding-top: 2.5rem;
     padding-bottom: 3rem;
 }
 
-/* Custom elegant scrollbar */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-main); }
+/* Elegant scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-paper); }
 ::-webkit-scrollbar-thumb {
-    background: var(--border-soft);
+    background: var(--border-strong);
     border-radius: 10px;
+    border: 2px solid var(--bg-paper);
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-sage); }
 
 /* ============================================
-   2. TYPOGRAPHY
+   2. TYPOGRAPHY — HIGH READABILITY
    ============================================ */
 h1, h2, h3 {
-    font-family: 'Playfair Display', serif !important;
-    color: var(--text-primary) !important;
+    font-family: 'Fraunces', Georgia, serif !important;
+    color: var(--ink-primary) !important;
     letter-spacing: -0.02em;
+    font-weight: 700 !important;
+}
+
+h1 { font-size: 2.4rem !important; line-height: 1.2 !important; }
+h2 { font-size: 1.8rem !important; line-height: 1.3 !important; }
+h3 { font-size: 1.4rem !important; line-height: 1.4 !important; }
+
+p, span, div, label {
+    color: var(--ink-primary);
+    font-family: 'Inter', sans-serif;
+}
+
+strong, b {
+    color: var(--ink-primary);
+    font-weight: 700;
 }
 
 /* ============================================
-   3. HERO STRIP — EDITORIAL MAGAZINE STYLE
+   3. HERO STRIP
    ============================================ */
 .hero-strip {
-    background: linear-gradient(135deg, var(--bg-hero-start) 0%, var(--bg-hero-end) 100%);
-    color: var(--text-on-dark);
-    padding: 3rem;
-    border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(62, 82, 69, 0.15);
+    background: linear-gradient(135deg, #2D4A3A 0%, #3E5F4D 50%, #4A6F58 100%);
+    color: var(--ink-on-dark);
+    padding: 3rem 3.5rem;
+    border-radius: 28px;
+    box-shadow: 0 20px 50px rgba(45, 74, 58, 0.20);
     margin-bottom: 2.5rem;
     position: relative;
     overflow: hidden;
@@ -103,40 +131,49 @@ h1, h2, h3 {
 .hero-strip::before {
     content: '🌿';
     position: absolute;
-    right: 2rem;
+    right: 3rem;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 12rem;
-    opacity: 0.06;
-    filter: blur(2px);
+    font-size: 14rem;
+    opacity: 0.08;
+    filter: blur(3px);
+}
+
+.hero-strip::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-copper), var(--accent-sand), transparent);
 }
 
 .hero-title {
-    font-family: 'Playfair Display', serif !important;
-    font-size: 2.6rem;
-    font-weight: 700;
+    font-family: 'Fraunces', serif !important;
+    font-size: 2.8rem !important;
+    font-weight: 800 !important;
     color: #FFFFFF !important;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem;
     position: relative;
     z-index: 2;
+    letter-spacing: -0.03em;
 }
 
 .hero-accent {
-    width: 70px;
+    width: 80px;
     height: 3px;
-    background: var(--accent-sand);
+    background: var(--accent-copper);
     border-radius: 2px;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.5rem;
     position: relative;
     z-index: 2;
 }
 
 .hero-subtitle {
-    color: rgba(246, 244, 238, 0.85);
+    color: rgba(250, 247, 240, 0.92);
     font-size: 1.05rem;
     line-height: 1.7;
-    max-width: 80%;
-    margin-bottom: 1.5rem;
+    max-width: 75%;
+    margin-bottom: 1.8rem;
     position: relative;
     z-index: 2;
     font-weight: 400;
@@ -151,28 +188,28 @@ h1, h2, h3 {
 }
 
 .hero-badge {
-    background: rgba(255,255,255,0.12);
+    background: rgba(250, 247, 240, 0.12);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(250, 247, 240, 0.25);
     color: #FFFFFF;
-    padding: 0.45rem 1.1rem;
+    padding: 0.5rem 1.2rem;
     border-radius: 999px;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 500;
     transition: all 0.3s ease;
 }
 
 .hero-badge:hover {
-    background: rgba(255,255,255,0.2);
+    background: rgba(250, 247, 240, 0.20);
     transform: translateY(-2px);
 }
 
 .hero-mini-stats {
     display: flex;
-    gap: 2.5rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255,255,255,0.15);
+    gap: 3rem;
+    margin-top: 2.2rem;
+    padding-top: 1.8rem;
+    border-top: 1px solid rgba(250, 247, 240, 0.20);
     position: relative;
     z-index: 2;
     flex-wrap: wrap;
@@ -180,302 +217,451 @@ h1, h2, h3 {
 
 .mini-stat-label {
     font-size: 0.72rem;
-    color: rgba(255,255,255,0.6);
+    color: rgba(250, 247, 240, 0.70);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     font-weight: 600;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.4rem;
 }
 
 .mini-stat-value {
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #FFFFFF;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', serif;
+    letter-spacing: -0.02em;
 }
 
 /* ============================================
-   4. SIDEBAR — SOFT SAND
+   4. SIDEBAR — PREMIUM HERITAGE DESIGN
    ============================================ */
 section[data-testid="stSidebar"] {
-    background-color: var(--bg-sidebar) !important;
-    border-right: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, #F0EBE0 0%, #E8E0CF 100%) !important;
+    padding: 0 !important;
 }
 
-section[data-testid="stSidebar"] .block-container {
-    padding-top: 1.5rem;
+section[data-testid="stSidebar"] > div {
+    padding-top: 0 !important;
 }
 
+/* Brand header */
+.sidebar-brand {
+    background: linear-gradient(135deg, var(--bg-sidebar-header) 0%, #3E5F4D 100%);
+    color: var(--ink-on-dark);
+    padding: 2rem 1.5rem 1.8rem;
+    margin: -1rem -1rem 1.5rem -1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-brand::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-copper), var(--accent-sand));
+}
+
+.sidebar-brand-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.sidebar-brand-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 0.2rem;
+    letter-spacing: -0.02em;
+}
+
+.sidebar-brand-sub {
+    font-size: 0.72rem;
+    color: rgba(250, 247, 240, 0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+}
+
+/* Sidebar blocks */
 .sidebar-block {
     background: var(--bg-card);
-    border: 1px solid var(--border-soft);
-    border-radius: 18px;
-    padding: 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.3rem;
     margin-bottom: 1.2rem;
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.sidebar-block:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
 }
 
 .sidebar-title {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    color: var(--accent-olive);
+    color: var(--accent-heritage);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.8rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
 }
 
+.sidebar-title::before {
+    content: '';
+    width: 4px;
+    height: 14px;
+    background: var(--accent-copper);
+    border-radius: 2px;
+}
+
+/* Sidebar navigation pills */
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] {
+    gap: 4px !important;
+    padding: 0.3rem !important;
+    background: rgba(229, 223, 208, 0.4);
+    border-radius: 14px;
+}
+
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
+    border-radius: 10px !important;
+    padding: 0.7rem 1rem !important;
+    transition: all 0.2s ease !important;
+    color: var(--ink-secondary) !important;
+    font-weight: 500 !important;
+    font-size: 0.92rem !important;
+    border-left: 3px solid transparent !important;
+    margin-bottom: 0 !important;
+}
+
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover {
+    background-color: rgba(139, 168, 136, 0.12) !important;
+    color: var(--accent-heritage) !important;
+    border-left-color: var(--accent-sage) !important;
+}
+
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child {
+    display: none;
+}
+
+section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-checked="true"] {
+    background-color: var(--accent-heritage) !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(45, 95, 63, 0.25) !important;
+    border-left-color: var(--accent-copper) !important;
+}
+
+/* Commodity brief card */
 .commodity-brief {
-    background: #EFF3F0;
-    border-left: 3px solid var(--accent-sage);
-    padding: 1rem;
+    background: linear-gradient(135deg, #F5F0E3 0%, #EFE7D3 100%);
+    border-left: 4px solid var(--accent-heritage);
+    padding: 1rem 1.1rem;
     border-radius: 0 14px 14px 0;
     margin-top: 0.8rem;
+    transition: all 0.3s ease;
 }
 
-/* Sidebar Radio Buttons Customization */
-section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
-    border-radius: 12px;
-    padding: 0.6rem 0.8rem;
-    transition: all 0.2s ease;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-bottom: 0.3rem;
+.commodity-brief:hover {
+    transform: translateX(3px);
+    box-shadow: var(--shadow-sm);
 }
 
-section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover {
-    background-color: rgba(107, 142, 118, 0.08);
-    color: var(--accent-olive);
+/* Sidebar decorative footer */
+.sidebar-footer {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--border);
+    position: relative;
 }
 
-section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label[data-baseweb="radio"] > div:first-child {
-    display: none; /* hide default dot */
+.sidebar-footer-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.4rem;
+    opacity: 0.5;
 }
 
-section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label[aria-checked="true"] {
-    background-color: #FFFFFF;
-    color: var(--accent-olive);
-    font-weight: 600;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-soft);
+.sidebar-footer-text {
+    font-size: 0.68rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+/* Sidebar form controls */
+section[data-testid="stSidebar"] .stSelectbox > div,
+section[data-testid="stSidebar"] .stSlider > div {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.3rem 0.6rem;
+}
+
+section[data-testid="stSidebar"] label {
+    color: var(--ink-secondary) !important;
+    font-weight: 600 !important;
+    font-size: 0.82rem !important;
+    margin-bottom: 0.4rem !important;
 }
 
 /* ============================================
-   5. INTEL KPI CARDS — EDITORIAL STYLE
+   5. KPI CARDS
    ============================================ */
 .intel-kpi {
     background: var(--bg-card);
-    border: 1px solid var(--border-soft);
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.6rem 1.5rem;
+    box-shadow: var(--shadow-sm);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
     position: relative;
     overflow: hidden;
 }
 
+.intel-kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-sage);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+}
+
 .intel-kpi:hover {
     transform: translateY(-6px);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--accent-sage);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-strong);
+}
+
+.intel-kpi:hover::before {
+    transform: scaleX(1);
 }
 
 .kpi-layer1 {
     font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-muted);
+    font-weight: 700;
+    color: var(--ink-muted);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.6rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.7rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
 .kpi-layer2 {
-    font-size: 2rem;
+    font-size: 2.1rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--ink-primary);
     line-height: 1.1;
     margin-bottom: 0.4rem;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Fraunces', serif;
     letter-spacing: -0.02em;
 }
 
 .kpi-layer3 {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
+    font-size: 0.88rem;
+    color: var(--ink-secondary);
     line-height: 1.5;
+    font-weight: 500;
 }
 
 /* ============================================
-   6. SECTION TITLES — ELEGANT UNDERLINE
+   6. SECTION TITLES
    ============================================ */
 .section-title {
-    font-family: 'Playfair Display', serif !important;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent-olive) !important;
-    border-bottom: 2px solid var(--accent-sand);
-    padding-bottom: 0.5rem;
-    margin-top: 2.5rem;
+    font-family: 'Fraunces', serif !important;
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    color: var(--accent-heritage) !important;
+    border-bottom: 3px solid var(--accent-copper);
+    padding-bottom: 0.6rem;
+    margin-top: 2.8rem;
     margin-bottom: 1.5rem;
     display: inline-block;
     letter-spacing: -0.01em;
 }
 
 .section-subtitle {
-    font-size: 0.95rem;
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
+    font-size: 0.98rem;
+    color: var(--ink-secondary);
+    margin-bottom: 1.8rem;
     font-style: italic;
-    padding-left: 0.8rem;
-    border-left: 2px solid var(--border-soft);
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent-sand);
+    font-weight: 500;
 }
 
 /* ============================================
-   7. INSIGHT / WATCHLIST / REC CARDS
+   7. CARDS (Insight, Watchlist, Rec, Priority)
    ============================================ */
 .insight-card {
-    background: #EFF3F0; /* Soft sage tint */
-    border-left: 4px solid var(--accent-sage);
-    padding: 1.3rem 1.6rem;
+    background: linear-gradient(135deg, #F0F5EE 0%, #E8F0E5 100%);
+    border-left: 4px solid var(--accent-heritage);
+    padding: 1.4rem 1.7rem;
     border-radius: 4px 16px 16px 4px;
-    color: var(--text-primary);
-    margin: 1rem 0;
-    line-height: 1.7;
+    color: var(--ink-primary);
+    margin: 1.2rem 0;
+    line-height: 1.75;
     transition: all 0.3s ease;
+    font-size: 0.98rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .insight-card:hover {
     transform: translateX(4px);
+    box-shadow: var(--shadow-md);
     border-left-width: 6px;
 }
 
 .watchlist-card {
-    background: #FDF6F0; /* Soft clay tint */
-    border-left: 4px solid var(--accent-clay);
-    padding: 1.3rem 1.6rem;
+    background: linear-gradient(135deg, #FDF5EC 0%, #FAECD9 100%);
+    border-left: 4px solid var(--accent-copper);
+    padding: 1.4rem 1.7rem;
     border-radius: 4px 16px 16px 4px;
-    color: var(--text-primary);
-    margin: 1rem 0;
-    line-height: 1.7;
+    color: var(--ink-primary);
+    margin: 1.2rem 0;
+    line-height: 1.75;
+    font-size: 0.98rem;
     transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .watchlist-card:hover {
     transform: translateX(4px);
+    box-shadow: var(--shadow-md);
     border-left-width: 6px;
 }
 
 .rec-card {
     background: var(--bg-card);
-    border: 1px solid var(--border-soft);
+    border: 1px solid var(--border);
     border-left: 4px solid var(--accent-sand);
     padding: 1.3rem 1.6rem;
-    border-radius: 4px 16px 16px 4px;
-    color: var(--text-primary);
+    border-radius: 4px 14px 14px 4px;
+    color: var(--ink-primary);
     margin: 0.8rem 0;
     line-height: 1.7;
+    font-size: 0.96rem;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-sm);
 }
 
 .rec-card:hover {
     transform: translateX(4px);
+    box-shadow: var(--shadow-md);
     border-left-width: 6px;
-    box-shadow: var(--shadow-hover);
 }
 
 .priority-card {
     background: var(--bg-card);
-    border: 1px solid var(--border-soft);
-    padding: 1.8rem;
-    border-radius: 20px;
-    color: var(--text-primary);
+    border: 1px solid var(--border);
+    padding: 1.8rem 1.5rem;
+    border-radius: 18px;
+    color: var(--ink-primary);
     margin: 0.6rem 0;
     transition: all 0.4s ease;
     text-align: center;
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-sm);
 }
 
 .priority-card:hover {
     transform: translateY(-6px);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--accent-sage);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-heritage);
 }
 
 /* ============================================
-   8. TABS — SEGMENTED ELEGANT CONTROL
+   8. TABS
    ============================================ */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px;
-    background-color: transparent !important;
+    background: rgba(229, 223, 208, 0.4);
+    padding: 0.5rem;
+    border-radius: 14px;
 }
 
 .stTabs [data-baseweb="tab"] {
     background-color: transparent !important;
-    border-radius: 12px !important;
-    color: var(--text-secondary) !important;
-    font-weight: 500 !important;
+    border-radius: 10px !important;
+    color: var(--ink-secondary) !important;
+    font-weight: 600 !important;
     padding: 0.7rem 1.4rem !important;
-    border: 1px solid transparent !important;
+    border: none !important;
     transition: all 0.2s ease !important;
+    font-size: 0.92rem !important;
 }
 
 .stTabs [data-baseweb="tab"]:hover {
-    background-color: rgba(107, 142, 118, 0.08) !important;
-    color: var(--accent-olive) !important;
+    background-color: rgba(139, 168, 136, 0.15) !important;
+    color: var(--accent-heritage) !important;
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: #FFFFFF !important;
-    color: var(--accent-olive) !important;
-    border: 1px solid var(--border-soft) !important;
-    box-shadow: var(--shadow-soft) !important;
-    font-weight: 600 !important;
+    background-color: var(--bg-card) !important;
+    color: var(--accent-heritage) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-sm) !important;
+    font-weight: 700 !important;
 }
 
 /* ============================================
-   9. FORM CONTROLS & BUTTONS
+   9. BUTTONS & CONTROLS
    ============================================ */
-.stSelectbox label, .stSlider label, .stRadio label,
-.stMultiSelect label, .stNumberInput label {
-    color: var(--text-secondary) !important;
-    font-weight: 600;
-    font-size: 0.85rem;
-    letter-spacing: 0.02em;
+.stButton > button, .stDownloadButton > button {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.5rem !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.92rem !important;
+    letter-spacing: 0.01em;
 }
 
 .stButton > button {
-    border-radius: 12px !important;
-    background-color: var(--accent-olive) !important;
+    background-color: var(--accent-heritage) !important;
     color: #FFFFFF !important;
     border: none !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 2px 8px rgba(74, 107, 83, 0.15) !important;
-    padding: 0.6rem 1.5rem !important;
+    box-shadow: 0 2px 8px rgba(45, 95, 63, 0.2) !important;
 }
 
 .stButton > button:hover {
-    background-color: var(--accent-sage) !important;
+    background-color: #223F30 !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 6px 16px rgba(74, 107, 83, 0.25) !important;
+    box-shadow: 0 6px 18px rgba(45, 95, 63, 0.3) !important;
 }
 
 .stDownloadButton > button {
-    border-radius: 12px !important;
-    background-color: #FFFFFF !important;
-    color: var(--accent-olive) !important;
-    border: 1px solid var(--accent-sage) !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
+    background-color: var(--bg-card) !important;
+    color: var(--accent-heritage) !important;
+    border: 1.5px solid var(--accent-heritage) !important;
 }
 
 .stDownloadButton > button:hover {
-    background-color: #EFF3F0 !important;
+    background-color: #F0F5EE !important;
     transform: translateY(-2px) !important;
+}
+
+/* Main area form labels */
+.stSelectbox label, .stSlider label, .stRadio label,
+.stMultiSelect label, .stNumberInput label {
+    color: var(--ink-secondary) !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    letter-spacing: 0.02em;
 }
 
 /* ============================================
@@ -483,44 +669,48 @@ section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label[aria-chec
    ============================================ */
 div[data-testid="stMetric"] {
     background: var(--bg-card);
-    padding: 1rem 1.2rem;
+    padding: 1.1rem 1.3rem;
     border-radius: 14px;
-    border: 1px solid var(--border-soft);
-    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
 }
 
 div[data-testid="stMetric"] label {
-    color: var(--text-muted) !important;
-    font-family: 'DM Sans', sans-serif !important;
+    color: var(--ink-muted) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600;
 }
 
 div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
-    color: var(--text-primary) !important;
-    font-family: 'Playfair Display', serif !important;
+    color: var(--ink-primary) !important;
+    font-family: 'Fraunces', serif !important;
     font-weight: 700 !important;
+    font-size: 1.5rem;
 }
 
 header[data-testid="stHeader"] {
-    background: rgba(246, 244, 238, 0.9) !important;
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-soft);
+    background: rgba(250, 247, 240, 0.95) !important;
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
 }
 
 .stDataFrame {
     border-radius: 14px !important;
-    border: 1px solid var(--border-soft) !important;
+    border: 1px solid var(--border) !important;
     overflow: hidden;
-    box-shadow: var(--shadow-soft);
+    box-shadow: var(--shadow-sm);
 }
 
 /* ============================================
-   11. WARNING / INFO BOXES
+   11. WARNINGS
    ============================================ */
 .stWarning {
-    border-radius: 14px !important;
-    border-left: 4px solid var(--accent-clay) !important;
-    background: #FDF6F0 !important;
-    color: var(--text-primary) !important;
+    border-radius: 12px !important;
+    border-left: 4px solid var(--accent-copper) !important;
+    background: #FDF5EC !important;
+    color: var(--ink-primary) !important;
+    padding: 1rem 1.2rem !important;
+    font-size: 0.92rem;
 }
 
 /* ============================================
@@ -528,23 +718,23 @@ header[data-testid="stHeader"] {
    ============================================ */
 .organic-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-soft), transparent);
-    margin: 2.5rem 0;
+    background: linear-gradient(90deg, transparent, var(--border-strong), var(--accent-sand), var(--border-strong), transparent);
+    margin: 3rem 0;
 }
 
 /* ============================================
    13. CODE BLOCKS
    ============================================ */
 .stCodeBlock {
-    border-radius: 14px !important;
-    border: 1px solid var(--border-soft) !important;
-    background: #28362C !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--border-strong) !important;
+    background: #1A2B20 !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================================================
-# DATASET EMBEDDED (BPS 2024)
+# DATASET
 # =========================================================
 CSV_DATA = """Provinsi,Kelapa Sawit,Kelapa,Karet,Kopi,Kakao,Teh,Tebu
 ACEH,1092.71,64.1,51.17,74.13,34.17,0,0
@@ -594,22 +784,22 @@ df = load_data()
 numeric_cols = [c for c in df.columns if c != "Provinsi"]
 
 # =========================================================
-# COMMODITY IDENTITY MAP (EARTHY PASTEL PALETTE)
+# COMMODITY IDENTITY MAP — EARTHY REFINED PALETTE
 # =========================================================
 COMMODITY_IDENTITY = {
-    "Kelapa Sawit": {"icon": "🌴", "color": "#5E7A54", "color_light": "#84A578", "sector": "Perkebunan Besar", "desc": "Primadona ekspor. Mendominasi Sumatera & Kalimantan."},
-    "Kelapa": {"icon": "🥥", "color": "#6B8E93", "color_light": "#94B7BC", "sector": "Perkebunan Rakyat", "desc": "Tanaman pesisir Nusantara. Potensi hilirisasi minyak & sabut."},
-    "Karet": {"icon": "🌳", "color": "#8C6A54", "color_light": "#B39179", "sector": "Perkebunan Campuran", "desc": "Sentra di Sumatera. Tantangan fluktuasi harga & peremajaan."},
-    "Kopi": {"icon": "☕", "color": "#6E564A", "color_light": "#9C8070", "sector": "Perkebunan Rakyat", "desc": "Ikon specialty coffee dunia (Gayo, Toraja, Kintamani)."},
+    "Kelapa Sawit": {"icon": "🌴", "color": "#3E5F4D", "color_light": "#6B9278", "sector": "Perkebunan Besar", "desc": "Primadona ekspor. Mendominasi Sumatera & Kalimantan."},
+    "Kelapa": {"icon": "🥥", "color": "#5A7B8A", "color_light": "#89AAB8", "sector": "Perkebunan Rakyat", "desc": "Tanaman pesisir Nusantara. Potensi hilirisasi minyak & sabut."},
+    "Karet": {"icon": "🌳", "color": "#8B6F4E", "color_light": "#B39471", "sector": "Perkebunan Campuran", "desc": "Sentra di Sumatera. Tantangan fluktuasi harga & peremajaan."},
+    "Kopi": {"icon": "☕", "color": "#6B4E3D", "color_light": "#9C7B63", "sector": "Perkebunan Rakyat", "desc": "Ikon specialty coffee dunia (Gayo, Toraja, Kintamani)."},
     "Kakao": {"icon": "🍫", "color": "#7A5647", "color_light": "#A67B66", "sector": "Perkebunan Rakyat", "desc": "Sulawesi sebagai tulang punggung. Perlu peremajaan pohon."},
-    "Teh": {"icon": "🍃", "color": "#758C74", "color_light": "#A3B89F", "sector": "Perkebunan Besar", "desc": "Eksklusif dataran tinggi dingin (Jabar & Sumut)."},
-    "Tebu": {"icon": "🌾", "color": "#A89B6A", "color_light": "#C9BE8D", "sector": "Perkebunan Strategis", "desc": "Bahan baku gula nasional (Jatim & Lampung)."}
+    "Teh": {"icon": "🍃", "color": "#5E7A54", "color_light": "#8FA885", "sector": "Perkebunan Besar", "desc": "Eksklusif dataran tinggi dingin (Jabar & Sumut)."},
+    "Tebu": {"icon": "🌾", "color": "#A89558", "color_light": "#CBB879", "sector": "Perkebunan Strategis", "desc": "Bahan baku gula nasional (Jatim & Lampung)."}
 }
 
-SOFT_PALETTE = ["#84A578", "#94B7BC", "#B39179", "#9C8070", "#A67B66", "#A3B89F", "#C9BE8D"]
+SOFT_PALETTE = ["#6B9278", "#89AAB8", "#B39471", "#9C7B63", "#A67B66", "#8FA885", "#CBB879"]
 
 def get_comm_attr(comm, attr="color"):
-    return COMMODITY_IDENTITY.get(comm, {}).get(attr, "#84A578")
+    return COMMODITY_IDENTITY.get(comm, {}).get(attr, "#6B9278")
 
 def format_num(x):
     try:
@@ -633,71 +823,80 @@ def create_intel_kpi(label, value, subtext, icon, color):
 def apply_plantation_layout(fig, height=480):
     fig.update_layout(
         template="plotly_white",
-        paper_bgcolor="#F6F4EE",
+        paper_bgcolor="#FAF7F0",
         plot_bgcolor="#FFFFFF",
-        font=dict(color="#28362C", family="DM Sans, sans-serif", size=12),
+        font=dict(color="#1A2B20", family="Inter, sans-serif", size=13),
         height=height,
-        margin=dict(l=40, r=30, t=60, b=45),
+        margin=dict(l=40, r=30, t=60, b=50),
         xaxis=dict(
-            gridcolor="#E2DFD5",
-            zerolinecolor="#E2DFD5",
-            tickfont=dict(size=11, color="#556359")
+            gridcolor="#E5DFD0",
+            zerolinecolor="#E5DFD0",
+            tickfont=dict(size=11, color="#3E5245", family="Inter")
         ),
         yaxis=dict(
-            gridcolor="#E2DFD5",
-            zerolinecolor="#E2DFD5",
-            tickfont=dict(size=11, color="#556359")
+            gridcolor="#E5DFD0",
+            zerolinecolor="#E5DFD0",
+            tickfont=dict(size=11, color="#3E5245", family="Inter")
         ),
         title=dict(
-            font=dict(size=16, color="#3E5245", family="Playfair Display, serif", weight=600),
+            font=dict(size=17, color="#2D5F3F", family="Fraunces, serif", weight=600),
             x=0.02, xanchor="left"
         ),
         hoverlabel=dict(
             bgcolor="#FFFFFF",
-            bordercolor="#6B8E76",
-            font=dict(color="#28362C", family="DM Sans", size=12)
+            bordercolor="#2D5F3F",
+            font=dict(color="#1A2B20", family="Inter", size=13)
         ),
-        legend=dict(
-            font=dict(color="#556359")
-        )
+        legend=dict(font=dict(color="#3E5245", size=12))
     )
     return fig
 
 # =========================================================
-# SIDEBAR
+# SIDEBAR — PREMIUM HERITAGE
 # =========================================================
 with st.sidebar:
-    st.markdown('''<div class="sidebar-block">
-        <div class="sidebar-title">🧭 Navigasi Intelijen</div>''', unsafe_allow_html=True)
-
+    # Brand header
+    st.markdown('''
+    <div class="sidebar-brand">
+        <span class="sidebar-brand-icon">🌿</span>
+        <div class="sidebar-brand-title">Plantation Intel</div>
+        <div class="sidebar-brand-sub">Indonesia 2024</div>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    # Navigation block
+    st.markdown('<div class="sidebar-block"><div class="sidebar-title">🧭 Navigasi</div>', unsafe_allow_html=True)
     menu = st.radio("Menu",
         ["🏠 Ringkasan Nasional", "🌴 Profil Komoditas", "🗺️ Profil Provinsi",
          "🔬 Eksplorasi Visual", "📊 Analisis Produksi", "🌍 Sebaran Wilayah",
          "📈 Proyeksi & Model", "🧠 Insight & Strategi", "📦 Data & Ekspor"],
         label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="sidebar-block"><div class="sidebar-title">🎛️ Filter Aktif</div>', unsafe_allow_html=True)
+    
+    # Filter block
+    st.markdown('<div class="sidebar-block"><div class="sidebar-title">🎛️ Filter Data</div>', unsafe_allow_html=True)
     selected_commodity = st.selectbox("Komoditas Fokus", numeric_cols, index=0, key="side_comm")
     selected_province = st.selectbox("Wilayah Provinsi", ["Semua Provinsi"] + df["Provinsi"].tolist(), index=0, key="side_prov")
     top_n = st.slider("Top N Sentra", 5, 20, 10, key="side_topn")
     show_zeros = st.checkbox("Tampilkan wilayah tanpa produksi", value=True, key="side_zero")
     st.markdown('</div>', unsafe_allow_html=True)
-
+    
+    # Commodity brief
     comm_info = COMMODITY_IDENTITY[selected_commodity]
     st.markdown(f'''<div class="sidebar-block">
         <div class="sidebar-title">🌱 Commodity Brief</div>
         <div class="commodity-brief" style="border-left-color: {comm_info["color_light"]};">
-            <div style="font-size:1.2rem; margin-bottom:0.3rem; color:#28362C;">{comm_info["icon"]} <b>{selected_commodity}</b></div>
-            <div style="font-size:0.72rem; color:#849187; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.4rem; font-weight:600;">{comm_info["sector"]}</div>
-            <div style="font-size:0.85rem; color:#556359; line-height:1.6;">{comm_info["desc"]}</div>
+            <div style="font-size:1.4rem; margin-bottom:0.4rem; color:#1A2B20; font-weight:700; font-family:'Fraunces',serif;">{comm_info["icon"]} {selected_commodity}</div>
+            <div style="font-size:0.7rem; color:#6B7D70; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:0.5rem; font-weight:700;">{comm_info["sector"]}</div>
+            <div style="font-size:0.88rem; color:#3E5245; line-height:1.6;">{comm_info["desc"]}</div>
         </div>
     </div>''', unsafe_allow_html=True)
-
+    
+    # Footer
     st.markdown('''
-    <div style="text-align:center; padding:1.5rem 0 0.5rem; opacity:0.4;">
-        <div style="font-size:2rem;">🌿</div>
-        <div style="font-size:0.65rem; color:#849187; letter-spacing:0.15em; text-transform:uppercase; margin-top:0.3rem; font-weight:600;">Botanical Intel</div>
+    <div class="sidebar-footer">
+        <div class="sidebar-footer-icon">🌴</div>
+        <div class="sidebar-footer-text">Tropical Heritage</div>
     </div>
     ''', unsafe_allow_html=True)
 
@@ -716,7 +915,7 @@ if menu == "🏠 Ringkasan Nasional":
 
     st.markdown(f"""
     <div class="hero-strip">
-        <div class="hero-title">🌿 Plantation Intelligence</div>
+        <div class="hero-title">Plantation Intelligence</div>
         <div class="hero-accent"></div>
         <div class="hero-subtitle">Pusat intelijen strategis untuk pemetaan sentra produksi, portofolio komoditas andalan, dan analisis struktur perkebunan nasional per provinsi.</div>
         <div class="hero-badges">
@@ -752,9 +951,9 @@ if menu == "🏠 Ringkasan Nasional":
 
     c1, c2, c3, c4 = st.columns(4)
     with c1: st.markdown(create_intel_kpi("Komoditas Dominan", dom_comm, f"Menyumbang {dom_share:.1f}%", get_comm_attr(dom_comm,"icon"), get_comm_attr(dom_comm,"color_light")), unsafe_allow_html=True)
-    with c2: st.markdown(create_intel_kpi("Sentra Tertinggi", top_prov[:14], f"Output {format_ton(top_val)}", "🏆", "#C28F6A"), unsafe_allow_html=True)
-    with c3: st.markdown(create_intel_kpi("Terdiversifikasi", diverse_prov[:14], f"{diverse_count} komoditas", "🌱", "#6B8E76"), unsafe_allow_html=True)
-    with c4: st.markdown(create_intel_kpi("Konsentrasi Top-5", f"{top5_share:.1f}%", "Pangsa 5 provinsi", "🎯", "#94B7BC"), unsafe_allow_html=True)
+    with c2: st.markdown(create_intel_kpi("Sentra Tertinggi", top_prov[:14], f"Output {format_ton(top_val)}", "🏆", "#B87333"), unsafe_allow_html=True)
+    with c3: st.markdown(create_intel_kpi("Terdiversifikasi", diverse_prov[:14], f"{diverse_count} komoditas", "🌱", "#2D5F3F"), unsafe_allow_html=True)
+    with c4: st.markdown(create_intel_kpi("Konsentrasi Top-5", f"{top5_share:.1f}%", "Pangsa 5 provinsi", "🎯", "#8BA888"), unsafe_allow_html=True)
 
     st.markdown('<div class="section-title">🌾 Sentra & Kontribusi Produksi Nasional</div>', unsafe_allow_html=True)
     col_l, col_r = st.columns(2)
@@ -769,7 +968,7 @@ if menu == "🏠 Ringkasan Nasional":
         prov_totals["Total_Output"] = prov_totals[numeric_cols].sum(axis=1)
         top_prov_df = prov_totals.nlargest(top_n, "Total_Output")[["Provinsi", "Total_Output"]].sort_values("Total_Output", ascending=True)
         fig2 = px.bar(top_prov_df, x="Total_Output", y="Provinsi", orientation='h', text="Total_Output",
-                      title="Kontribusi Output Perkebunan per Provinsi", color_discrete_sequence=["#C28F6A"])
+                      title="Kontribusi Output Perkebunan per Provinsi", color_discrete_sequence=["#B87333"])
         fig2.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
         st.plotly_chart(apply_plantation_layout(fig2, 520), use_container_width=True, key="nat_bar_02")
 
@@ -782,15 +981,15 @@ if menu == "🏠 Ringkasan Nasional":
         fig_pie = px.pie(comp_df, values="Produksi", names="Komoditas", hole=0.65,
                          color="Komoditas", color_discrete_map={c: get_comm_attr(c, "color_light") for c in comp_df["Komoditas"]},
                          title="Komposisi Output Nasional")
-        fig_pie.update_traces(textinfo='percent+label', textfont_size=12, textfont_color='#28362C')
+        fig_pie.update_traces(textinfo='percent+label', textfont_size=12, textfont_color='#1A2B20')
         st.plotly_chart(apply_plantation_layout(fig_pie, 450), use_container_width=True, key="nat_pie_01")
     with col_t2:
         tm_df = active_df.copy()
         tm_df["Total"] = tm_df[numeric_cols].sum(axis=1)
         tm_df = tm_df[tm_df["Total"] > 0].nlargest(15, "Total")
-        fig_tm = px.treemap(tm_df, path=["Provinsi"], values="Total", color="Total", color_continuous_scale=[[0, "#E2DFD5"], [0.5, "#A3B89F"], [1, "#5E7A54"]],
+        fig_tm = px.treemap(tm_df, path=["Provinsi"], values="Total", color="Total", color_continuous_scale=[[0, "#E5DFD0"], [0.5, "#8BA888"], [1, "#2D5F3F"]],
                             title="15 Wilayah Teratas (Treemap)")
-        fig_tm.update_traces(textfont_color="#FFFFFF")
+        fig_tm.update_traces(textfont_color="#FFFFFF", textfont_size=13)
         st.plotly_chart(apply_plantation_layout(fig_tm, 450), use_container_width=True, key="nat_tree_01")
 
     st.markdown('<div class="section-title">⚠️ Watchlist Strategis</div>', unsafe_allow_html=True)
@@ -812,10 +1011,10 @@ elif menu == "🌴 Profil Komoditas":
     info = COMMODITY_IDENTITY[target]
 
     st.markdown(f"""
-    <div style="background: #FFFFFF; border: 1px solid #E2DFD5; border-radius: 24px; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 4px 24px rgba(40, 54, 44, 0.04); position: relative; overflow: hidden;">
-        <div style="position:absolute; top:-20px; right:-20px; font-size:10rem; opacity:0.04; transform:rotate(15deg); color: {info['color_light']};">{info['icon']}</div>
-        <div style="font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; color: #3E5245; margin-bottom: 0.8rem; letter-spacing: -0.02em;">{info['icon']} Profil Komoditas: {target}</div>
-        <div style="font-size:0.95rem; color:#556359; line-height:1.7;"><b style="color:#28362C;">Sektor:</b> {info['sector']}<br><b style="color:#28362C;">Potret:</b> {info['desc']}</div>
+    <div style="background: #FFFFFF; border: 1px solid #E5DFD0; border-radius: 24px; padding: 2.8rem; margin-bottom: 2.2rem; box-shadow: 0 4px 24px rgba(26, 43, 32, 0.05); position: relative; overflow: hidden;">
+        <div style="position:absolute; top:-20px; right:-20px; font-size:10rem; opacity:0.05; transform:rotate(15deg);">{info['icon']}</div>
+        <div style="font-family:'Fraunces',serif; font-size:2.2rem; font-weight:700; color: #2D5F3F; margin-bottom: 0.8rem; letter-spacing: -0.02em;">{info['icon']} Profil Komoditas: {target}</div>
+        <div style="font-size:1rem; color:#3E5245; line-height:1.75; font-weight:500;"><b style="color:#1A2B20;">Sektor:</b> {info['sector']}<br><b style="color:#1A2B20;">Potret:</b> {info['desc']}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -829,9 +1028,9 @@ elif menu == "🌴 Profil Komoditas":
 
     c1,c2,c3,c4 = st.columns(4)
     with c1: st.markdown(create_intel_kpi("Total Panen", format_num(tot), "Volume agregat", info["icon"], info["color_light"]), unsafe_allow_html=True)
-    with c2: st.markdown(create_intel_kpi("Sentra Utama", top_p[:14], "Kontributor terbesar", "🏆", "#C28F6A"), unsafe_allow_html=True)
-    with c3: st.markdown(create_intel_kpi("Median Produksi", format_ton(med), "Tendensi sentral", "⚖️", "#94B7BC"), unsafe_allow_html=True)
-    with c4: st.markdown(create_intel_kpi("Konsentrasi Top-5", f"{share5:.1f}%", "Pangsa 5 provinsi", "🎯", "#84A578"), unsafe_allow_html=True)
+    with c2: st.markdown(create_intel_kpi("Sentra Utama", top_p[:14], "Kontributor terbesar", "🏆", "#B87333"), unsafe_allow_html=True)
+    with c3: st.markdown(create_intel_kpi("Median Produksi", format_ton(med), "Tendensi sentral", "⚖️", "#8BA888"), unsafe_allow_html=True)
+    with c4: st.markdown(create_intel_kpi("Konsentrasi Top-5", f"{share5:.1f}%", "Pangsa 5 provinsi", "🎯", "#6B9278"), unsafe_allow_html=True)
 
     tab1, tab2, tab3 = st.tabs(["🏆 Hirarki Sentra", "📊 Potret Distribusi", "🗺️ Peta Kontribusi"])
     comm_color = get_comm_attr(target, "color_light")
@@ -850,8 +1049,8 @@ elif menu == "🌴 Profil Komoditas":
             st.plotly_chart(apply_plantation_layout(fig_b, 480), use_container_width=True, key=f"comm_box_{target}")
     with tab3:
         fig_t = px.treemap(c_df.head(15), path=["Provinsi"], values=target, color=target,
-                           color_continuous_scale=[[0, "#E2DFD5"], [0.5, info["color_light"]], [1, info["color"]]], title="Treemap Kontribusi Wilayah")
-        fig_t.update_traces(textfont_color="#FFFFFF")
+                           color_continuous_scale=[[0, "#E5DFD0"], [0.5, info["color_light"]], [1, info["color"]]], title="Treemap Kontribusi Wilayah")
+        fig_t.update_traces(textfont_color="#FFFFFF", textfont_size=13)
         st.plotly_chart(apply_plantation_layout(fig_t, 500), use_container_width=True, key=f"comm_tree_{target}")
         fig_p = px.pie(c_df.head(10), values=target, names="Provinsi", hole=0.65, title="Komposisi 10 Wilayah Teratas",
                        color_discrete_sequence=SOFT_PALETTE)
@@ -881,18 +1080,18 @@ elif menu == "🗺️ Profil Provinsi":
     nat_share = (tot_p / df[numeric_cols].sum().sum() * 100) if df[numeric_cols].sum().sum() > 0 else 0
 
     st.markdown(f"""
-    <div style="background: #FFFFFF; border: 1px solid #E2DFD5; border-radius: 24px; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 4px 24px rgba(40, 54, 44, 0.04); position: relative; overflow: hidden;">
-        <div style="position:absolute; top:-30px; right:-10px; font-size:10rem; opacity:0.04; color: #6B8E76;">🗺️</div>
-        <div style="font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; color: #3E5245; margin-bottom: 0.8rem;">🗺️ Profil Perkebunan: {target_prov}</div>
-        <div style="font-size:0.95rem; color:#556359; line-height:1.7;">Total output <b style="color:#28362C;">{format_ton(tot_p)} ribu ton</b> ({nat_share:.2f}% nasional). Komoditas andalan: <b style="color:#28362C;">{dom_c}</b> ({dom_share:.1f}%).</div>
+    <div style="background: #FFFFFF; border: 1px solid #E5DFD0; border-radius: 24px; padding: 2.8rem; margin-bottom: 2.2rem; box-shadow: 0 4px 24px rgba(26, 43, 32, 0.05); position: relative; overflow: hidden;">
+        <div style="position:absolute; top:-30px; right:-10px; font-size:10rem; opacity:0.05; color: #2D5F3F;">🗺️</div>
+        <div style="font-family:'Fraunces',serif; font-size:2.2rem; font-weight:700; color: #2D5F3F; margin-bottom: 0.8rem;">🗺️ Profil Perkebunan: {target_prov}</div>
+        <div style="font-size:1rem; color:#3E5245; line-height:1.75; font-weight:500;">Total output <b style="color:#1A2B20;">{format_ton(tot_p)} ribu ton</b> ({nat_share:.2f}% nasional). Komoditas andalan: <b style="color:#1A2B20;">{dom_c}</b> ({dom_share:.1f}%).</div>
     </div>
     """, unsafe_allow_html=True)
 
     c1,c2,c3,c4 = st.columns(4)
-    with c1: st.markdown(create_intel_kpi("Total Output", format_num(tot_p), "Agregat komoditas", "📦", "#84A578"), unsafe_allow_html=True)
+    with c1: st.markdown(create_intel_kpi("Total Output", format_num(tot_p), "Agregat komoditas", "📦", "#6B9278"), unsafe_allow_html=True)
     with c2: st.markdown(create_intel_kpi("Komoditas Andalan", dom_c, f"Penopang ({dom_share:.0f}%)", get_comm_attr(dom_c,"icon"), get_comm_attr(dom_c,"color_light")), unsafe_allow_html=True)
-    with c3: st.markdown(create_intel_kpi("Sektor Aktif", str(active_c), f"dari {len(numeric_cols)}", "🌱", "#94B7BC"), unsafe_allow_html=True)
-    with c4: st.markdown(create_intel_kpi("Tingkat Dominasi", f"{dom_share:.0f}%", "Konsentrasi utama", "🎯", "#C28F6A"), unsafe_allow_html=True)
+    with c3: st.markdown(create_intel_kpi("Sektor Aktif", str(active_c), f"dari {len(numeric_cols)}", "🌱", "#8BA888"), unsafe_allow_html=True)
+    with c4: st.markdown(create_intel_kpi("Tingkat Dominasi", f"{dom_share:.0f}%", "Konsentrasi utama", "🎯", "#B87333"), unsafe_allow_html=True)
 
     st.markdown('<div class="section-title">🌳 Struktur & Portofolio Komoditas</div>', unsafe_allow_html=True)
     col1, col2 = st.columns(2)
@@ -921,18 +1120,18 @@ elif menu == "🗺️ Profil Provinsi":
         nat_norm = [(v / nat_max * 100) if nat_max > 0 else 0 for v in nat_values]
         fig_r = go.Figure()
         fig_r.add_trace(go.Scatterpolar(r=p_norm + [p_norm[0]], theta=numeric_cols + [numeric_cols[0]],
-                                        fill='toself', name=target_prov, line_color="#6B8E76", fillcolor="rgba(107, 142, 118, 0.3)"))
+                                        fill='toself', name=target_prov, line_color="#2D5F3F", fillcolor="rgba(45, 95, 63, 0.3)"))
         fig_r.add_trace(go.Scatterpolar(r=nat_norm + [nat_norm[0]], theta=numeric_cols + [numeric_cols[0]],
-                                        fill='toself', name="Rata-rata Nasional", line_color="#C28F6A", fillcolor="rgba(194, 143, 106, 0.15)"))
+                                        fill='toself', name="Rata-rata Nasional", line_color="#B87333", fillcolor="rgba(184, 115, 51, 0.15)"))
         fig_r.update_layout(polar=dict(bgcolor="#FFFFFF",
-                                       radialaxis=dict(visible=True, showticklabels=False, gridcolor="#E2DFD5"),
-                                       angularaxis=dict(gridcolor="#E2DFD5", tickfont=dict(color="#556359", family="DM Sans"))),
+                                       radialaxis=dict(visible=True, showticklabels=False, gridcolor="#E5DFD0"),
+                                       angularaxis=dict(gridcolor="#E5DFD0", tickfont=dict(color="#3E5245", family="Inter"))),
                             showlegend=True, title="Radar (Normalisasi)")
         st.plotly_chart(apply_plantation_layout(fig_r, 500), use_container_width=True, key=f"prov_radar_{target_prov}")
     with col_r2:
         bench_df = pd.DataFrame({"Komoditas": numeric_cols, "Provinsi": p_values, "Nasional": list(nat_avg.values())})
         bench_df["Deviasi"] = bench_df["Provinsi"] - bench_df["Nasional"]
-        colors = ["#84A578" if v >= 0 else "#B39179" for v in bench_df["Deviasi"]]
+        colors = ["#6B9278" if v >= 0 else "#B39471" for v in bench_df["Deviasi"]]
         fig3 = go.Figure(go.Bar(y=bench_df["Komoditas"], x=bench_df["Deviasi"], orientation='h', marker_color=colors))
         fig3.update_layout(title="Deviasi vs Rata-rata Nasional", xaxis_title="Deviasi (Ribu Ton)")
         st.plotly_chart(apply_plantation_layout(fig3, 500), use_container_width=True, key=f"prov_bench_{target_prov}")
@@ -941,7 +1140,7 @@ elif menu == "🗺️ Profil Provinsi":
     st.markdown(f'<div class="insight-card">🗺️ <b>{target_prov}</b>: <b>{active_c}</b> komoditas aktif. {dep_note} Strategi: perkuat klaster unggulan & hilirisasi lokal.</div>', unsafe_allow_html=True)
 
 # =========================================================
-# PAGE 4: EKSPLORASI VISUAL (EDA 5-TAB)
+# PAGE 4: EKSPLORASI VISUAL
 # =========================================================
 elif menu == "🔬 Eksplorasi Visual":
     st.markdown('<div class="section-title">🔬 Eksplorasi Visual & EDA</div>', unsafe_allow_html=True)
@@ -959,7 +1158,7 @@ elif menu == "🔬 Eksplorasi Visual":
         with c2:
             temp = active_df.copy(); temp["Total"] = temp[numeric_cols].sum(axis=1)
             top_total = temp.nlargest(top_n, "Total").sort_values("Total", ascending=True)
-            fig2 = px.bar(top_total, x="Total", y="Provinsi", orientation='h', text="Total", title="Top Provinsi Total Produksi", color_discrete_sequence=["#C28F6A"])
+            fig2 = px.bar(top_total, x="Total", y="Provinsi", orientation='h', text="Total", title="Top Provinsi Total Produksi", color_discrete_sequence=["#B87333"])
             fig2.update_traces(texttemplate='%{text:,.0f}', textposition='outside')
             st.plotly_chart(apply_plantation_layout(fig2, 500), use_container_width=True, key="eda_overview_2")
     with tab2:
@@ -979,7 +1178,7 @@ elif menu == "🔬 Eksplorasi Visual":
         x_v = c1.selectbox("Komoditas X", numeric_cols, index=0, key="eda_rel_x")
         y_v = c2.selectbox("Komoditas Y", numeric_cols, index=1, key="eda_rel_y")
         if x_v != y_v:
-            fig = px.scatter(active_df, x=x_v, y=y_v, hover_name="Provinsi", title=f"{x_v} vs {y_v}", color_discrete_sequence=["#6B8E76"])
+            fig = px.scatter(active_df, x=x_v, y=y_v, hover_name="Provinsi", title=f"{x_v} vs {y_v}", color_discrete_sequence=["#2D5F3F"])
             st.plotly_chart(apply_plantation_layout(fig, 550), use_container_width=True, key="eda_rel_scatter")
             corr = active_df[[x_v, y_v]].corr().iloc[0,1]
             strength = "kuat" if abs(corr)>0.6 else "sedang" if abs(corr)>0.3 else "lemah"
@@ -988,14 +1187,14 @@ elif menu == "🔬 Eksplorasi Visual":
     with tab4:
         corr_m = active_df[numeric_cols].corr()
         fig = px.imshow(corr_m, text_auto=".2f", aspect="auto", zmin=-1, zmax=1,
-                        color_continuous_scale=[[0,"#A67B66"],[0.5,"#F6F4EE"],[1,"#6B8E76"]],
+                        color_continuous_scale=[[0,"#A67B66"],[0.5,"#FAF7F0"],[1,"#2D5F3F"]],
                         title="Matriks Korelasi Agro-Ekologis")
-        fig.update_traces(textfont=dict(color="#28362C", size=11), xgap=3, ygap=3)
+        fig.update_traces(textfont=dict(color="#1A2B20", size=12, family="Inter"), xgap=3, ygap=3)
         fig.update_xaxes(side="bottom", tickangle=30); fig.update_yaxes(autorange="reversed")
-        fig.update_layout(paper_bgcolor="#F6F4EE", plot_bgcolor="#FFFFFF",
-                          font=dict(color="#28362C"), margin=dict(l=40,r=30,t=60,b=40))
-        fig.update_coloraxes(colorbar=dict(title=dict(text="Korelasi", font=dict(color="#556359")),
-                                            tickfont=dict(color="#556359"), len=0.75))
+        fig.update_layout(paper_bgcolor="#FAF7F0", plot_bgcolor="#FFFFFF",
+                          font=dict(color="#1A2B20"), margin=dict(l=40,r=30,t=60,b=40))
+        fig.update_coloraxes(colorbar=dict(title=dict(text="Korelasi", font=dict(color="#3E5245")),
+                                            tickfont=dict(color="#3E5245"), len=0.75))
         st.plotly_chart(fig, use_container_width=True, key="eda_corr")
     with tab5:
         deep_prov = st.selectbox("Pilih Provinsi", active_df["Provinsi"].tolist(), key="eda_deep")
@@ -1012,7 +1211,7 @@ elif menu == "🔬 Eksplorasi Visual":
             with c2:
                 total_p = profile["Produksi"].sum()
                 dom_comm = profile.iloc[0]["Komoditas"]
-                st.markdown(create_intel_kpi("Total Produksi", format_num(total_p), "Ribu Ton", "📦", "#84A578"), unsafe_allow_html=True)
+                st.markdown(create_intel_kpi("Total Produksi", format_num(total_p), "Ribu Ton", "📦", "#6B9278"), unsafe_allow_html=True)
                 st.markdown(create_intel_kpi("Komoditas Dominan", dom_comm, format_ton(profile.iloc[0]['Produksi']), get_comm_attr(dom_comm,'icon'), get_comm_attr(dom_comm,'color_light')), unsafe_allow_html=True)
 
 # =========================================================
@@ -1028,8 +1227,8 @@ elif menu == "📊 Analisis Produksi":
         d1, d2 = df[df["Provinsi"]==p1].iloc[0], df[df["Provinsi"]==p2].iloc[0]
         comp = pd.DataFrame({"Komoditas": numeric_cols, p1: [d1[c] for c in numeric_cols], p2: [d2[c] for c in numeric_cols]})
         fig = go.Figure()
-        fig.add_trace(go.Bar(name=p1, x=comp["Komoditas"], y=comp[p1], marker_color="#84A578"))
-        fig.add_trace(go.Bar(name=p2, x=comp["Komoditas"], y=comp[p2], marker_color="#C28F6A"))
+        fig.add_trace(go.Bar(name=p1, x=comp["Komoditas"], y=comp[p1], marker_color="#6B9278"))
+        fig.add_trace(go.Bar(name=p2, x=comp["Komoditas"], y=comp[p2], marker_color="#B87333"))
         fig.update_layout(barmode='group', title=f"{p1} vs {p2}")
         st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="duel_chart")
         w1, w2 = (comp[p1] >comp[p2]).sum(), (comp[p2] >comp[p1]).sum()
@@ -1039,7 +1238,7 @@ elif menu == "📊 Analisis Produksi":
         x_v = c1.selectbox("X", numeric_cols, index=0, key="rel_x")
         y_v = c2.selectbox("Y", numeric_cols, index=1, key="rel_y")
         if x_v != y_v:
-            fig = px.scatter(active_df, x=x_v, y=y_v, hover_name="Provinsi", title=f"{x_v} vs {y_v}", color_discrete_sequence=["#6B8E76"])
+            fig = px.scatter(active_df, x=x_v, y=y_v, hover_name="Provinsi", title=f"{x_v} vs {y_v}", color_discrete_sequence=["#2D5F3F"])
             st.plotly_chart(apply_plantation_layout(fig, 500), use_container_width=True, key="rel_scatter")
             corr = active_df[[x_v, y_v]].corr().iloc[0,1]
             st.markdown(f'<div class="insight-card">🔗 Korelasi: <b>{corr:.3f}</b></div>', unsafe_allow_html=True)
@@ -1050,7 +1249,7 @@ elif menu == "📊 Analisis Produksi":
         bdf = pd.DataFrame({"Komoditas": numeric_cols, "Prov": [bd[c] for c in numeric_cols], "Nat": [df[c].mean() for c in numeric_cols]})
         bdf["Rasio"] = bdf["Prov"] / bdf["Nat"].replace(0, 0.01)
         fig = go.Figure(go.Bar(x=bdf["Komoditas"], y=bdf["Rasio"], marker_color=[get_comm_attr(c, "color_light") for c in bdf["Komoditas"]]))
-        fig.add_hline(y=1, line_dash="dash", line_color="#C28F6A")
+        fig.add_hline(y=1, line_dash="dash", line_color="#B87333")
         fig.update_layout(title=f"{bp} vs Nasional", yaxis_title="Rasio")
         st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="bench_chart")
 
@@ -1063,7 +1262,7 @@ elif menu == "🌍 Sebaran Wilayah":
     col_l, col_r = st.columns([1.2, 1])
     with col_l:
         fig1 = px.bar(geo_df.head(top_n), x="Provinsi", y=selected_commodity, color=selected_commodity, text=selected_commodity,
-                      color_continuous_scale=[[0, "#E2DFD5"], [1, get_comm_attr(selected_commodity, "color_light")]],
+                      color_continuous_scale=[[0, "#E5DFD0"], [1, get_comm_attr(selected_commodity, "color_light")]],
                       title="Ranking Intensitas Sentra")
         fig1.update_traces(texttemplate='%{text:.2f}', textposition='outside'); fig1.update_xaxes(tickangle=45)
         st.plotly_chart(apply_plantation_layout(fig1, 500), use_container_width=True, key="geo_rank")
@@ -1080,13 +1279,13 @@ elif menu == "🌍 Sebaran Wilayah":
         kc = geo_df["Kategori"].value_counts()
         st.markdown('<div class="section-title">🏷️ Klasifikasi Wilayah</div>', unsafe_allow_html=True)
         k1,k2,k3,k4 = st.columns(4)
-        k1.markdown(create_intel_kpi("Sentra Nasional", str(kc.get("Nasional",0)), "Anchor production", "🏆", "#C28F6A"), unsafe_allow_html=True)
-        k2.markdown(create_intel_kpi("Sentra Regional", str(kc.get("Regional",0)), "Pillar produksi", "🌾", "#84A578"), unsafe_allow_html=True)
-        k3.markdown(create_intel_kpi("Penyangga", str(kc.get("Penyangga",0)), "Stabilisator", "🌱", "#94B7BC"), unsafe_allow_html=True)
-        k4.markdown(create_intel_kpi("Minor", str(kc.get("Minor",0)), "Niche", "🍃", "#B39179"), unsafe_allow_html=True)
+        k1.markdown(create_intel_kpi("Sentra Nasional", str(kc.get("Nasional",0)), "Anchor production", "🏆", "#B87333"), unsafe_allow_html=True)
+        k2.markdown(create_intel_kpi("Sentra Regional", str(kc.get("Regional",0)), "Pillar produksi", "🌾", "#6B9278"), unsafe_allow_html=True)
+        k3.markdown(create_intel_kpi("Penyangga", str(kc.get("Penyangga",0)), "Stabilisator", "🌱", "#8BA888"), unsafe_allow_html=True)
+        k4.markdown(create_intel_kpi("Minor", str(kc.get("Minor",0)), "Niche", "🍃", "#B39471"), unsafe_allow_html=True)
 
 # =========================================================
-# PAGE 7: PROYEKSI & MODEL (4 TAB LENGKAP)
+# PAGE 7: PROYEKSI & MODEL
 # =========================================================
 elif menu == "📈 Proyeksi & Model":
     st.markdown('<div class="section-title">📈 Proyeksi & Model Produksi</div>', unsafe_allow_html=True)
@@ -1111,9 +1310,9 @@ elif menu == "📈 Proyeksi & Model":
                     k2.metric("RMSE", f"{math.sqrt(mean_squared_error(y, pred)):.2f}")
                     k3.metric("R²", f"{r2_score(y, pred):.4f}")
                     fig = go.Figure()
-                    fig.add_trace(go.Scatter(x=mdf[x_var], y=mdf[y_var], mode="markers", name="Aktual", marker=dict(color="#6B8E76", size=9, symbol="circle")))
+                    fig.add_trace(go.Scatter(x=mdf[x_var], y=mdf[y_var], mode="markers", name="Aktual", marker=dict(color="#2D5F3F", size=9, symbol="circle")))
                     sort_idx = np.argsort(mdf[x_var].values)
-                    fig.add_trace(go.Scatter(x=mdf[x_var].values[sort_idx], y=pred[sort_idx], mode="lines", name="Regresi", line=dict(color="#C28F6A", width=3)))
+                    fig.add_trace(go.Scatter(x=mdf[x_var].values[sort_idx], y=pred[sort_idx], mode="lines", name="Regresi", line=dict(color="#B87333", width=3)))
                     fig.update_layout(title=f"Pola Hubungan: {x_var} → {y_var}", xaxis_title=x_var, yaxis_title=y_var)
                     st.plotly_chart(apply_plantation_layout(fig, 480), use_container_width=True, key="proj_reg")
                     st.markdown("#### 🎮 Playground Prediksi")
@@ -1133,8 +1332,8 @@ elif menu == "📈 Proyeksi & Model":
             fc["Proyeksi_2025"] = fc[fc_comm] * (1 + gr)
             top_fc = fc.sort_values(fc_comm, ascending=False).head(top_n)
             fig_fc = go.Figure()
-            fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[fc_comm], name="Panen 2024", marker_color="#B39179"))
-            fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Proyeksi_2025"], name="Proyeksi 2025", marker_color="#84A578"))
+            fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc[fc_comm], name="Panen 2024", marker_color="#B39471"))
+            fig_fc.add_trace(go.Bar(x=top_fc["Provinsi"], y=top_fc["Proyeksi_2025"], name="Proyeksi 2025", marker_color="#6B9278"))
             fig_fc.update_layout(barmode="group", title=f"Forecasting {fc_comm}: 2024 vs 2025", xaxis_title="Provinsi", yaxis_title="Volume (Ribu Ton)")
             st.plotly_chart(apply_plantation_layout(fig_fc, 500), use_container_width=True, key="fc_chart_bar")
             c1, c2 = st.columns(2)
@@ -1158,11 +1357,11 @@ elif menu == "📈 Proyeksi & Model":
                 c1, c2 = st.columns(2)
                 with c1:
                     imp = pd.Series(rf.feature_importances_, index=feats).sort_values(ascending=True)
-                    fig_imp = px.bar(x=imp.values, y=imp.index, orientation='h', title="Feature Importance", color_discrete_sequence=["#84A578"])
+                    fig_imp = px.bar(x=imp.values, y=imp.index, orientation='h', title="Feature Importance", color_discrete_sequence=["#6B9278"])
                     st.plotly_chart(apply_plantation_layout(fig_imp, 450), use_container_width=True, key="rf_imp")
                 with c2:
                     comp_df = pd.DataFrame({"Aktual": y_te, "Prediksi": y_pred})
-                    fig_sc = px.scatter(comp_df, x="Aktual", y="Prediksi", title="Aktual vs Prediksi (Test Set)", color_discrete_sequence=["#C28F6A"])
+                    fig_sc = px.scatter(comp_df, x="Aktual", y="Prediksi", title="Aktual vs Prediksi (Test Set)", color_discrete_sequence=["#B87333"])
                     st.plotly_chart(apply_plantation_layout(fig_sc, 450), use_container_width=True, key="rf_scatter")
                 st.markdown(f'<div class="insight-card">🌱 <b>{imp.idxmax()}</b> menjadi driver utama untuk <b>{tgt}</b> (score: {imp.max():.3f}).</div>', unsafe_allow_html=True)
             else: st.warning("Data terlalu sedikit.")
@@ -1183,7 +1382,7 @@ elif menu == "📈 Proyeksi & Model":
                 imp_dt = pd.Series(dt.feature_importances_, index=feats_dt).sort_values(ascending=True)
                 fig_imp_dt = px.bar(x=imp_dt.values, y=imp_dt.index, orientation='h',
                                     title="Feature Importance (Pembagi Utama)",
-                                    color_discrete_sequence=["#94B7BC"])
+                                    color_discrete_sequence=["#8BA888"])
                 st.plotly_chart(apply_plantation_layout(fig_imp_dt, 400), use_container_width=True, key="dt_imp")
                 st.markdown("#### 🌳 Logika Percabangan Pohon Keputusan")
                 st.markdown("""
@@ -1237,9 +1436,9 @@ elif menu == "🧠 Insight & Strategi":
 
     st.markdown("### 🎯 Prioritas Pengembangan Strategis")
     p1, p2, p3 = st.columns(3)
-    with p1: st.markdown('<div class="priority-card"><b>🏭 Hilirisasi & Nilai Tambah</b><br><span style="color:#556359; font-size:0.9rem;">Pengolahan CPO, karet olahan, kopi specialty.</span></div>', unsafe_allow_html=True)
-    with p2: st.markdown('<div class="priority-card"><b>🌱 Diversifikasi & Ketahanan</b><br><span style="color:#556359; font-size:0.9rem;">Tanaman sela & agroforestri berkelanjutan.</span></div>', unsafe_allow_html=True)
-    with p3: st.markdown('<div class="priority-card"><b>📈 Digitalisasi & Data</b><br><span style="color:#556359; font-size:0.9rem;">Precision agriculture & dashboard real-time.</span></div>', unsafe_allow_html=True)
+    with p1: st.markdown('<div class="priority-card"><b style="font-family:Fraunces,serif; font-size:1.2rem; color:#2D5F3F;">🏭 Hilirisasi & Nilai Tambah</b><br><span style="color:#3E5245; font-size:0.92rem;">Pengolahan CPO, karet olahan, kopi specialty.</span></div>', unsafe_allow_html=True)
+    with p2: st.markdown('<div class="priority-card"><b style="font-family:Fraunces,serif; font-size:1.2rem; color:#2D5F3F;">🌱 Diversifikasi & Ketahanan</b><br><span style="color:#3E5245; font-size:0.92rem;">Tanaman sela & agroforestri berkelanjutan.</span></div>', unsafe_allow_html=True)
+    with p3: st.markdown('<div class="priority-card"><b style="font-family:Fraunces,serif; font-size:1.2rem; color:#2D5F3F;">📈 Digitalisasi & Data</b><br><span style="color:#3E5245; font-size:0.92rem;">Precision agriculture & dashboard real-time.</span></div>', unsafe_allow_html=True)
 
 # =========================================================
 # PAGE 9: DATA & EKSPOR
@@ -1276,15 +1475,15 @@ elif menu == "📦 Data & Ekspor":
     st.download_button(f"⬇️ Ekspor Proyeksi {exp_comm} 2025", export_fc.to_csv(index=False).encode("utf-8"), f"proyeksi_{exp_comm}_2025.csv", "text/csv", use_container_width=True)
 
 # =========================================================
-# 🌿 FOOTER — ELEGANT BOTANICAL
+# FOOTER
 # =========================================================
 st.markdown("""
-<div style="text-align:center; padding:3rem 2rem; margin-top:3rem; background: #FFFFFF; border-radius: 24px; border: 1px solid #E2DFD5; box-shadow: 0 -4px 24px rgba(40, 54, 44, 0.03);">
-    <div style="font-size:2.5rem; margin-bottom:0.5rem; opacity:0.8;">🌿</div>
-    <h3 style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color: #3E5245; margin-bottom:0.6rem; letter-spacing:-0.02em;">Plantation Intelligence Dashboard</h3>
-    <p style="color:#556359; font-size:0.9rem; margin-bottom:0.4rem;">UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
-    <p style="color:#849187; font-size:0.82rem; margin-top:0.8rem;">Streamlit + Plotly + Scikit-Learn untuk perencanaan strategis sektor perkebunan Indonesia</p>
-    <div style="width:60px; height:2px; background: #D4B895; margin: 1.5rem auto; border-radius:2px;"></div>
-    <p style="color:#849187; font-size:0.75rem; letter-spacing:0.05em;">© 2026 | Sumber: BPS — Produksi Tanaman Perkebunan Menurut Provinsi, 2024</p>
+<div style="text-align:center; padding:3rem 2rem; margin-top:3rem; background: #FFFFFF; border-radius: 24px; border: 1px solid #E5DFD0; box-shadow: 0 -4px 24px rgba(26, 43, 32, 0.04);">
+    <div style="font-size:2.5rem; margin-bottom:0.5rem; opacity:0.7;">🌿</div>
+    <h3 style="font-family:'Fraunces',serif; font-size:1.6rem; font-weight:700; color: #2D5F3F; margin-bottom:0.6rem; letter-spacing:-0.02em;">Plantation Intelligence Dashboard</h3>
+    <p style="color:#3E5245; font-size:0.95rem; margin-bottom:0.4rem; font-weight:500;">UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
+    <p style="color:#6B7D70; font-size:0.88rem; margin-top:0.8rem;">Streamlit + Plotly + Scikit-Learn untuk perencanaan strategis sektor perkebunan Indonesia</p>
+    <div style="width:60px; height:2px; background: linear-gradient(90deg, #2D5F3F, #B87333); margin: 1.5rem auto; border-radius:2px;"></div>
+    <p style="color:#9AA89F; font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; font-weight:600;">© 2026 | Sumber: BPS — Produksi Tanaman Perkebunan Menurut Provinsi, 2024</p>
 </div>
 """, unsafe_allow_html=True)
