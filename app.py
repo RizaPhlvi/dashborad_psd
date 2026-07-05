@@ -1401,7 +1401,7 @@ header[data-testid="stHeader"] {
 """, unsafeallowhtml=True)
 
 
-DATASET (BPS 2025)
+DATASET (BPS, 2025)
 
 CSV_DATA = """Provinsi,Kelapa Sawit,Kelapa,Karet,Kopi,Kakao,Teh,Tebu
 ACEH,1092.71,64.1,51.17,74.13,34.17,0,0
