@@ -89,8 +89,8 @@ def create_choropleth_map(df_map, value_col, title, color_label, is_aggregate=Fa
         lataxis_range=[-12, 8], lonaxis_range=[94, 142]
     )
     fig.update_layout(
-        paper_bgcolor="#FAF7F0", plot_bgcolor="#FFFFFF",
-        font=dict(color="#1A2B20", family="Inter, sans-serif"),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="var(--text-color, #1A2B20)", family="Inter, sans-serif"),
         margin={"r": 0, "t": 60, "l": 0, "b": 40}, height=580,
         title=dict(font=dict(size=16, color="#2D5F3F", family="Georgia, serif"), x=0.02),
         coloraxis_colorbar=dict(title=color_label, len=0.8, thickness=18)
@@ -98,33 +98,26 @@ def create_choropleth_map(df_map, value_col, title, color_label, is_aggregate=Fa
     return fig
 
 # =========================================================
-# LIGHTWEIGHT BOTANICAL THEME (Optimized CSS)
+# ADAPTIVE BOTANICAL THEME (DARK/LIGHT MODE)
 # =========================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --bg: #FAF7F0;
-    --card: #FFFFFF;
-    --sidebar: #F0EBE0;
-    --ink: #1A2B20;
-    --ink2: #3E5245;
-    --ink3: #6B7D70;
-    --heritage: #2D5F3F;
-    --copper: #B87333;
-    --sage: #8BA888;
-    --sand: #D4B896;
-    --border: #E5DFD0;
-    --sh: 0 2px 8px rgba(26,43,32,0.06);
-    --sh-md: 0 8px 20px rgba(26,43,32,0.08);
+    --botanical-heritage: #2D5F3F;
+    --botanical-copper: #B87333;
+    --botanical-sage: #8BA888;
+    --botanical-sand: #D4B896;
+    --botanical-sh: 0 2px 8px rgba(26,43,32,0.06);
+    --botanical-sh-md: 0 8px 20px rgba(26,43,32,0.08);
 }
 
 * { box-sizing: border-box; }
 
 .stApp {
-    background: var(--bg);
-    color: var(--ink);
+    background: var(--background-color, #FAF7F0);
+    color: var(--text-color, #1A2B20);
     font-family: 'Inter', -apple-system, system-ui, sans-serif;
     font-size: 14.5px;
     line-height: 1.6;
@@ -133,19 +126,19 @@ st.markdown("""
 .block-container { max-width: 1500px; padding: 2rem 2.5rem 3rem; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+::-webkit-scrollbar-track { background: var(--background-color, #FAF7F0); }
+::-webkit-scrollbar-thumb { background: var(--border-color, #E5DFD0); border-radius: 8px; }
 
 h1, h2, h3 { 
     font-family: Georgia, 'Times New Roman', serif !important;
-    color: var(--ink) !important;
+    color: var(--text-color, #1A2B20) !important;
     letter-spacing: -0.02em;
 }
 
 /* HERO */
 .hero-strip {
     background: linear-gradient(135deg, #1E3A2B 0%, #2D5F3F 60%, #3E7550 100%);
-    color: var(--card);
+    color: #FAF7F0;
     padding: 2.5rem 3rem;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(30,58,43,0.18);
@@ -168,7 +161,7 @@ h1, h2, h3 {
     margin-bottom: 0.8rem;
     letter-spacing: -0.03em;
 }
-.hero-subtitle {
+.hero-subtitle { 
     color: rgba(250,247,240,0.88);
     font-size: 1rem;
     line-height: 1.7;
@@ -208,9 +201,10 @@ h1, h2, h3 {
     font-family: Georgia, serif;
 }
 
-/* SIDEBAR */
+/* SIDEBAR - ADAPTIVE */
 section[data-testid="stSidebar"] {
-    background: var(--sidebar) !important;
+    background: var(--secondary-background-color, #F0EBE0) !important;
+    border-right: 1px solid var(--border-color, #E5DFD0) !important;
 }
 .sidebar-brand {
     background: linear-gradient(135deg, #1E3A2B, #2D5F3F);
@@ -224,6 +218,7 @@ section[data-testid="stSidebar"] {
     font-size: 1.4rem;
     font-weight: 700;
     margin-bottom: 0.2rem;
+    color: #fff;
 }
 .sidebar-brand-sub {
     font-size: 0.7rem;
@@ -233,27 +228,28 @@ section[data-testid="stSidebar"] {
     font-weight: 600;
 }
 .sidebar-block {
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: var(--background-color, #FFFFFF) !important;
+    border: 1px solid var(--border-color, #E5DFD0) !important;
     border-radius: 14px;
     padding: 1.2rem;
     margin-bottom: 1rem;
-    box-shadow: var(--sh);
+    box-shadow: var(--botanical-sh);
+    color: var(--text-color, #1A2B20) !important;
 }
 .sidebar-title {
     font-size: 0.7rem;
     font-weight: 700;
-    color: var(--heritage);
+    color: var(--botanical-heritage) !important;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     margin-bottom: 0.8rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-color, #E5DFD0);
 }
 section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
     border-radius: 8px !important;
     padding: 0.6rem 0.9rem !important;
-    color: var(--ink2) !important;
+    color: var(--text-color, #3E5245) !important;
     font-weight: 500 !important;
     font-size: 0.88rem !important;
     border-left: 3px solid transparent !important;
@@ -262,41 +258,44 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
 }
 section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover {
     background: rgba(139,168,136,0.1) !important;
-    color: var(--heritage) !important;
+    color: var(--botanical-heritage) !important;
 }
 section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[data-baseweb="radio"] > div:first-child { display: none; }
 section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-checked="true"] {
-    background: var(--heritage) !important;
+    background: var(--botanical-heritage) !important;
     color: #fff !important;
     font-weight: 600 !important;
     box-shadow: 0 3px 10px rgba(45,95,63,0.2) !important;
 }
 .commodity-brief {
-    background: #F5EFE0;
-    border-left: 3px solid var(--heritage);
+    background: rgba(139,168,136,0.08) !important;
+    border-left: 3px solid var(--botanical-heritage);
     padding: 0.9rem 1rem;
     border-radius: 0 10px 10px 0;
     margin-top: 0.7rem;
+    color: var(--text-color, #1A2B20) !important;
 }
 
 /* KPI */
 .intel-kpi {
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: var(--background-color, #FFFFFF) !important;
+    border: 1px solid var(--border-color, #E5DFD0) !important;
     border-radius: 16px;
     padding: 1.4rem 1.3rem;
-    box-shadow: var(--sh);
+    box-shadow: var(--botanical-sh);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     height: 100%;
+    color: var(--text-color, #1A2B20) !important;
 }
 .intel-kpi:hover {
     transform: translateY(-4px);
-    box-shadow: var(--sh-md);
+    box-shadow: var(--botanical-sh-md);
 }
 .kpi-layer1 {
     font-size: 0.7rem;
     font-weight: 700;
-    color: var(--ink3);
+    color: var(--text-color, #6B7D70) !important;
+    opacity: 0.75;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.6rem;
@@ -307,7 +306,7 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
 .kpi-layer2 {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--ink);
+    color: var(--text-color, #1A2B20) !important;
     line-height: 1.1;
     margin-bottom: 0.35rem;
     font-family: Georgia, serif;
@@ -315,7 +314,8 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
 }
 .kpi-layer3 {
     font-size: 0.82rem;
-    color: var(--ink2);
+    color: var(--text-color, #3E5245) !important;
+    opacity: 0.85;
     line-height: 1.4;
     font-weight: 500;
 }
@@ -325,7 +325,7 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     font-family: Georgia, serif !important;
     font-size: 1.5rem !important;
     font-weight: 700 !important;
-    color: var(--heritage) !important;
+    color: var(--botanical-heritage) !important;
     padding-bottom: 0.6rem;
     margin-top: 2.2rem;
     margin-bottom: 1.2rem;
@@ -337,16 +337,17 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     position: absolute;
     bottom: 0; left: 0;
     width: 60px; height: 3px;
-    background: var(--copper);
+    background: var(--botanical-copper);
     border-radius: 2px;
 }
 .section-subtitle {
     font-size: 0.92rem;
-    color: var(--ink2);
+    color: var(--text-color, #3E5245) !important;
+    opacity: 0.8;
     margin-bottom: 1.5rem;
     font-style: italic;
     padding-left: 1rem;
-    border-left: 3px solid var(--sand);
+    border-left: 3px solid var(--botanical-sand);
 }
 
 /* CARDS */
@@ -356,46 +357,48 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     margin: 1rem 0;
     line-height: 1.7;
     font-size: 0.92rem;
-    box-shadow: var(--sh);
+    box-shadow: var(--botanical-sh);
+    color: var(--text-color, #1A2B20) !important;
 }
 .insight-card {
-    background: #EFF5EE;
-    border-left: 4px solid var(--heritage);
+    background: rgba(139,168,136,0.12) !important;
+    border-left: 4px solid var(--botanical-heritage);
 }
 .watchlist-card {
-    background: #FDF5EC;
-    border-left: 4px solid var(--copper);
+    background: rgba(184,115,51,0.1) !important;
+    border-left: 4px solid var(--botanical-copper);
 }
 .rec-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--sand);
+    background: var(--background-color, #FFFFFF) !important;
+    border: 1px solid var(--border-color, #E5DFD0) !important;
+    border-left: 4px solid var(--botanical-sand);
 }
 .priority-card {
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: var(--background-color, #FFFFFF) !important;
+    border: 1px solid var(--border-color, #E5DFD0) !important;
     padding: 1.5rem 1.3rem;
     border-radius: 14px;
     text-align: center;
-    box-shadow: var(--sh);
+    box-shadow: var(--botanical-sh);
     transition: transform 0.25s ease;
+    color: var(--text-color, #1A2B20) !important;
 }
 .priority-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--sh-md);
+    box-shadow: var(--botanical-sh-md);
 }
 
 /* TABS */
 .stTabs [data-baseweb="tab-list"] {
     gap: 6px;
-    background: rgba(229,223,208,0.4);
+    background: rgba(139,168,136,0.08);
     padding: 0.4rem;
     border-radius: 12px;
 }
 .stTabs [data-baseweb="tab"] {
     background: transparent !important;
     border-radius: 8px !important;
-    color: var(--ink2) !important;
+    color: var(--text-color, #3E5245) !important;
     font-weight: 600 !important;
     padding: 0.65rem 1.3rem !important;
     border: none !important;
@@ -403,13 +406,13 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
 }
 .stTabs [data-baseweb="tab"]:hover {
     background: rgba(139,168,136,0.12) !important;
-    color: var(--heritage) !important;
+    color: var(--botanical-heritage) !important;
 }
 .stTabs [aria-selected="true"] {
-    background: var(--card) !important;
-    color: var(--heritage) !important;
-    border: 1px solid var(--border) !important;
-    box-shadow: var(--sh) !important;
+    background: var(--background-color, #FFFFFF) !important;
+    color: var(--botanical-heritage) !important;
+    border: 1px solid var(--border-color, #E5DFD0) !important;
+    box-shadow: var(--botanical-sh) !important;
     font-weight: 700 !important;
 }
 
@@ -422,7 +425,7 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     transition: all 0.2s ease !important;
 }
 .stButton > button {
-    background: var(--heritage) !important;
+    background: var(--botanical-heritage) !important;
     color: #fff !important;
     border: none !important;
     box-shadow: 0 2px 6px rgba(45,95,63,0.18) !important;
@@ -433,37 +436,37 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     box-shadow: 0 6px 14px rgba(45,95,63,0.25) !important;
 }
 .stDownloadButton > button {
-    background: var(--card) !important;
-    color: var(--heritage) !important;
-    border: 1.5px solid var(--heritage) !important;
+    background: var(--background-color, #FFFFFF) !important;
+    color: var(--botanical-heritage) !important;
+    border: 1.5px solid var(--botanical-heritage) !important;
 }
 .stDownloadButton > button:hover {
-    background: #F0F5EE !important;
+    background: rgba(139,168,136,0.1) !important;
     transform: translateY(-2px) !important;
 }
 
 /* FORM LABELS */
 .stSelectbox label, .stSlider label, .stRadio label, .stMultiSelect label, .stNumberInput label {
-    color: var(--ink2) !important;
+    color: var(--text-color, #3E5245) !important;
     font-weight: 600 !important;
     font-size: 0.84rem !important;
 }
 
 /* METRICS */
 div[data-testid="stMetric"] {
-    background: var(--card);
+    background: var(--background-color, #FFFFFF) !important;
     padding: 1rem 1.2rem;
     border-radius: 12px;
-    border: 1px solid var(--border);
-    box-shadow: var(--sh);
+    border: 1px solid var(--border-color, #E5DFD0) !important;
+    box-shadow: var(--botanical-sh);
 }
 div[data-testid="stMetric"] label {
-    color: var(--ink3) !important;
+    color: var(--text-color, #6B7D70) !important;
     font-weight: 600;
     font-size: 0.8rem !important;
 }
 div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
-    color: var(--ink) !important;
+    color: var(--text-color, #1A2B20) !important;
     font-family: Georgia, serif !important;
     font-weight: 700 !important;
     font-size: 1.5rem;
@@ -471,24 +474,24 @@ div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
 
 /* HEADER */
 header[data-testid="stHeader"] {
-    background: rgba(250,247,240,0.9) !important;
+    background: var(--background-color, rgba(250,247,240,0.9)) !important;
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-color, #E5DFD0);
 }
 
 /* DATAFRAME */
 .stDataFrame {
     border-radius: 12px !important;
-    border: 1px solid var(--border) !important;
+    border: 1px solid var(--border-color, #E5DFD0) !important;
     overflow: hidden;
 }
 
 /* WARNING */
 .stWarning {
     border-radius: 10px !important;
-    border-left: 4px solid var(--copper) !important;
-    background: #FDF5EC !important;
-    color: var(--ink) !important;
+    border-left: 4px solid var(--botanical-copper) !important;
+    background: rgba(184,115,51,0.1) !important;
+    color: var(--text-color, #1A2B20) !important;
     padding: 0.9rem 1.1rem !important;
     font-size: 0.88rem;
 }
@@ -496,14 +499,14 @@ header[data-testid="stHeader"] {
 /* DIVIDER */
 .organic-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), var(--sand), var(--border), transparent);
+    background: linear-gradient(90deg, transparent, var(--border-color, #E5DFD0), var(--botanical-sand), var(--border-color, #E5DFD0), transparent);
     margin: 2.5rem 0;
 }
 
 /* BADGE */
 .aggregate-badge {
     display: inline-block;
-    background: linear-gradient(135deg, var(--copper), #D4A574);
+    background: linear-gradient(135deg, var(--botanical-copper), #D4A574);
     color: #fff;
     padding: 0.35rem 0.9rem;
     border-radius: 999px;
@@ -519,8 +522,8 @@ header[data-testid="stHeader"] {
 .js-plotly-plot .plotly {
     border-radius: 14px;
     overflow: hidden;
-    box-shadow: var(--sh);
-    border: 1px solid var(--border);
+    box-shadow: var(--botanical-sh);
+    border: 1px solid var(--border-color, #E5DFD0);
 }
 
 @media (max-width: 1024px) {
@@ -618,7 +621,7 @@ def create_intel_kpi(label, value, subtext, icon, color):
 
 def apply_plantation_layout(fig, height=480):
     fig.update_layout(
-        template="plotly_white", paper_bgcolor="#FAF7F0", plot_bgcolor="#FFFFFF",
+        template="plotly_white", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(color="#1A2B20", family="Inter, sans-serif", size=12),
         height=height, margin=dict(l=40, r=30, t=60, b=50),
         xaxis=dict(gridcolor="#E5DFD0", zerolinecolor="#E5DFD0", tickfont=dict(size=10, color="#3E5245")),
@@ -668,17 +671,17 @@ with st.sidebar:
         st.markdown(f'''<div class="sidebar-block">
             <div class="sidebar-title">🌱 Commodity Brief</div>
             <div class="commodity-brief" style="border-left-color: {comm_info["color_light"]};">
-                <div style="font-size:1.2rem; margin-bottom:0.3rem; font-weight:700;">{comm_info["icon"]} {selected_commodity}</div>
-                <div style="font-size:0.68rem; color:#6B7D70; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem; font-weight:700;">{comm_info["sector"]}</div>
-                <div style="font-size:0.85rem; color:#3E5245; line-height:1.5;">{comm_info["desc"]}</div>
+                <div style="font-size:1.2rem; margin-bottom:0.3rem; font-weight:700; color: var(--text-color, #1A2B20);">{comm_info["icon"]} {selected_commodity}</div>
+                <div style="font-size:0.68rem; color: var(--text-color, #6B7D70); opacity: 0.75; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.4rem; font-weight:700;">{comm_info["sector"]}</div>
+                <div style="font-size:0.85rem; color: var(--text-color, #3E5245); opacity: 0.9; line-height:1.5;">{comm_info["desc"]}</div>
             </div>
         </div>''', unsafe_allow_html=True)
     else:
         st.markdown('''<div class="sidebar-block">
             <div class="sidebar-title">🌾 Mode Agregat</div>
             <div class="commodity-brief" style="border-left-color: #B87333;">
-                <div style="font-size:1.1rem; margin-bottom:0.3rem; font-weight:700;">📊 Total Output</div>
-                <div style="font-size:0.85rem; color:#3E5245; line-height:1.5;">Gabungan total produksi 7 komoditas perkebunan utama.</div>
+                <div style="font-size:1.1rem; margin-bottom:0.3rem; font-weight:700; color: var(--text-color, #1A2B20);">📊 Total Output</div>
+                <div style="font-size:0.85rem; color: var(--text-color, #3E5245); opacity: 0.9; line-height:1.5;">Gabungan total produksi 7 komoditas perkebunan utama.</div>
             </div>
         </div>''', unsafe_allow_html=True)
 
@@ -858,10 +861,10 @@ elif menu == "🌴 Profil Komoditas":
     info = COMMODITY_IDENTITY[target]
 
     st.markdown(f"""
-    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 2rem; margin-bottom: 1.8rem; box-shadow: var(--sh); position: relative; overflow: hidden;">
+    <div style="background: var(--background-color, #FFFFFF); border: 1px solid var(--border-color, #E5DFD0); border-radius: 18px; padding: 2rem; margin-bottom: 1.8rem; box-shadow: var(--botanical-sh); position: relative; overflow: hidden;">
         <div style="position:absolute; top:-20px; right:-20px; font-size:10rem; opacity:0.04;">{info['icon']}</div>
         <div style="font-family:Georgia,serif; font-size:2rem; font-weight:700; color: #2D5F3F; margin-bottom: 0.7rem;">{info['icon']} Profil Komoditas: {target}</div>
-        <div style="font-size:0.95rem; color:#3E5245; line-height:1.7;"><b>Sektor:</b> {info['sector']}<br><b>Potret:</b> {info['desc']}</div>
+        <div style="font-size:0.95rem; color: var(--text-color, #3E5245); opacity: 0.9; line-height:1.7;"><b>Sektor:</b> {info['sector']}<br><b>Potret:</b> {info['desc']}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -923,9 +926,9 @@ elif menu == "🗺️ Profil Provinsi":
     nat_share = (tot_p / df[numeric_cols].sum().sum() * 100) if df[numeric_cols].sum().sum() > 0 else 0
 
     st.markdown(f"""
-    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 2rem; margin-bottom: 1.8rem; box-shadow: var(--sh);">
+    <div style="background: var(--background-color, #FFFFFF); border: 1px solid var(--border-color, #E5DFD0); border-radius: 18px; padding: 2rem; margin-bottom: 1.8rem; box-shadow: var(--botanical-sh);">
         <div style="font-family:Georgia,serif; font-size:2rem; font-weight:700; color: #2D5F3F; margin-bottom: 0.7rem;">🗺️ Profil: {target_prov}</div>
-        <div style="font-size:0.95rem; color:#3E5245; line-height:1.7;">Total output <b>{format_ton(tot_p)} ribu ton</b> ({nat_share:.2f}% nasional). Andalan: <b>{dom_c}</b> ({dom_share:.1f}%).</div>
+        <div style="font-size:0.95rem; color: var(--text-color, #3E5245); opacity: 0.9; line-height:1.7;">Total output <b>{format_ton(tot_p)} ribu ton</b> ({nat_share:.2f}% nasional). Andalan: <b>{dom_c}</b> ({dom_share:.1f}%).</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -965,7 +968,7 @@ elif menu == "🗺️ Profil Provinsi":
                                         fill='toself', name=target_prov, line_color="#2D5F3F", fillcolor="rgba(45, 95, 63, 0.25)"))
         fig_r.add_trace(go.Scatterpolar(r=nat_norm + [nat_norm[0]], theta=numeric_cols + [numeric_cols[0]],
                                         fill='toself', name="Nasional", line_color="#B87333", fillcolor="rgba(184, 115, 51, 0.12)"))
-        fig_r.update_layout(polar=dict(bgcolor="#FFFFFF",
+        fig_r.update_layout(polar=dict(bgcolor="rgba(0,0,0,0)",
                                        radialaxis=dict(visible=True, showticklabels=False, gridcolor="#E5DFD0"),
                                        angularaxis=dict(gridcolor="#E5DFD0", tickfont=dict(color="#3E5245"))),
                             showlegend=True, title="Radar (Normalisasi)")
@@ -1035,7 +1038,7 @@ elif menu == "🔬 Eksplorasi Visual":
                         title="Matriks Korelasi Agro-Ekologis")
         fig.update_traces(textfont=dict(color="#1A2B20", size=11), xgap=3, ygap=3)
         fig.update_xaxes(side="bottom", tickangle=30); fig.update_yaxes(autorange="reversed")
-        fig.update_layout(paper_bgcolor="#FAF7F0", plot_bgcolor="#FFFFFF", font=dict(color="#1A2B20"), margin=dict(l=40,r=30,t=60,b=40))
+        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="#1A2B20"), margin=dict(l=40,r=30,t=60,b=40))
         fig.update_coloraxes(colorbar=dict(title="Korelasi", len=0.75))
         st.plotly_chart(fig, use_container_width=True, key="eda_corr")
     with tab5:
@@ -1329,9 +1332,9 @@ elif menu == "🧠 Insight & Strategi":
 
     st.markdown("### 🎯 Prioritas Pengembangan Strategis")
     p1, p2, p3 = st.columns(3)
-    with p1: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">🏭 Hilirisasi</b><br><span style="color:#3E5245; font-size:0.88rem;">Pengolahan CPO, karet olahan, kopi specialty.</span></div>', unsafe_allow_html=True)
-    with p2: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">🌱 Diversifikasi</b><br><span style="color:#3E5245; font-size:0.88rem;">Tanaman sela & agroforestri berkelanjutan.</span></div>', unsafe_allow_html=True)
-    with p3: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">📈 Digitalisasi</b><br><span style="color:#3E5245; font-size:0.88rem;">Precision agriculture & dashboard real-time.</span></div>', unsafe_allow_html=True)
+    with p1: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">🏭 Hilirisasi</b><br><span style="color: var(--text-color, #3E5245); opacity: 0.85; font-size:0.88rem;">Pengolahan CPO, karet olahan, kopi specialty.</span></div>', unsafe_allow_html=True)
+    with p2: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">🌱 Diversifikasi</b><br><span style="color: var(--text-color, #3E5245); opacity: 0.85; font-size:0.88rem;">Tanaman sela & agroforestri berkelanjutan.</span></div>', unsafe_allow_html=True)
+    with p3: st.markdown('<div class="priority-card"><b style="font-family:Georgia,serif; font-size:1.2rem; color:#2D5F3F;">📈 Digitalisasi</b><br><span style="color: var(--text-color, #3E5245); opacity: 0.85; font-size:0.88rem;">Precision agriculture & dashboard real-time.</span></div>', unsafe_allow_html=True)
 
 # =========================================================
 # PAGE 9: DATA & EKSPOR
@@ -1372,12 +1375,12 @@ elif menu == "📦 Data & Ekspor":
 # FOOTER
 # =========================================================
 st.markdown("""
-<div style="text-align:center; padding:2.5rem 2rem; margin-top:3rem; background: var(--card); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--sh);">
+<div style="text-align:center; padding:2.5rem 2rem; margin-top:3rem; background: var(--background-color, #FFFFFF); border-radius: 20px; border: 1px solid var(--border-color, #E5DFD0); box-shadow: var(--botanical-sh);">
     <div style="font-size:2.5rem; margin-bottom:0.6rem;">🌿</div>
     <h3 style="font-family:Georgia,serif; font-size:1.5rem; font-weight:700; color: #2D5F3F; margin-bottom:0.5rem;">Plantation Intelligence Dashboard</h3>
-    <p style="color:#3E5245; font-size:0.9rem; margin-bottom:0.4rem; font-weight:500;">UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
-    <p style="color:#6B7D70; font-size:0.85rem; margin-top:0.6rem;">Streamlit + Plotly + Scikit-Learn untuk perencanaan strategis sektor perkebunan Indonesia</p>
+    <p style="color: var(--text-color, #3E5245); opacity: 0.9; font-size:0.9rem; margin-bottom:0.4rem; font-weight:500;">UAS Pengenalan Sains Data — Visualisasi Data & Analisis Data Dasar</p>
+    <p style="color: var(--text-color, #6B7D70); opacity: 0.85; font-size:0.85rem; margin-top:0.6rem;">Streamlit + Plotly + Scikit-Learn untuk perencanaan strategis sektor perkebunan Indonesia</p>
     <div style="width:60px; height:2px; background: linear-gradient(90deg, #2D5F3F, #B87333); margin: 1.2rem auto;"></div>
-    <p style="color:#9AA89F; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:700;">© 2026 | Sumber: BPS — Produksi Tanaman Perkebunan, 2025</p>
+    <p style="color: var(--text-color, #9AA89F); opacity: 0.75; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:700;">© 2026 | Sumber: BPS — Produksi Tanaman Perkebunan, 2025</p>
 </div>
 """, unsafe_allow_html=True)
