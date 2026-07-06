@@ -15,6 +15,9 @@ from sklearn.model_selection import train_test_split
 import warnings
 warnings.filterwarnings('ignore')
 
+# =========================================================
+# PAGE CONFIG
+# =========================================================
 st.set_page_config(
     page_title="Plantation Intelligence Dashboard",
     page_icon="🌿",
@@ -22,6 +25,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# =========================================================
+# GEOJSON CACHE
+# =========================================================
 PROVINCE_MAPPING = {
     "DKI JAKARTA": "Jakarta Raya",
     "DI YOGYAKARTA": "Yogyakarta",
@@ -92,7 +98,7 @@ def create_choropleth_map(df_map, value_col, title, color_label, is_aggregate=Fa
     return fig
 
 # =========================================================
-# THEME WITH FORCED DARK SIDEBAR (Always readable)
+# FORCED DARK SIDEBAR THEME
 # =========================================================
 st.markdown("""
 <style>
@@ -112,7 +118,7 @@ st.markdown("""
     --sh: 0 2px 8px rgba(26,43,32,0.06);
     --sh-md: 0 8px 20px rgba(26,43,32,0.08);
     
-    /* FORCED DARK SIDEBAR COLORS */
+    /* FORCED DARK SIDEBAR */
     --sidebar-bg: #1E3A2B;
     --sidebar-bg-deep: #162B20;
     --sidebar-card: #2D4A3A;
@@ -213,20 +219,17 @@ h1, h2, h3 {
 }
 
 /* ============================================
-   FORCED DARK SIDEBAR - ALWAYS READABLE
+   FORCED DARK SIDEBAR
    ============================================ */
 section[data-testid="stSidebar"],
 section[data-testid="stSidebar"] .st-emotion-cache,
 section[data-testid="stSidebar"] > div,
-section[data-testid="stSidebar"] .block-container,
-section[data-testid="stSidebar"] [data-testid="stSidebarContent"],
-section[data-testid="stSidebar"] .stSidebarContent {
+section[data-testid="stSidebar"] .block-container {
     background: var(--sidebar-bg) !important;
     background-image: linear-gradient(180deg, var(--sidebar-bg) 0%, var(--sidebar-bg-deep) 100%) !important;
     color: var(--sidebar-text) !important;
 }
 
-/* Force ALL text in sidebar to be light */
 section[data-testid="stSidebar"] *,
 section[data-testid="stSidebar"] label,
 section[data-testid="stSidebar"] p,
@@ -307,7 +310,7 @@ section[data-testid="stSidebar"] h3 {
     border-radius: 2px;
 }
 
-/* Radio navigation - forced readable */
+/* Radio navigation */
 section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] {
     gap: 3px !important;
     padding: 0.3rem !important;
@@ -345,7 +348,7 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     border-left-color: var(--sidebar-accent) !important;
 }
 
-/* Commodity brief card - forced dark readable */
+/* Commodity brief card */
 .commodity-brief {
     background: rgba(0,0,0,0.2) !important;
     border-left: 3px solid var(--sidebar-accent);
@@ -368,7 +371,7 @@ section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label[aria-
     opacity: 1 !important;
 }
 
-/* Sidebar form controls - forced dark */
+/* Form controls */
 section[data-testid="stSidebar"] .stSelectbox > div[data-baseweb="select"],
 section[data-testid="stSidebar"] .stSelectbox > div > div {
     background: rgba(0,0,0,0.25) !important;
@@ -385,45 +388,104 @@ section[data-testid="stSidebar"] .stCheckbox label {
     font-size: 0.82rem !important;
 }
 
-section[data-testid="stSidebar"] .stCheckbox label:hover {
-    color: var(--sidebar-text) !important;
-}
-
-/* Checkbox custom styling */
-section[data-testid="stSidebar"] [data-baseweb="checkbox"] label {
-    color: var(--sidebar-text-muted) !important;
-}
-
-section[data-testid="stSidebar"] [data-baseweb="checkbox"] input:checked + div {
-    background-color: var(--sidebar-accent) !important;
-    border-color: var(--sidebar-accent) !important;
-}
-
-/* Slider forced dark */
-section[data-testid="stSidebar"] .stSlider > div {
-    color: var(--sidebar-text) !important;
-}
-
 section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {
     background-color: var(--sidebar-accent) !important;
     border-color: var(--sidebar-accent) !important;
 }
 
-/* Selectbox dropdown */
-section[data-testid="stSidebar"] [data-baseweb="select"] [role="listbox"] {
-    background: var(--sidebar-card) !important;
-    border: 1px solid var(--sidebar-border) !important;
+/* Current Page Indicator */
+.current-page-indicator {
+    background: linear-gradient(135deg, #2D5F3F 0%, #3E7550 100%);
+    border: 1px solid rgba(212, 165, 116, 0.3);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    margin-bottom: 1.2rem;
+    position: relative;
+    overflow: hidden;
+    animation: slideDown 0.4s ease-out;
 }
 
-section[data-testid="stSidebar"] [data-baseweb="select"] [role="option"] {
-    color: var(--sidebar-text) !important;
-    background: var(--sidebar-card) !important;
+.current-page-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #D4A574, transparent);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
 }
 
-section[data-testid="stSidebar"] [data-baseweb="select"] [role="option"]:hover,
-section[data-testid="stSidebar"] [data-baseweb="select"] [role="option"][aria-selected="true"] {
-    background: var(--sidebar-hover) !important;
-    color: var(--sidebar-text) !important;
+.current-page-indicator::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(212, 165, 116, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+}
+
+.page-indicator-label {
+    font-size: 0.65rem;
+    color: #D4A574;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    position: relative;
+    z-index: 2;
+}
+
+.page-indicator-label::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #D4A574;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(212, 165, 116, 0.6);
+}
+
+.page-indicator-icon {
+    font-size: 1.8rem;
+    display: inline-block;
+    margin-right: 0.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    animation: gentleSway 4s ease-in-out infinite;
+}
+
+.page-indicator-title {
+    font-family: Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #F5F0E3;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    position: relative;
+    z-index: 2;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+@keyframes gentleSway {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
 }
 
 /* Sidebar footer */
@@ -450,7 +512,7 @@ section[data-testid="stSidebar"] [data-baseweb="select"] [role="option"][aria-se
 }
 
 /* ============================================
-   MAIN CONTENT (unchanged)
+   MAIN CONTENT
    ============================================ */
 .intel-kpi {
     background: var(--card);
@@ -527,22 +589,20 @@ section[data-testid="stSidebar"] [data-baseweb="select"] [role="option"][aria-se
     line-height: 1.7;
     font-size: 0.92rem;
     box-shadow: var(--sh);
+    color: var(--ink);
 }
 .insight-card {
     background: #EFF5EE;
     border-left: 4px solid var(--heritage);
-    color: var(--ink);
 }
 .watchlist-card {
     background: #FDF5EC;
     border-left: 4px solid var(--copper);
-    color: var(--ink);
 }
 .rec-card {
     background: var(--card);
     border: 1px solid var(--border);
     border-left: 4px solid var(--sand);
-    color: var(--ink);
 }
 .priority-card {
     background: var(--card);
@@ -696,6 +756,9 @@ header[data-testid="stHeader"] {
 </style>
 """, unsafe_allow_html=True)
 
+# =========================================================
+# DATASET (BPS 2025)
+# =========================================================
 CSV_DATA = """Provinsi,Kelapa Sawit,Kelapa,Karet,Kopi,Kakao,Teh,Tebu
 ACEH,1092.71,64.1,51.17,74.13,34.17,0,0
 SUMATERA UTARA,5120.02,103.64,251.52,91.69,38.48,10.14,14.52
@@ -791,9 +854,30 @@ def apply_plantation_layout(fig, height=480):
     return fig
 
 # =========================================================
-# SIDEBAR - Dark themed, always readable
+# SIDEBAR (FIXED: urutannya benar sekarang!)
 # =========================================================
+
+# Page metadata untuk Current Page Indicator
+PAGE_METADATA = {
+    "🏠 Ringkasan Nasional": {"icon": "🏠", "desc": "Overview performa nasional"},
+    "🌴 Profil Komoditas": {"icon": "🌴", "desc": "Analisis mendalam per komoditas"},
+    "🗺️ Profil Provinsi": {"icon": "🗺️", "desc": "Eksplorasi wilayah spesifik"},
+    "🔬 Eksplorasi Visual": {"icon": "🔬", "desc": "EDA & analisis pola data"},
+    "📊 Analisis Produksi": {"icon": "📊", "desc": "Perbandingan & benchmarking"},
+    "🌍 Sebaran Wilayah": {"icon": "🌍", "desc": "Peta geospasial produksi"},
+    "📈 Proyeksi & Model": {"icon": "📈", "desc": "ML & forecasting 2026"},
+    "🧠 Insight & Strategi": {"icon": "🧠", "desc": "Rekomendasi strategis"},
+    "📦 Data & Ekspor": {"icon": "📦", "desc": "Dataset mentah & export"},
+}
+
+MENU_OPTIONS = [
+    "🏠 Ringkasan Nasional", "🌴 Profil Komoditas", "🗺️ Profil Provinsi",
+    "🔬 Eksplorasi Visual", "📊 Analisis Produksi", "🌍 Sebaran Wilayah",
+    "📈 Proyeksi & Model", "🧠 Insight & Strategi", "📦 Data & Ekspor"
+]
+
 with st.sidebar:
+    # 1. Brand header
     st.markdown('''
     <div class="sidebar-brand">
         <span class="sidebar-brand-icon">🌿</span>
@@ -802,14 +886,27 @@ with st.sidebar:
     </div>
     ''', unsafe_allow_html=True)
     
+    # 2. Navigation block (RENDER DULU agar dapat nilai menu)
     st.markdown('<div class="sidebar-block"><div class="sidebar-title">🧭 Navigasi</div>', unsafe_allow_html=True)
-    menu = st.radio("Menu",
-        ["🏠 Ringkasan Nasional", "🌴 Profil Komoditas", "🗺️ Profil Provinsi",
-         "🔬 Eksplorasi Visual", "📊 Analisis Produksi", "🌍 Sebaran Wilayah",
-         "📈 Proyeksi & Model", "🧠 Insight & Strategi", "📦 Data & Ekspor"],
-        label_visibility="collapsed")
+    menu = st.radio("Menu", MENU_OPTIONS, label_visibility="collapsed", key="main_menu_radio")
     st.markdown('</div>', unsafe_allow_html=True)
     
+    # 3. CURRENT PAGE INDICATOR (SETELAH menu terdefinisi)
+    page_meta = PAGE_METADATA.get(menu, {"icon": "🌿", "desc": "Dashboard perkebunan"})
+    page_title_clean = menu.split(" ", 1)[1] if " " in menu else menu
+    
+    st.markdown(f'''
+    <div class="current-page-indicator">
+        <div class="page-indicator-label">Halaman Aktif</div>
+        <div class="page-indicator-title">
+            <span class="page-indicator-icon">{page_meta["icon"]}</span>
+            {page_title_clean}
+        </div>
+        <div style="font-size:0.78rem; color:#B8C5B8; margin-top:0.3rem; position:relative; z-index:2; opacity:0.9;">{page_meta["desc"]}</div>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    # 4. Filter block
     st.markdown('<div class="sidebar-block"><div class="sidebar-title">🎛️ Filter Data</div>', unsafe_allow_html=True)
     
     commodity_options = ["🌾 Semua Komoditas"] + numeric_cols
@@ -824,6 +921,7 @@ with st.sidebar:
     show_zeros = st.checkbox("Tampilkan wilayah tanpa produksi", value=True, key="side_zero")
     st.markdown('</div>', unsafe_allow_html=True)
     
+    # 5. Commodity brief
     if not is_all_commodities:
         comm_info = COMMODITY_IDENTITY[selected_commodity]
         st.markdown(f'''<div class="sidebar-block">
@@ -843,6 +941,7 @@ with st.sidebar:
             </div>
         </div>''', unsafe_allow_html=True)
     
+    # 6. Footer
     st.markdown('''
     <div class="sidebar-footer">
         <div class="sidebar-footer-icon">🌴</div>
